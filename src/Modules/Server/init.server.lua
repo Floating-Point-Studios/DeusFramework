@@ -1,1 +1,1 @@
-script.Parent:WaitForChild("Shared"):WaitForChild("loader")()
+script:WaitForChild("Shared"):WaitForChild("loader")()

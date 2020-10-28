@@ -6,18 +6,7 @@
       "$className": "ServerScriptService",
       "deus-framework": {
         "$className": "Folder",
-        "Server": {
-          "$className": "Folder"
-        },
-        "Client": {
-          "$className": "Folder"
-        },
-        "Shared": {
-          "$className": "Folder"
-        },
-        "Loader": {
-          "$path": "src/Modules/loader.lua"
-        }
+        "$path": "src/Modules"
       }
     }
   }

@@ -43,8 +43,8 @@ shared.Setup = function()
     return DeusRequire
 end
 
-local function AddDirectory(instance)
-    for _,v in pairs(instance:GetChildren()) do
+local function AddDirectory(obj)
+    for _,v in pairs(obj:GetChildren()) do
         if v:IsA("ModuleScript") and v ~= script then
             if not Deus[v.Name] then
                 Deus[v.Name] = {Module = v, IsIntialized = false}
@@ -63,3 +63,5 @@ for _,module in pairs(Deus) do
         module.Module.Name = HttpService:GenerateGUID(false)
     end
 end
+
+shared.Setup = nil
