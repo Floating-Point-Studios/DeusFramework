@@ -9,8 +9,6 @@ local DeusShared = Deus.Shared
 DeusShared:Clone().Parent = DeusServer
 DeusShared.Parent = DeusClient
 
-local a = {}
-
 return function(gameDirectory)
 	local gameServer = gameDirectory.Server
 	local gameClient = gameDirectory.Client
