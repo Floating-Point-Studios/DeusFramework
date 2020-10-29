@@ -1,6 +1,6 @@
 -- Decodes events to make remote spy being able to read and send events more difficult
 
-local require = shared.Setup()
+local require = shared.DeusHook()
 
 local JSONEncoder = require("JSONEncoder")
 

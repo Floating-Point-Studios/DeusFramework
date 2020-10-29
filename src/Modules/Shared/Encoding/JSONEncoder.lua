@@ -1,4 +1,4 @@
-local require = shared.Setup()
+local require = shared.DeusHook()
 
 local JSONEncoder = {}
 

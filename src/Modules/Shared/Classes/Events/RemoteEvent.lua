@@ -1,4 +1,4 @@
-local require = shared.Setup()
+local require = shared.DeusHook()
 
 local BaseObject = require("BaseObject")
 
@@ -14,6 +14,9 @@ if game:GetService("RunService"):IsServer() then
         local remoteEvent = Instance.new("RemoteEvent", parent)
 
         local self = setmetatable(BaseObject.new(remoteEvent), RemoteEvent)
+
+        self._connections = {}
+        self._lastFired = 0
 
         -- Fires event to a singular client
         function self:FireClient(player: Player, ...)
@@ -50,6 +53,14 @@ if game:GetService("RunService"):IsServer() then
             end
         end
 
+        function self:Connect(callback)
+
+        end
+
+        function self:Wait()
+            
+        end
+
         return self
     end
 
@@ -58,9 +69,20 @@ else
     function RemoteEvent.new(remoteEvent)
         local self = setmetatable(BaseObject.new(remoteEvent), RemoteEvent)
 
+        self._connections = {}
+        self._lastFired = 0
+
         -- Fires event to server
         function self:FireServer(...)
+            remoteEvent:FireServer(...)
+        end
 
+        function self:Connect(callback)
+            
+        end
+
+        function self:Wait()
+            
         end
 
         return self

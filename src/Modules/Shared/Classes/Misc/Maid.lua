@@ -1,10 +1,10 @@
-local require = shared.Setup()
+local require = shared.DeusHook()
 
 ---	Manages the cleaning of events and other things.
 -- Useful for encapsulating state and make deconstructors easy
 
 local Maid = {}
-Maid.ClassName = "Maid"
+Maid.ClassName = "Deus/Maid"
 
 --- Returns a new Maid object
 -- @constructor Maid.new()

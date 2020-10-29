@@ -6,10 +6,11 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 local function IntializeModule(module)
-    if not module.IsIntialized then
+    local Init = module.Module.Init
+    if not module.IsIntialized and Init then
         module.Module.Init()
-        module.IsIntialized = true
     end
+    module.IsIntialized = true
 end
 
 local function DeusRequire(moduleName: string)
@@ -18,7 +19,7 @@ local function DeusRequire(moduleName: string)
     return module.Module
 end
 
-shared.Setup = function()
+shared.DeusHook = function()
     -- Removes source from ModuleScripts
     if RunService:IsClient() and not RunService:IsStudio() then
 
@@ -64,4 +65,7 @@ for _,module in pairs(Deus) do
     end
 end
 
-shared.Setup = nil
+if RunService:IsClient() then
+    -- Prevents exploits that do not inject on launch from hooking into Deus, server may hook in freely at any time
+    shared.DeusHook = nil
+end
