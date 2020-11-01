@@ -1,3 +1,6 @@
+# gitignore
+/*.gitignore
+
 # Project place file
 /deus-framework.rbxlx
 
