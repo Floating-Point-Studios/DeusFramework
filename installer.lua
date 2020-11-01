@@ -297,7 +297,7 @@ end
 print("Installing Deus Framework...")
 
 GitHub:Install(
-    "https://github.com/Floating-Point-Studios/deus-framework/tree/master/src/Modules",
+    "https://github.com/Floating-Point-Studios/deus-framework/tree/master/src/Modules?token=AOGIKQNDTDI7LFGMF452WCK7T2UOG",
     game:GetService("ServerScriptService")
 )
 
