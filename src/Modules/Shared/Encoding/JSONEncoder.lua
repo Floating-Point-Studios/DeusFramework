@@ -1,5 +1,3 @@
-local require = shared.DeusHook()
-
 local JSONEncoder = {}
 
 local HttpService = game:GetService("HttpService")

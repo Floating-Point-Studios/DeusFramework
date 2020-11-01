@@ -1,59 +1,30 @@
-local require = shared.DeusHook()
+warn = shared.Deus.import("Deus.Output").warn
 
-local RunService = game:GetService("RunService")
+local Signal = shared.Deus.import("Deus.BaseClass").new("Deus/Signal")
 
-local BaseObject = require("BaseObject")
-local Debugger = require("Debugger")
+local Connection = shared.Deus.import("Deus.Connection")
 
-local Signal = setmetatable({}, BaseObject)
-Signal.ClassName = "Deus/Signal"
-Signal._lastFired = 0
-Signal._connections = {}
-Signal.__index = Signal
-
-local Connection = setmetatable({}, BaseObject)
-Connection.ClassName = "Deus/Connection"
-Connection.Connected = true
-Connection.__index = Connection
-
-function Connection.new(func)
-    local self = setmetatable(BaseObject.new({}), Connection)
-
-    self._func = func
-
-    return self
-end
-
-function Connection:Disconnect()
-    self.Connected = false
-    self:Destroy()
-end
-
-function Signal.new()
-    local self = setmetatable(BaseObject.new({}), Signal)
-    
-	return self
+function Signal.Constructor(self)
+    self._connections = {}
+    self._lastFired = 0
 end
 
 function Signal:Connect(func)
-    local SignalConnection = Connection.new(func)
-    table.insert(self._connections, SignalConnection)
-    return SignalConnection
+    table.insert(self._connections, Connection.new(func))
 end
 
-function Signal:Wait(timeout)
+function Signal:Wait(timeout: number?)
     timeout = timeout or 30
-    local waitStarted = tick()
+    local waitStart = tick()
     repeat
-        RunService.Heartbeat:Wait()
-        if tick() - timeout > waitStarted then
-            Debugger.warn(("ScriptConnection Wait timed out after %s seconds"):format(timeout))
-            return
+        if tick() - waitStart > timeout then
+            warn(("Signal Wait timed out after %s seconds"):format(timeout))
+            break
         end
-    until self._lastFired > waitStarted
+    until self._lastFired > waitStart
 end
 
-function Signal:Fire(...)
+function Signal:Fire()
     for i, connection in pairs(self._connections) do
         if connection.Connected then
             connection._func()
