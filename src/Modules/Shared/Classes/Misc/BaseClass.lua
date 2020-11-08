@@ -8,7 +8,7 @@ function BaseClass.new(className)
 	Class.ClassName = className or "Deus/BaseClass"
 
 	function Class.new(...)
-		local self
+		local self = {}
 		self._maid = Maid.new()
 
 		if Class.super then

@@ -1,3 +1,5 @@
+-- Explanation on how to tune http://robotsforroboticists.com/pid-control/
+
 local PID = {}
 
 function PID.new(kP, kI, kD, desiredValue, bias)

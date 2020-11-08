@@ -8,4 +8,4 @@ DeusShared.Parent = DeusClient
 DeusServer.Parent = game:GetService("ServerScriptService")
 DeusClient.Parent = game:GetService("ReplicatedFirst")
 
-script:Destroy()
+script.Parent:Destroy()

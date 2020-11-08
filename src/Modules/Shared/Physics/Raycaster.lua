@@ -2,9 +2,18 @@
 
 local Raycaster = {}
 
-local raycast = workspace.Raycast
+function Raycaster.newParams(filterDescendantsInstances, filterType, ignoreWater)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = filterDescendantsInstances
+    raycastParams.FilterType = filterType
+    raycastParams.IgnoreWater = ignoreWater
+    return raycastParams
+end
 
-function Raycaster.new(raycastParams: RaycastParams, length: number, canCollideOnly: boolean?)
+function Raycaster.new(raycastParams, length, canCollideOnly)
+    if typeof(raycastParams) == "table" then
+        raycastParams = Raycaster.newParams(unpack(raycastParams))
+    end
     local self = {
         RaycastParams = raycastParams,
         Length = length,
@@ -19,7 +28,7 @@ function Raycaster:Cast(origin, direction)
         direction = origin.LookVector
     end
     local length = self.Length
-    local result = raycast(origin, direction * length, self.RaycastParams)
+    local result = workspace:Raycast(origin, direction * length, self.RaycastParams)
     if result and self.CanCollideOnly and not result.Instance.CanCollide then
         repeat
             if length <= 0 then
@@ -33,7 +42,7 @@ function Raycaster:Cast(origin, direction)
                 raycastParams.FilterType = self.RaycastParams.FilterType
                 raycastParams.IgnoreWater = self.RaycastParams.IgnoreWater
                 raycastParams.CollisionGroup = self.RaycastParams.CollisionGroup
-                result = raycast(origin, direction * length, raycastParams)
+                result = workspace:Raycast(origin, direction * length, raycastParams)
             end
         until not result or result.Instance.CanCollide
         return result

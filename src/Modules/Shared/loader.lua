@@ -1,20 +1,33 @@
 local Deus = {}
 local Modules = {}
 
+shared.Deus = Deus
+
 function Deus.import(moduleName: string)
-    return Modules[moduleName]
+    local module = Modules[moduleName]
+    if typeof(module) == "Instance" then
+        Modules[moduleName] = require(module)
+        module = Modules[moduleName]
+    end
+    return module
 end
 
-function Deus.addBranch(branch: Instance, name: string?)
-    name = name or branch.Name
+function Deus.addBranch(branch: Instance, branchName: string?)
+    branchName = branchName or branch.Name
 
     for _,module in pairs(branch:GetDescendants()) do
         if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
-            Modules[("%s."):format(module.Name)] = require(module)
+            Modules[("%s.%s"):format(branchName, module.Name)] = module
+        end
+    end
+
+    for name, module in pairs(Modules) do
+        if name:sub(1, #branchName) == branchName and typeof(module) == "Instance" then
+            Modules[name] = require(module)
         end
     end
 end
 
-Deus.addBranch(script, "Deus")
+Deus.addBranch(script.Parent.Parent, "Deus")
 
-shared.Deus = Deus
+return nil
