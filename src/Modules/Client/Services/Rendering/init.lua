@@ -1,5 +1,0 @@
-local Rendering = {}
-
-
-
-return Rendering

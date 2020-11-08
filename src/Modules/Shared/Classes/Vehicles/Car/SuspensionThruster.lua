@@ -4,6 +4,8 @@ local SuspensionThruster = {}
 
 function SuspensionThruster.new(vehicle, attachment, raycaster, limit, stiffness, rigidity, turnAngle, powered, steering)
     local self = {
+        _lastUpdate = tick(),
+
         _vehicle = vehicle,
         _attachment = attachment,
         _raycaster = raycaster,
@@ -32,6 +34,9 @@ end
 
 function SuspensionThruster:Update()
     if self.Enabled then
+        local updateTime = tick()
+        local elapsed = math.min(updateTime - self._lastUpdate, 0.01)
+
         local vehicle = self._vehicle
         local attachment = self._attachment
         local dx = self._dx
@@ -46,7 +51,7 @@ function SuspensionThruster:Update()
 
             local distance = (attachment.WorldPosition - raycastResults.Position).Magnitude
 			local x = limit - distance
-            local f = stiffness * x + rigidity*(x-dx) + rigidity/2*(x-d2x)
+            local f = stiffness * x + rigidity*(x-dx) + rigidity/2*(x-d2x) * elapsed
             self._d2x = dx
             self._dx = x
             
@@ -74,8 +79,10 @@ function SuspensionThruster:Update()
             local f = stiffness * limit + rigidity*(limit-dx) + rigidity/2*(limit-d2x)
             self._d2x = dx
 			self._dx = limit
-            self._vectorForce.Force = Vector3.new(0, f * force, 0)
+            self._vectorForce.Force = Vector3.new(0, 0, 0)
         end
+
+        self._lastUpdate = tick()
     end
 end
 

@@ -1,4 +1,4 @@
-local UserInputService = require("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 
 local KeyEvent = require(script.KeyEvent)
 
