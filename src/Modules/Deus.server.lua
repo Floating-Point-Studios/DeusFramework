@@ -1,6 +1,6 @@
-local DeusServer = script.Server
-local DeusClient = script.Client
-local DeusShared = script.Shared
+local DeusServer = script.Parent.Server
+local DeusClient = script.Parent.Client
+local DeusShared = script.Parent.Shared
 
 DeusShared:Clone().Parent = DeusServer
 DeusShared.Parent = DeusClient
