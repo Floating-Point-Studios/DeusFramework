@@ -7,7 +7,7 @@
       "$className": "ServerScriptService",
       "deus-framework": {
         "$className": "Folder",
-        "$path": "src/Modules",
+        "$path": "src/Deus",
 
         "Client": {
           "$className": "Folder",
@@ -16,7 +16,7 @@
             "$className": "Folder",
 
             "Roact": {
-              "$path": "roact/src"
+              "$path": "src/Submodules/Roact"
             }
 
           }
