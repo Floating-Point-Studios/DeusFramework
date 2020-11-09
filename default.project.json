@@ -2,12 +2,28 @@
   "name": "deus-framework",
   "tree": {
     "$className": "DataModel",
+
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "deus-framework": {
         "$className": "Folder",
-        "$path": "src/Modules"
+        "$path": "src/Modules",
+
+        "Client": {
+          "$className": "Folder",
+
+          "UserInterface": {
+            "$className": "Folder",
+
+            "Roact": {
+              "$path": "roact/src"
+            }
+
+          }
+        }
+
       }
     }
+
   }
 }
