@@ -5,25 +5,11 @@
 
     "ServerScriptService": {
       "$className": "ServerScriptService",
+
       "deus-framework": {
         "$className": "Folder",
-        "$path": "src/Deus",
-
-        "Client": {
-          "$className": "Folder",
-
-          "UserInterface": {
-            "$className": "Folder",
-
-            "Roact": {
-              "$path": "src/Submodules/Roact"
-            }
-
-          }
-        }
-
+        "$path": "src"
       }
     }
-
   }
 }
