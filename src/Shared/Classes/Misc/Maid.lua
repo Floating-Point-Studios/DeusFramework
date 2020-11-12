@@ -1,10 +1,6 @@
 ---	Manages the cleaning of events and other things.
 -- Useful for encapsulating state and make deconstructors easy
 
-local Output = shared.Deus.import("Deus.Output")
-warn = Output.warn
-error = Output.error
-
 local Maid = {}
 Maid.ClassName = "Deus/Maid"
 

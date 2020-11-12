@@ -1,9 +1,9 @@
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
-local Rendering = {}
+local RenderingService = {}
 
-function Rendering.createRenderPipeline(name, priority)
+function RenderingService.createRenderPipeline(name, priority)
     local self = {
         Pipeline = {}
     }
@@ -18,12 +18,12 @@ function Rendering.createRenderPipeline(name, priority)
         end
     end)
 
-    return setmetatable(self, {__index = Rendering})
+    return setmetatable(self, {__index = RenderingService})
 end
 
 -- @param obj: object with a function named 'Update'
-function Rendering:Add(obj)
+function RenderingService:Add(obj)
     self.Pipeline[HttpService:GenerateGUID(false)] = obj
 end
 
-return Rendering
+return RenderingService

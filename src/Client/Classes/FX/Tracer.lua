@@ -1,5 +1,3 @@
-error = shared.Deus.import("Deus.Output").error
-
 local Tracer = {}
 
 local Terrain = workspace.Terrain
@@ -26,14 +24,13 @@ function Tracer.new(size: number?, parent: instance?, properties)
 end
 
 function Tracer:__newindex(index, value)
+    assert(index, ("%q is not a valid member of Tracer"):format(tostring(index)))
     if index == "CFrame" then
         self.Attachment0.CFrame = value + value.UpVector * self._size
         self.Attachment1.CFrame = value - value.UpVector * self._size
     elseif index == "Position" or index == "p" then
         self.Attachment0.Position = value + Vector3.new(0, self._size, 0)
         self.Attachment1.Position = value - Vector3.new(0, self._size, 0)
-    else
-        error(("%q is not a valid member of Tracer"):format(tostring(index)), 2)
     end
 end
 

@@ -1,4 +1,4 @@
-local DebugPipeline = shared.Deus.import("Deus.Rendering").createRenderPipeline("Debugging", 1000)
+local DebugPipeline = shared.Deus.import("Deus.RenderingService").createRenderPipeline("Debugging", 1000)
 
 local TextBillboard = require(script.TextBillboard)
 local Arrow = require(script.Arrow)

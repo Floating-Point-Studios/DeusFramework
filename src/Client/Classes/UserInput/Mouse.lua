@@ -1,6 +1,6 @@
 -- Replaces the unsupported Roblox mouse
 
-local UserInputService = require("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 
 local Mouse = {}
 

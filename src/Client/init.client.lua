@@ -1,1 +1,1 @@
-require(script:WaitForChild("Shared").Loader)
+require(script:WaitForChild("Shared")[".loader"])

@@ -16,8 +16,13 @@ function Deus.addBranch(branch: Instance, branchName: string?)
     branchName = branchName or branch.Name
 
     for _,module in pairs(branch:GetDescendants()) do
-        if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
-            Modules[("%s.%s"):format(branchName, module.Name)] = module
+        local moduleName = module.Name
+        if moduleName ~= ".loader" then -- stop infinite loops from ocurring
+
+            if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
+                Modules[("%s.%s"):format(branchName, moduleName)] = module
+            end
+
         end
     end
 
