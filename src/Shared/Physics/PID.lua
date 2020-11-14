@@ -20,7 +20,7 @@ end
 
 function PID:Update(actualValue)
     local time = tick()
-    local iterationTime = time - self._lastUpdate
+    local iterationTime = math.min(time - self._lastUpdate, 0.1)
     local error = self.DesiredValue - actualValue
     local integral = self._integralPrior + error * iterationTime
     local derivative = (error - self._errorPrior) / iterationTime

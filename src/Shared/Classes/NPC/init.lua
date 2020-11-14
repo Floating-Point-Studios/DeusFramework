@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 
+local Raycaster = shared.Deus.import("Deus.Raycaster")
 local InstanceUtils = shared.Deus.import("Deus.InstanceUtils")
 
 local AnimationController = require(script.AnimationController)
@@ -18,17 +19,12 @@ function NPC.Constructor(self, body)
         humanoidRootPart.Size = Vector3.new(1, 1, 1)
         humanoidRootPart.Parent = body
 
-        local attachment = Instance.new("Attachment", humanoidRootPart)
-
-        local vectorForce = Instance.new("VectorForce")
-        vectorForce.Force = Vector3.new()
-        vectorForce.Parent = attachment
-
         InstanceUtils.instanceConfig("Humanoid", {
             Health = {"NumberValue", 100},
             MaxHealth = {"NumberValue", 100},
             HipHeight = {"NumberValue", 2},
             WalkSpeed = {"NumberValue", 16},
+            JumpPower = {"NumberValue", 50},
             CanJump = {"BoolValue", true},
             Seat = {"ObjectValue", nil},
             Rig = {"ObjectValue", nil}
@@ -44,8 +40,8 @@ function NPC.Constructor(self, body)
     local humanoidRootPart = body:WaitForChild("HumanoidRootPart")
 
     self._body = body
-    self._vectorForce = humanoidRootPart.Attachment.VectorForce
     self._config = body:WaitForChild("Humanoid")
+    self._raycaster = Raycaster.new({{body}, Enum.RaycastFilterType.Blacklist, true}, 2.1, true)
 
     self.AnimationController = AnimationController.new(Instance.new("AnimationController", humanoidRootPart))
     self.MovementController = MovementController.new(self)
@@ -97,7 +93,7 @@ function NPC:SetRig(rig)
     return self
 end
 
--- can only be run on server
+-- Can only be run on server
 function NPC:SetPlayer(player)
     assert(RunService:IsServer(), "Setting NPC to player can only be performed on the server")
 
@@ -110,8 +106,11 @@ function NPC:SetPlayer(player)
 end
 
 function NPC:Update()
-    self.StateController:Update()
-    self.MovementController:Update()
+    -- Cast ray to ground
+    local raycastResult = self._raycaster:Cast(self._body.HumanoidRootPart.Position, Vector3.new(0, -1, 0))
+
+    self.StateController:Update(raycastResult)
+    self.MovementController:Update(raycastResult)
 end
 
 return NPC
