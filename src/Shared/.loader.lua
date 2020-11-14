@@ -28,7 +28,13 @@ function Deus.addBranch(branch: Instance, branchName: string?)
 
     for name, module in pairs(Modules) do
         if name:sub(1, #branchName) == branchName and typeof(module) == "Instance" then
-            Modules[name] = require(module)
+            module = require(module)
+
+            if module.Init then
+                module.Init()
+            end
+
+            Modules[name] = module
         end
     end
 end
