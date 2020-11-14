@@ -9,6 +9,9 @@ function Deus.import(moduleName: string)
         Modules[moduleName] = require(module)
         module = Modules[moduleName]
     end
+
+    assert(module, ("Module '%s' does not exist"):format(moduleName))
+
     return module
 end
 
@@ -30,8 +33,9 @@ function Deus.addBranch(branch: Instance, branchName: string?)
         if name:sub(1, #branchName) == branchName and typeof(module) == "Instance" then
             module = require(module)
 
-            if module.Init then
-                module.Init()
+            local init = rawget(module, "Init")
+            if init then
+                init()
             end
 
             Modules[name] = module

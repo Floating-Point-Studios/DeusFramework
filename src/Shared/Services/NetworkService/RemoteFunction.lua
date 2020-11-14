@@ -4,7 +4,9 @@ local Signal = shared.Deus.import("Deus.Signal")
 
 local RemoteFunction = {}
 
-function RemoteFunction.new(name, parent)
+function RemoteFunction.new(...)
+    local creationArgs = {...}
+
     local self = {
         ClassName = "Deus/RemoteFunction"
 
@@ -15,12 +17,12 @@ function RemoteFunction.new(name, parent)
         -- ReturnFilter: function arguments will be passed through when returning or receiving a return
     }
 
-    local remoteFunction = Instance.new("RemoteFunction")
-    remoteFunction.Name = name
-    remoteFunction.Parent = parent
-    self._remoteFunction = remoteFunction
-
     if RunService:IsServer() then
+        local remoteFunction = Instance.new("RemoteFunction")
+        remoteFunction.Name = creationArgs[1]
+        remoteFunction.Parent = creationArgs[2]
+        self._remoteFunction = remoteFunction
+
         function remoteFunction.OnClientInvoke(...)
             local callback = self.OnInvoke
             if callback then
@@ -43,8 +45,11 @@ function RemoteFunction.new(name, parent)
             return false
         end
     else
+        local remoteFunction = creationArgs[1]
+        self._remoteFunction = remoteFunction
+
         function remoteFunction.OnServerInvoke(...)
-            local callback = self.Callback
+            local callback = self.OnInvoke
             if callback then
                 local receiveFilter = self.ReceiveFilter
                 local returnFilter = self.ReturnFilter
@@ -57,9 +62,9 @@ function RemoteFunction.new(name, parent)
                 end
 
                 if returnFilter then
-                    return returnFilter(callback(...))
+                    return returnFilter(callback(args))
                 else
-                    return callback(...)
+                    return callback(args)
                 end
             end
             return false

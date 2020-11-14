@@ -4,7 +4,9 @@ local Signal = shared.Deus.import("Deus.Signal")
 
 local RemoteEvent = {}
 
-function RemoteEvent.new(name, parent)
+function RemoteEvent.new(...)
+    local creationArgs = {...}
+
     local self = {
         ClassName = "Deus/RemoteEvent"
 
@@ -12,24 +14,12 @@ function RemoteEvent.new(name, parent)
         -- ReceiveFilter: function arguments will be passed throguh before sending through event
     }
 
-    local remoteEvent = Instance.new("RemoteEvent")
-    remoteEvent.Name = name
-    remoteEvent.Parent = parent
-    self._remoteEvent = remoteEvent
-
     if RunService:IsServer() then
-        self.OnClientEvent = Signal.new()
-        remoteEvent.OnClientEvent:Connect(function(...)
+        local remoteEvent = Instance.new("RemoteEvent")
+        remoteEvent.Name = creationArgs[1]
+        remoteEvent.Parent = creationArgs[2]
+        self._remoteEvent = remoteEvent
 
-            local receiveFilter = self.ReceiveFilter
-            if receiveFilter then
-                self.OnClientEvent:Fire(receiveFilter(...))
-            else
-                self.OnClientEvent:Fire(...)
-            end
-
-        end)
-    else
         self.OnServerEvent = Signal.new()
         remoteEvent.OnServerEvent:Connect(function(...)
 
@@ -41,13 +31,28 @@ function RemoteEvent.new(name, parent)
             end
 
         end)
+    else
+        local remoteEvent = creationArgs[1]
+        self._remoteEvent = remoteEvent
+
+        self.OnClientEvent = Signal.new()
+        remoteEvent.OnClientEvent:Connect(function(...)
+
+            local receiveFilter = self.ReceiveFilter
+            if receiveFilter then
+                self.OnClientEvent:Fire(receiveFilter(...))
+            else
+                self.OnClientEvent:Fire(...)
+            end
+
+        end)
     end
 
     return setmetatable(self, {__index = RemoteEvent})
 end
 
 function RemoteEvent:FireServer(...)
-    assert(RunService:IsServer(), "RemoteEvent can only fire server from client")
+    assert(RunService:IsClient(), "RemoteEvent can only fire server from client")
 
     local sendFilter = self.SendFilter
     if sendFilter then
@@ -58,7 +63,7 @@ function RemoteEvent:FireServer(...)
 end
 
 function RemoteEvent:FireClient(player, ...)
-    assert(RunService:IsClient(), "RemoteEvent can only fire client from server")
+    assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
 
     local sendFilter = self.SendFilter
     if sendFilter then
@@ -69,7 +74,7 @@ function RemoteEvent:FireClient(player, ...)
 end
 
 function RemoteEvent:FireAllClients(...)
-    assert(RunService:IsClient(), "RemoteEvent can only fire client from server")
+    assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
 
     local sendFilter = self.SendFilter
     if sendFilter then

@@ -1,4 +1,4 @@
-local Team = shared.Deus.import("Deus.Baseclass").new("Deus/Team")
+local Team = shared.Deus.import("Deus.BaseClass").new("Deus/Team")
 
 function Team.Constructor(self, players)
     self._players = players or {}

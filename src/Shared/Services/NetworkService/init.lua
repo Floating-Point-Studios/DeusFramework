@@ -8,6 +8,7 @@ local RemoteFunction = require(script.RemoteFunction)
 local NetworkService = {}
 
 local RemotesFolder
+local Remotes = {}
 
 function NetworkService.Init()
     if RunService:IsServer() then
@@ -16,26 +17,52 @@ function NetworkService.Init()
         RemotesFolder.Parent = ReplicatedStorage
     else
         RemotesFolder = ReplicatedStorage:WaitForChild("DeusNetworkServiceRemotes")
+
+        for _,remote in pairs(RemotesFolder:GetChildren()) do
+            if remote:IsA("RemoteEvent") then
+                NetworkService.createRemoteEvent(remote)
+            elseif remote:IsA("RemoteFunction") then
+                NetworkService.createRemoteFunction(remote)
+            end
+        end
+
+        RemotesFolder.ChildAdded:Connect(function(remote)
+            if remote:IsA("RemoteEvent") then
+                NetworkService.createRemoteEvent(remote)
+            elseif remote:IsA("RemoteFunction") then
+                NetworkService.createRemoteFunction(remote)
+            end
+        end)
     end
 end
 
-local Remotes = {}
-
-function NetworkService.createRemoteEvent(remoteName)
-    assert(RunService:IsServer(), "createRemoteEvent can only be run on the Server")
-
-    local remote = RemoteEvent.new(remoteName, RemotesFolder)
-    Remotes[remoteName] = remote
-
+function NetworkService.createRemoteEvent(...)
+    local args = {...}
+    local remote
+    if RunService:IsServer() then
+        local remoteName = args[1]
+        remote = RemoteEvent.new(remoteName, RemotesFolder)
+        Remotes[remoteName] = remote
+    else
+        local remoteEvent = args[1]
+        remote = RemoteEvent.new(remoteEvent)
+        Remotes[remoteEvent.Name] = remote
+    end
     return remote
 end
 
-function NetworkService.createRemoteFunction(remoteName)
-    assert(RunService:IsServer(), "createRemoteFunction can only be run on the Server")
-
-    local remote = RemoteFunction.new(remoteName, RemotesFolder)
-    Remotes[remoteName] = remote
-
+function NetworkService.createRemoteFunction(...)
+    local args = {...}
+    local remote
+    if RunService:IsServer() then
+        local remoteName = args[1]
+        remote = RemoteFunction.new(remoteName, RemotesFolder)
+        Remotes[remoteName] = remote
+    else
+        local remoteFunction
+        remote = remoteFunction.new(remoteFunction)
+        Remotes[remoteFunction.Name] = remote
+    end
     return remote
 end
 
@@ -43,16 +70,16 @@ function NetworkService.listen(remoteName, func)
     local remote = Remotes[remoteName]
 
     if RunService:IsServer() then
-        -- Listen to client events
+        -- Listen to server events
         if remote.ClassName == "Deus/RemoteEvent" then
-            return remote.OnClientEvent:Connect(func)
+            return remote.OnServerEvent:Connect(func)
         else
             remote.OnInvoke = func
         end
     else
-        -- Listen to server events
+        -- Listen to client events
         if remote.ClassName == "Deus/RemoteEvent" then
-            return remote.OnServerEvent:Connect(func)
+            return remote.OnClientEvent:Connect(func)
         else
             remote.OnInvoke = func
         end
