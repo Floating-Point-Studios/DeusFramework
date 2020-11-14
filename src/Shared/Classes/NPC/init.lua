@@ -19,6 +19,10 @@ function NPC.Constructor(self, body)
         humanoidRootPart.Size = Vector3.new(1, 1, 1)
         humanoidRootPart.Parent = body
 
+        Instance.new("AnimationController", humanoidRootPart)
+
+        body.PrimaryPart = humanoidRootPart
+
         InstanceUtils.instanceConfig("Humanoid", {
             Health = {"NumberValue", 100},
             MaxHealth = {"NumberValue", 100},
@@ -41,9 +45,9 @@ function NPC.Constructor(self, body)
 
     self._body = body
     self._config = body:WaitForChild("Humanoid")
-    self._raycaster = Raycaster.new({{body}, Enum.RaycastFilterType.Blacklist, true}, 2.1, true)
+    self._raycaster = Raycaster.new({{body}, Enum.RaycastFilterType.Blacklist, true}, 3, true)
 
-    self.AnimationController = AnimationController.new(Instance.new("AnimationController", humanoidRootPart))
+    self.AnimationController = AnimationController.new(humanoidRootPart.AnimationController)
     self.MovementController = MovementController.new(self)
     self.StateController = StateController.new(self)
 
@@ -107,7 +111,8 @@ end
 
 function NPC:Update()
     -- Cast ray to ground
-    local raycastResult = self._raycaster:Cast(self._body.HumanoidRootPart.Position, Vector3.new(0, -1, 0))
+    local humanoidRootPart = self._body.HumanoidRootPart
+    local raycastResult = self._raycaster:Cast(humanoidRootPart.Position - Vector3.new(0, humanoidRootPart.Size.Y / 2 - 0.1, 0), Vector3.new(0, -1, 0))
 
     self.StateController:Update(raycastResult)
     self.MovementController:Update(raycastResult)

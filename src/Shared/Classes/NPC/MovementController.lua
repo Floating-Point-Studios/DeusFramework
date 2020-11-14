@@ -7,22 +7,25 @@ function MovementController.new(character)
 
     local self = {
         _character = character,
-        _alignAxis = AlignAxis.new(humanoidRootPart, 0, 0, 0, false, true, false, humanoidRootPart.Mass * 2),
-        _force = humanoidRootPart.Mass
+        -- These PID values are only tuned for a mass of 2.8 (Default Roblox HumanoidRootPart under standard Gravity)
+        _alignAxis = AlignAxis.new(humanoidRootPart, 20, 0.25, 0.75, Vector3.new(0, 10000, 0)),
+        _force = -humanoidRootPart.Mass * workspace.Gravity
     }
 
     return setmetatable(self, {__index = MovementController})
 end
 
-function MovementController:Update(raycastParams)
+function MovementController:Update(raycastResult)
     local character = self._character
     local state = character.State or "Idling"
     local moveDirection = character.MoveDirection
     local alignAxis = self._alignAxis
 
-    if state == "Idling" then
-        alignAxis.DesiredPosition = Vector3.new(0, raycastParams.Hit.Y + character._config.HipHeight.Value, 0)
+    if state == "Idling" and raycastResult then
+
+        alignAxis.DesiredPosition = Vector3.new(0, raycastResult.Position.Y + character._config.HipHeight.Value + (character._body.HumanoidRootPart.Size.Y / 2), 0)
         alignAxis:Update(self._force)
+
     elseif state == "Jumping" or state == "Falling" then
         alignAxis._vectorForce.Force = Vector3.new()
     end

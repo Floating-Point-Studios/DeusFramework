@@ -4,17 +4,14 @@ local PID = shared.Deus.import("Deus.PID")
 
 local AlignAxis = {}
 
-function AlignAxis.new(obj, kP, kI, kD, alignX, alignY, alignZ, maxForce)
+function AlignAxis.new(obj, kP, kI, kD, maxForce)
     local self = {
         _PIDx = PID.new(kP, kI, kD, 0),
         _PIDy = PID.new(kP, kI, kD, 0),
         _PIDz = PID.new(kP, kI, kD, 0),
 
         DesiredPosition = Vector3.new(),
-        AlignXAxis = alignX or true,
-        AlignYAxis = alignY or true,
-        AlignZAxis = alignZ or true,
-        MaxForce = maxForce or 5000,
+        MaxForce = maxForce or Vector3.new(5000, 5000, 5000),
     }
 
     local attachment = Instance.new("Attachment", obj)
@@ -29,22 +26,15 @@ function AlignAxis.new(obj, kP, kI, kD, alignX, alignY, alignZ, maxForce)
 end
 
 function AlignAxis:Update(magnitude)
-    local force = {x = 0, y = 0, z = 0}
     local maxForce = self.MaxForce
-    local currentPos = self._vectorForce.Parent.Position
+    local currentPos = self._vectorForce.Parent.Parent.Position
     local desiredPos = self.DesiredPosition
 
-    if self.AlignXAxis then
-        force.x = math.clamp(self._PIDx:Update(desiredPos.X - currentPos.X) * magnitude, -maxForce, maxForce)
-    end
-    if self.AlignYAxis then
-        force.y = math.clamp(self._PIDy:Update(desiredPos.Y - currentPos.Y) * magnitude, -maxForce, maxForce)
-    end
-    if self.AlignZAxis then
-        force.z = math.clamp(self._PIDz:Update(desiredPos.Z - currentPos.Z) * magnitude, -maxForce, maxForce)
-    end
+    local forceX = math.clamp(self._PIDx:Update(desiredPos.X - currentPos.X) * magnitude, -maxForce.X, maxForce.X)
+    local forceY = math.clamp(self._PIDy:Update(desiredPos.Y - currentPos.Y) * magnitude, -maxForce.Y, maxForce.Y)
+    local forceZ = math.clamp(self._PIDz:Update(desiredPos.Z - currentPos.Z) * magnitude, -maxForce.Z, maxForce.Z)
 
-    self._vectorForce.Force = Vector3.new(force.x, force.y, force.z)
+    self._vectorForce.Force = Vector3.new(forceX, forceY, forceZ)
 end
 
 return AlignAxis
