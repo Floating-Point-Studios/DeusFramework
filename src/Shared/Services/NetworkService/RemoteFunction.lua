@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 
+local Debug = shared.Deus.import("Deus.Debug")
 local Signal = shared.Deus.import("Deus.Signal")
 
 local RemoteFunction = {}
@@ -75,7 +76,7 @@ function RemoteFunction.new(...)
 end
 
 function RemoteFunction:InvokeServer(...)
-    assert(RunService:IsClient(), "RemoteFunction can only invoke server from client")
+    Debug.assert(RunService:IsClient(), "RemoteFunction can only invoke server from client")
 
     local sendFilter = self.SendFilter
     if sendFilter then
@@ -86,7 +87,7 @@ function RemoteFunction:InvokeServer(...)
 end
 
 function RemoteFunction:InvokeClient(player, ...)
-    assert(RunService:IsServer(), "RemoteFunction can only invoke client from server")
+    Debug.assert(RunService:IsServer(), "RemoteFunction can only invoke client from server")
 
     local sendFilter = self.SendFilter
     if sendFilter then

@@ -1,3 +1,5 @@
+local Debug = shared.Deus.import("Deus.Debug")
+
 local Tracer = {}
 
 local Terrain = workspace.Terrain
@@ -24,7 +26,7 @@ function Tracer.new(size: number?, parent: instance?, properties)
 end
 
 function Tracer:__newindex(index, value)
-    assert(index, ("%q is not a valid member of Tracer"):format(tostring(index)))
+    Debug.assert(index, ("%q is not a valid member of Tracer"):format(tostring(index)))
     if index == "CFrame" then
         self.Attachment0.CFrame = value + value.UpVector * self._size
         self.Attachment1.CFrame = value - value.UpVector * self._size

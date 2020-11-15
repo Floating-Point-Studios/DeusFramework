@@ -3,6 +3,7 @@
 
 local Signal = shared.Deus.import("Deus.BaseClass").new("Deus/Signal")
 
+local Debug = shared.Deus.import("Deus.Debug")
 local Connection = shared.Deus.import("Deus.Connection")
 
 function Signal.Constructor(self)
@@ -26,7 +27,7 @@ function Signal:Wait(timeout: number?)
     local waitStart = tick()
     repeat
         if tick() - waitStart > timeout then
-            warn(("Signal Wait timed out after %s seconds"):format(timeout))
+            Debug.warn(("Signal Wait timed out after %s seconds"):format(timeout))
             break
         end
     until self._lastFired > waitStart

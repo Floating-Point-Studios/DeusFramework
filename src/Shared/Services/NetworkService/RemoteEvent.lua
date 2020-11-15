@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 
+local Debug = shared.Deus.import("Deus.Debug")
 local Signal = shared.Deus.import("Deus.Signal")
 
 local RemoteEvent = {}
@@ -52,7 +53,7 @@ function RemoteEvent.new(...)
 end
 
 function RemoteEvent:FireServer(...)
-    assert(RunService:IsClient(), "RemoteEvent can only fire server from client")
+    Debug.assert(RunService:IsClient(), "RemoteEvent can only fire server from client")
 
     local sendFilter = self.SendFilter
     if sendFilter then
@@ -63,7 +64,7 @@ function RemoteEvent:FireServer(...)
 end
 
 function RemoteEvent:FireClient(player, ...)
-    assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
+    Debug.assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
 
     local sendFilter = self.SendFilter
     if sendFilter then
@@ -74,7 +75,7 @@ function RemoteEvent:FireClient(player, ...)
 end
 
 function RemoteEvent:FireAllClients(...)
-    assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
+    Debug.assert(RunService:IsServer(), "RemoteEvent can only fire client from server")
 
     local sendFilter = self.SendFilter
     if sendFilter then

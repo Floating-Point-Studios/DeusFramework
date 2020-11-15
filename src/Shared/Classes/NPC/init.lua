@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 
+local Debug = shared.Deus.import("Deus.Debug")
 local Raycaster = shared.Deus.import("Deus.Raycaster")
 local InstanceUtils = shared.Deus.import("Deus.InstanceUtils")
 
@@ -99,7 +100,7 @@ end
 
 -- Can only be run on server
 function NPC:SetPlayer(player)
-    assert(RunService:IsServer(), "Setting NPC to player can only be performed on the server")
+    Debug.assert(RunService:IsServer(), "Setting NPC to player can only be performed on the server")
 
     local body = self._body
     body.Name = player.Name
