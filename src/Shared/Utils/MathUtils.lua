@@ -15,13 +15,19 @@ function MathUtils.roundFloor(x, accuracy)
 end
 
 -- @param vector: vector3/vector2 to clamp
--- @param min: minimum value
--- @param max: maximum value
+-- @param min: number/vecto3/vector2, minimum value
+-- @param max: number/vecto3/vector2, maximum value
 function MathUtils.clampVector(vector, min, max)
+    if type(min) == "number" then
+        min = Vector3.new(min, min, min)
+    end
+    if type(max) == "number" then
+        max = Vector3.new(max, max, max)
+    end
     if typeof(vector) == "Vector3" then
-        return Vector3.new(math.clamp(vector.X, min, max), math.clamp(vector.Y, min, max), math.clamp(vector.Z, min, max))
+        return Vector3.new(math.clamp(vector.X, min.X, max.X), math.clamp(vector.Y, min.Y, max.Y), math.clamp(vector.Z, min.Z, max.Z))
     else
-        return Vector2.new(math.clamp(vector.X, min, max), math.clamp(vector.Y, min, max))
+        return Vector2.new(math.clamp(vector.X, min.X, max.X), math.clamp(vector.Y, min.Y, max.Y))
     end
 end
 
