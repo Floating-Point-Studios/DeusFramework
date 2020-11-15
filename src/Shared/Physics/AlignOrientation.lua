@@ -24,7 +24,7 @@ function AlignOrientation.new(obj, maxForce, attachment, angularVelocity)
     return setmetatable(self, {__index = AlignOrientation})
 end
 
-function AlignOrientation:Update(magnitude)
+function AlignOrientation:Update(magnitude, add)
     magnitude = magnitude or 1
 
     local desiredOrientation = self.DesiredOrientation
@@ -35,7 +35,11 @@ function AlignOrientation:Update(magnitude)
     local goalX, goalY, goalZ = math.rad(desiredOrientation.X), math.rad(desiredOrientation.Y), math.rad(desiredOrientation.Z)
     local curX, curY, curZ = obj.CFrame:ToEulerAnglesYXZ()
 
-	angulularVelocity.AngularVelocity = MathUtils.clampVector(Vector3.new(goalX - curX, goalY - curY, goalZ - curZ) * obj.Mass * magnitude, -maxForce, maxForce)
+    if add then
+        angulularVelocity.AngularVelocity += MathUtils.clampVector(Vector3.new(goalX - curX, goalY - curY, goalZ - curZ) * obj.Mass * magnitude, -maxForce, maxForce)
+    else
+        angulularVelocity.AngularVelocity = MathUtils.clampVector(Vector3.new(goalX - curX, goalY - curY, goalZ - curZ) * obj.Mass * magnitude, -maxForce, maxForce)
+    end
 end
 
 return AlignOrientation
