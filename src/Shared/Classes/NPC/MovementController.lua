@@ -36,13 +36,12 @@ function MovementController:Update(raycastResult)
     local character = self._character
     local state = character.State or "Idling"
     local moveDirection = character.MoveDirection
+    local alignOrientation = self._alignOrientation
     local alignPosition = self._alignPosition
     local humanoidRootPart = character._body.HumanoidRootPart
 
-    self._alignOrientation:Update(3)
-
-    -- Update walk force
-    self._vectorForce.Force = moveDirection * self._force * character._config.WalkSpeed.Value
+    alignOrientation.DesiredOrientation = Vector3.new(0, character.LookAngle, 0)
+    alignOrientation:Update(3)
 
     if state == "Idling" and raycastResult then
 
@@ -54,11 +53,15 @@ function MovementController:Update(raycastResult)
 
         -- Update the DesiredPosition to HipHeight level based off RaycastResult.Position.Y
         alignPosition.DesiredPosition = Vector3.new(0, raycastResult.Position.Y + character._config.HipHeight.Value + (humanoidRootPart.Size.Y / 2), 0)
-        alignPosition:Update(self._force, true)
-        self._frictionForce:Update(raycastResult.Material, 20, true)
+        alignPosition:Update(self._force)
+        local frictionCoefficient = self._frictionForce:Update(raycastResult.Material, 20, true)
+
+        -- Update walk force
+        self.vectorForce.Force += moveDirection * frictionCoefficient * 20 * humanoidRootPart.Mass * character._config.WalkSpeed.Value
 
     elseif state == "Jumping" or state == "Falling" then
-        alignPosition._vectorForce.Force = Vector3.new()
+        -- Update walk force
+        alignPosition._vectorForce.Force = moveDirection * humanoidRootPart.Mass * character._config.WalkSpeed.Value
 
         -- Prevents bouncing from high falls
         local velocity = character._velocity

@@ -6,6 +6,7 @@ local AlignOrientation = {}
 
 function AlignOrientation.new(obj, maxForce, attachment, angularVelocity)
     local self = {
+        -- Desired orientation in degrees
         DesiredOrientation = Vector3.new(),
         MaxForce = maxForce or Vector3.new(5000, 5000, 5000)
     }
@@ -39,6 +40,7 @@ function AlignOrientation:Update(magnitude, add)
 	local curX, curY, curZ = math.asin(-m12), math.atan2(m02, m22), math.atan2(m10, m11)
 	local diffX, diffY, diffZ = goalX - curX, goalY - curY, goalZ - curZ
 
+    -- For instances when traversing would take more than 180 degrees
 	if math.abs(diffX) > PI then
 		diffX %= PI
 	end

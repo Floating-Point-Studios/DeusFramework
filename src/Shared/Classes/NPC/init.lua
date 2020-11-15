@@ -53,6 +53,7 @@ function NPC.Constructor(self, body)
     self.StateController = StateController.new(self)
 
     self.MoveDirection = Vector3.new()
+    self.LookAngle = 0
     self.Jump = false
     self.Sit = false
 end
