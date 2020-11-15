@@ -21,7 +21,7 @@ function FrictionForce:Update(coefficient, additive)
     local vectorForce = self._vectorForce
 
     if additive then
-        vectorForce.Force += -vectorForce.Parent.Parent.Velocity * coefficient
+        vectorForce.Force -= vectorForce.Parent.Parent.Velocity * coefficient
     else
         vectorForce.Force = -vectorForce.Parent.Parent.Velocity * coefficient
     end

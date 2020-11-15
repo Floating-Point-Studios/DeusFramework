@@ -24,6 +24,8 @@ function AlignOrientation.new(obj, maxForce, attachment, angularVelocity)
     return setmetatable(self, {__index = AlignOrientation})
 end
 
+local PI = math.pi
+
 function AlignOrientation:Update(magnitude, add)
     magnitude = magnitude or 1
 
@@ -33,12 +35,24 @@ function AlignOrientation:Update(magnitude, add)
     local maxForce = self.MaxForce
 
     local goalX, goalY, goalZ = math.rad(desiredOrientation.X), math.rad(desiredOrientation.Y), math.rad(desiredOrientation.Z)
-    local curX, curY, curZ = obj.CFrame:ToEulerAnglesYXZ()
+    local _,_,_,_,_, m02, m10, m11, m12, _,_, m22 = obj.CFrame:components()
+	local curX, curY, curZ = math.asin(-m12), math.atan2(m02, m22), math.atan2(m10, m11)
+	local diffX, diffY, diffZ = goalX - curX, goalY - curY, goalZ - curZ
+
+	if math.abs(diffX) > PI then
+		diffX %= PI
+	end
+	if math.abs(diffY) > PI then
+		diffY %= PI
+	end
+	if math.abs(diffZ) > PI then
+		diffZ %= PI
+	end
 
     if add then
-        angulularVelocity.AngularVelocity += MathUtils.clampVector(Vector3.new(goalX - curX, goalY - curY, goalZ - curZ) * obj.Mass * magnitude, -maxForce, maxForce)
+        angulularVelocity.AngularVelocity += MathUtils.clampVector(Vector3.new(diffX, diffY, diffZ) * obj.Mass * magnitude, -maxForce, maxForce)
     else
-        angulularVelocity.AngularVelocity = MathUtils.clampVector(Vector3.new(goalX - curX, goalY - curY, goalZ - curZ) * obj.Mass * magnitude, -maxForce, maxForce)
+        angulularVelocity.AngularVelocity = MathUtils.clampVector(Vector3.new(diffX, diffY, diffZ) * obj.Mass * magnitude, -maxForce, maxForce)
     end
 end
 
