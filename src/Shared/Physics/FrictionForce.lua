@@ -70,7 +70,7 @@ function FrictionForce:Update(coefficient, magnitude, additive)
             vectorForce.Force = -velocity * obj.Mass * coefficient * magnitude
         end
 
-        return coefficient * magnitude
+        return coefficient
     end
     return 0
 end
