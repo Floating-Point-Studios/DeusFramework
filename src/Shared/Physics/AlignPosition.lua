@@ -29,6 +29,8 @@ function AlignPosition.new(obj, kP, kI, kD, maxForce, attachment, vectorForce)
 end
 
 function AlignPosition:Update(magnitude)
+    magnitude = magnitude or 1
+
     local maxForce = self.MaxForce
     local vectorForce = self._vectorForce
     local currentPos = vectorForce.Parent.Parent.Position

@@ -1,6 +1,6 @@
 -- Similar to the AlignOrientation object but provides control over which axes it influences
 
-local MathUtils = shared.Deus.import("MathUtils")
+local MathUtils = shared.Deus.import("Deus.MathUtils")
 
 local AlignOrientation = {}
 
@@ -26,6 +26,8 @@ function AlignOrientation.new(obj, maxForce, attachment, angularVelocity)
 end
 
 function AlignOrientation:Update(magnitude)
+    magnitude = magnitude or 1
+
     local desiredOrientation = self.DesiredOrientation
     local angulularVelocity = self._angularVelocity
     local obj = angulularVelocity.Parent.Parent

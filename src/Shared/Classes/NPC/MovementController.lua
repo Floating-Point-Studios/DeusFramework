@@ -1,3 +1,4 @@
+local AlignOrientation = shared.Deus.import("Deus.AlignOrientation")
 local AlignPosition = shared.Deus.import("Deus.AlignPosition")
 
 local MovementController = {}
@@ -7,8 +8,9 @@ function MovementController.new(character)
 
     local self = {
         _character = character,
+        _AlignOrientation = AlignOrientation.new(humanoidRootPart, Vector3.new(50000, 1000, 50000), humanoidRootPart.Attachment),
         -- These PID values are only tuned for a mass of 2.8 (Default Roblox HumanoidRootPart under standard Gravity)
-        _AlignPosition = AlignPosition.new(humanoidRootPart, 20, 0.25, 0.75, Vector3.new(0, 10000, 0)),
+        _AlignPosition = AlignPosition.new(humanoidRootPart, 20, 0.25, 0.75, Vector3.new(0, 10000, 0), nil, humanoidRootPart.Attachment.VectorForce),
         _force = -humanoidRootPart.Mass * workspace.Gravity
     }
 
@@ -19,19 +21,22 @@ function MovementController:Update(raycastResult)
     local character = self._character
     local state = character.State or "Idling"
     local moveDirection = character.MoveDirection
-    local AlignPosition = self._AlignPosition
+    local alignOrientation = self._AlignOrientation
+    local alignPosition = self._AlignPosition
+
+    alignOrientation:Update(2)
 
     if state == "Idling" and raycastResult then
 
-        AlignPosition.DesiredPosition = Vector3.new(0, raycastResult.Position.Y + character._config.HipHeight.Value + (character._body.HumanoidRootPart.Size.Y / 2), 0)
-        AlignPosition:Update(self._force)
+        alignPosition.DesiredPosition = Vector3.new(0, raycastResult.Position.Y + character._config.HipHeight.Value + (character._body.HumanoidRootPart.Size.Y / 2), 0)
+        alignPosition:Update(self._force)
 
     elseif state == "Jumping" or state == "Falling" then
-        AlignPosition._vectorForce.Force = Vector3.new()
+        alignPosition._vectorForce.Force = Vector3.new()
     end
 
-    local force = AlignPosition._vectorForce.Force
-    AlignPosition._vectorForce.Force = force + moveDirection * self._force * character._config.WalkSpeed.Value
+    local force = alignPosition._vectorForce.Force
+    alignPosition._vectorForce.Force = force + moveDirection * self._force * character._config.WalkSpeed.Value
 end
 
 return MovementController
