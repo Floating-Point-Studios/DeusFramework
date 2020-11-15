@@ -28,7 +28,7 @@ function AlignPosition.new(obj, kP, kI, kD, maxForce, attachment, vectorForce)
     return setmetatable(self, {__index = AlignPosition})
 end
 
-function AlignPosition:Update(magnitude, add)
+function AlignPosition:Update(magnitude, additive)
     magnitude = magnitude or 1
 
     local maxForce = self.MaxForce
@@ -40,7 +40,7 @@ function AlignPosition:Update(magnitude, add)
     local forceY = math.clamp(self._PIDy:Update(desiredPos.Y - currentPos.Y) * magnitude, -maxForce.Y, maxForce.Y)
     local forceZ = math.clamp(self._PIDz:Update(desiredPos.Z - currentPos.Z) * magnitude, -maxForce.Z, maxForce.Z)
 
-    if add then
+    if additive then
         vectorForce.Force += Vector3.new(forceX, forceY, forceZ)
     else
         vectorForce.Force = Vector3.new(forceX, forceY, forceZ)
