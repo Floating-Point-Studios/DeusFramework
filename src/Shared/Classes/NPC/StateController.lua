@@ -5,14 +5,19 @@ function StateController.new(character)
         _character = character
     }
 
+    character._lastState = "Idling"
+    character._stateStartTime = tick()
+    character._stateStartPos = character._body.HumanoidRootPart.Position
+    character.State = "Idling"
+
     return setmetatable(self, {__index = StateController})
 end
 
 function StateController:Update(raycastResult)
     local character = self._character
     local humanoidRootPart = character._body.HumanoidRootPart
-    local curStateStartTime = character._lastStateStartTime or tick()
-    local curStateStartPos = character._lastStateStartPos or humanoidRootPart.Position
+    local curStateStartTime = character._stateStartTime or tick()
+    local curStateStartPos = character._stateStartPos or humanoidRootPart.Position
     local curState = character.State or "Idling"
     local newState = curState
 
@@ -60,10 +65,17 @@ function StateController:Update(raycastResult)
     end
 
     if newState ~= curState then
-        character._lastStateStart = tick()
-        character._lastStateStartPos = humanoidRootPart.Position
+        character._lastState = curState
+        character._stateStartTime = tick()
+        character._stateStartPos = humanoidRootPart.Position
         character.State = newState
     end
+
+    character._lastPos = character._position
+    character._lastVelocity = character._velocity
+    character._position = humanoidRootPart.Position
+    character._velocity = humanoidRootPart.Velocity
+
 end
 
 return StateController

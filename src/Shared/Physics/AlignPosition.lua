@@ -21,8 +21,8 @@ function AlignPosition.new(obj, kP, kI, kD, maxForce, attachment, vectorForce)
 
     vectorForce.Force = Vector3.new()
     vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
-    vectorForce.Attachment0 = attachment
-    vectorForce.Parent = attachment
+    vectorForce.Attachment0 = attachment or vectorForce.Parent
+    vectorForce.Parent = attachment or vectorForce.Parent
     self._vectorForce = vectorForce
 
     return setmetatable(self, {__index = AlignPosition})

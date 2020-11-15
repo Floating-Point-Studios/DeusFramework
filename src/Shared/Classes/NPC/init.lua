@@ -46,7 +46,7 @@ function NPC.Constructor(self, body)
 
     self._body = body
     self._config = body:WaitForChild("Humanoid")
-    self._raycaster = Raycaster.new({{body}, Enum.RaycastFilterType.Blacklist, true}, 3, true)
+    self._raycaster = Raycaster.new({{body}, Enum.RaycastFilterType.Blacklist, true}, 4, true)
 
     self.AnimationController = AnimationController.new(humanoidRootPart.AnimationController)
     self.MovementController = MovementController.new(self)

@@ -15,11 +15,10 @@ function AlignOrientation.new(obj, maxForce, attachment, angularVelocity)
     end
     angularVelocity = angularVelocity or Instance.new("AngularVelocity")
 
-    angularVelocity.Force = Vector3.new()
     angularVelocity.RelativeTo = Enum.ActuatorRelativeTo.World
     angularVelocity.MaxTorque = math.huge
-    angularVelocity.Attachment0 = attachment
-    angularVelocity.Parent = attachment
+    angularVelocity.Attachment0 = attachment or angularVelocity.Parent
+    angularVelocity.Parent = attachment or angularVelocity.Parent
     self._angularVelocity = angularVelocity
 
     return setmetatable(self, {__index = AlignOrientation})
