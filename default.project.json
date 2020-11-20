@@ -1,5 +1,5 @@
 {
-  "name": "deus-framework",
+  "name": "deus-framework-rewrite",
   "tree": {
     "$className": "DataModel",
 
@@ -7,9 +7,9 @@
       "$className": "ServerScriptService",
 
       "deus-framework": {
-        "$className": "Folder",
         "$path": "src"
       }
     }
+
   }
 }
