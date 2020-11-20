@@ -1,3 +1,0 @@
-local Arrow = {}
-
-return Arrow
