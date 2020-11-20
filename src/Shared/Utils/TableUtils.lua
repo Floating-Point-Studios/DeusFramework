@@ -1,4 +1,4 @@
-local import = shared.DeusFramework:Import
+local import = shared.DeusFramework.import
 
 local Debug = import("Deus/Debug")
 

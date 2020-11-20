@@ -2,13 +2,13 @@ local DeusFramework = {
     Libraries = {};
 
     -- Import libraries
-    Import = require(script.Import);
+    import = require(script.Import);
 
     -- Register libraries
-    Register = require(script.Register);
+    register = require(script.Register);
 
     -- Setup frameworks
-    Setup = require(script.Setup);
+    setup = require(script.Setup);
 }
 
 shared.DeusFramework = DeusFramework

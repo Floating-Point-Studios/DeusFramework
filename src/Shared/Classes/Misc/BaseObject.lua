@@ -1,4 +1,4 @@
-local import = shared.DeusFramework:Import
+local import = shared.DeusFramework.import
 
 return import("Deus/BaseClass").new("Deus/BaseObject", {
 

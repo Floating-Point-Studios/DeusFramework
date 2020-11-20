@@ -1,4 +1,4 @@
-local import = shared.DeusFramework:Import
+local import = shared.DeusFramework.import
 
 local TableUtils = import("Deus/TableUtils")
 
