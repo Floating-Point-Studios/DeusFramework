@@ -1,0 +1,3 @@
+local Connection = {}
+
+return Connection

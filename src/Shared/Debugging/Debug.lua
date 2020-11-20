@@ -1,30 +1,40 @@
+local import = shared.DeusFramework:Import
+
+local TableUtils = import("Deus/TableUtils")
+
 local Debug = {}
 
--- Creates a log in Deus without outputting to console
-function Debug.log(...)
-    
+function Debug.print(msg, ...)
+    print(("[DEUS] %s"):format(msg:format(...)))
 end
 
--- Replaces Roblox print function
-function Debug.print(...)
-    print(("[Deus] [%s]:"):format(getfenv(2).script.Name), ...)
+function Debug.warn(msg, ...)
+    warn(("[DEUS] %s"):format(msg:format(...)))
 end
 
--- Replaces Roblox warn function
-function Debug.warn(...)
-    warn(("[Deus] [%s]:"):format(getfenv(2).script.Name), ...)
+function Debug.error(level, msg, ...)
+    error(("[DEUS] %s"):format(msg:format(...)), level)
 end
 
--- Replaces Roblox error function
-function Debug.error(...)
-    error(("[Deus] [%s]:"):format(getfenv(2).script.Name), ..., 2)
-end
-
--- Replaces Roblox assert function
-function Debug.assert(condition, ...)
+function Debug.assert(condition, msg, ...)
     if not condition then
-        error(("[Deus] [%s]:"):format(getfenv(2).script.Name), ..., 2)
+        error(("[DEUS] %s"):format(msg:format(...)))
     end
 end
 
-return Debug
+function Debug.benchmark(func, trials, ...)
+    local benchmarkTime = 0
+    for i = 1, trials do
+        local startTime = tick()
+        func(...)
+        local endTime = tick()
+        benchmarkTime += endTime - startTime
+    end
+
+    benchmarkTime /= trials
+    Debug.print("Benchmark averaged %sns after %s trials", math.round(benchmarkTime * 1000000000), trials)
+
+    return benchmarkTime
+end
+
+return TableUtils.lock(Debug)

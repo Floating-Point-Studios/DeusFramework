@@ -1,57 +1,105 @@
-local Maid = shared.Deus.import("Deus.Maid")
+-- Based on RoStrap
+
+local import = shared.DeusFramework:Import
+
+local TableUtils = import("Deus/TableUtils")
+local Signal = import("Deus/Signal")
+local Debug = import("Deus/Debug")
+
+local Metatables = setmetatable({}, {__mode = "kv"})
+
+local function filter(self)
+    local internalAccess = false
+    local metatable = Metatables[self]
+    if not metatable then
+        internalAccess = true
+    end
+    return internalAccess, metatable or self
+end
+
+local function __index(self, i)
+    local internalAccess, self = filter(self)
+
+    local v = self.Events[i] or self.Methods[i] or self.Properties[i]
+    if v then
+        return v
+    else
+        v = self.Internals[i]
+        if v then
+            Debug.assert(internalAccess, "[%s] Cannot read Internal '%s' from externally", self.Internals.ClassName, i)
+            return v
+        end
+    end
+
+    if self.__superclass then
+        return self.__superclass[i]
+    end
+end
+
+local function __newindex(self, i, v)
+    local internalAccess, self = filter(self)
+
+    if self.Events[i] then
+        Debug.assert(internalAccess, "[%s] Cannot write to Event '%s' from externally", self.Internals.ClassName, i)
+        self.Events[i] = v
+    elseif self.Internals[i] then
+        Debug.assert(internalAccess, "[%s] Cannot write to Internal '%s' from externally", self.Internals.ClassName, i)
+        self.Internals[i] = v
+    elseif self.Methods[i] then
+        Debug.assert(internalAccess, "[%s] Cannot write Method '%s' from externally", self.Internals.ClassName, i)
+        self.Methods[i] = v
+    elseif self.Properties[i] then
+        self.Properties[i] = v
+    else
+        Debug.error(2, "[%s] Index '%s' was not found", self.Internals.ClassName, i)
+    end
+end
+
+local function __tostring(self)
+    local _,self = filter(self)
+    return self.Internals.ClassName
+end
 
 local BaseClass = {}
 
-function BaseClass.new(className)
-	local Class = {}
-	Class.__index = Class
-	Class.ClassName = className or "Deus/BaseClass"
+function BaseClass.new(className, classData, superclass)
+    classData.ClassName = className
+    classData.Superclass = superclass
 
-	function Class.new(...)
-		local self = {}
-		self._maid = Maid.new()
+    if superclass then
+        TableUtils.merge(classData.Events, superclass.Events)
+        TableUtils.merge(classData.Internals, superclass.Internals)
+        TableUtils.merge(classData.Methods, superclass.Methods)
+        TableUtils.merge(classData.Properties, superclass.Properties)
+    end
 
-		if Class.super then
-			self = setmetatable(Class.super.new(...), Class)
-		else
-			self = setmetatable({}, Class)
-		end
-		if Class.Constructor then
-			Class.Constructor(self, ...)
-		end
-		return self
-	end
+    function classData.new()
+        local self = newproxy(true)
+        local metatable = getmetatable(self)
 
-	Class.Extends = BaseClass.Extends
-	Class.IsA = BaseClass.IsA
-	Class.Destroy = BaseClass.Destroy
+        metatable.__index = __index
+        metatable.__newindex = __newindex
+        metatable.__tostring = __tostring
+        metatable.__metatable = ("[%s] Locked metatable"):format(classData.ClassName)
 
-	return Class
+        metatable.__class = {
+            Events = {};
+            Internals = classData.Internals;
+            Methods = classData.Methods;
+            Properties = TableUtils.shallowCopy(classData.Properties)
+        }
+        metatable.__superclass = classData.Superclass
+
+        for _,eventName in pairs(classData.Events) do
+            metatable.__class.Events[eventName] = Signal.new()
+        end
+
+        Metatables[self] = metatable
+
+        return self
+    end
+
+    return TableUtils.lock(setmetatable(classData, {__index = BaseClass}))
 end
 
-function BaseClass.Extends(self, superclass)
-	setmetatable(self, {__index = superclass})
-	self.super = superclass
-
-	return self
-end
-
-function BaseClass.IsA(self, className)
-	return self.ClassName == className
-end
-
-function BaseClass.Destroy(self)
-	-- local startTime = tick()
-	self._maid:DoCleaning()
-
-	-- This could emit events, which could cause bad startTime
-	-- but we'll take this risk over getting the ClassName
-	-- if tick() - startTime >= 0.01 then
-	-- 	warn(("[BaseObject.Destroy] - Took %f ms to clean up %s")
-	-- 		:format((tick() - startTime)*1000, tostring(self.ClassName)))
-	-- end
-
-	setmetatable(self, nil)
-end
-
-return BaseClass
+return TableUtils.lock(BaseClass)

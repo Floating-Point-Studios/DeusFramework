@@ -1,1 +1,1 @@
-require(script:WaitForChild("Shared")[".loader"])
+require(script:WaitForChild("Shared")[".loader"]):Register(script.Parent, "Deus", {"loader"})
