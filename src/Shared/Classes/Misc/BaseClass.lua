@@ -1,10 +1,10 @@
 -- Based on RoStrap
 
-local import = shared.DeusFramework.import
+local Deus = shared.DeusFramework
 
-local TableUtils = import("Deus/TableUtils")
-local Signal = import("Deus/Signal")
-local Debug = import("Deus/Debug")
+local TableUtils = Deus:Load("Deus/TableUtils")
+local Signal = Deus:Load("Deus/Signal")
+local Debug = Deus:Load("Deus/Debug")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 

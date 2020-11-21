@@ -1,4 +1,4 @@
-return shared.DeusFramework:import("Deus/BaseEnum").new(
+return shared.DeusFramework:Load("Deus/BaseEnum").new(
     {
         FirstPersonView     = 1;
         ThirdPersonView     = 2;

@@ -1,5 +1,7 @@
 local deusFramework = script.Parent
 local loader = require(deusFramework:WaitForChild("Shared")[".loader"])
-loader:SetupFramework(deusFramework)
+
+loader:Setup(deusFramework)
 loader:Register(script, "Deus", {"loader"})
+
 deusFramework:Destroy()

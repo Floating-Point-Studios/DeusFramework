@@ -1,6 +1,6 @@
-local import = shared.DeusFramework.import
+local Deus = shared.DeusFramework
 
-local Debug = import("Deus/Debug")
+local Debug = Deus:Load("Deus/Debug")
 
 local TableUtils = {}
 

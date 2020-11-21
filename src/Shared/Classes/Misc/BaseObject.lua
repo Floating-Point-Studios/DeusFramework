@@ -1,6 +1,4 @@
-local import = shared.DeusFramework.import
-
-return import("Deus/BaseClass").new("Deus/BaseObject", {
+return shared.DeusFramework:Load("Deus/BaseClass").new("Deus/BaseObject", {
 
     Events = {"TestEvent1"};
 

@@ -20,6 +20,8 @@ function BaseEnum.new(enumArray)
 
         end
     end
+
+    return enumArray
 end
 
 return BaseEnum
