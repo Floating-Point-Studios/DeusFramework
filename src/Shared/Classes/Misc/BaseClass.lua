@@ -102,4 +102,4 @@ function BaseClass.new(className, classData, superclass)
     return TableUtils.lock(setmetatable(classData, {__index = BaseClass}))
 end
 
-return TableUtils.lock(BaseClass)
+return BaseClass

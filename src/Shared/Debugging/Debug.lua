@@ -1,7 +1,3 @@
-local import = shared.DeusFramework.import
-
-local TableUtils = import("Deus/TableUtils")
-
 local Debug = {}
 
 function Debug.print(msg, ...)
@@ -37,4 +33,4 @@ function Debug.benchmark(func, trials, ...)
     return benchmarkTime
 end
 
-return TableUtils.lock(Debug)
+return Debug

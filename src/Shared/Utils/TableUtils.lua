@@ -78,4 +78,4 @@ function TableUtils.lock(tab)
     return userdata
 end
 
-return TableUtils.lock(TableUtils)
+return TableUtils
