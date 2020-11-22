@@ -56,7 +56,15 @@ function TableUtils.unpack(tab1, ...)
             table.insert(tab1, v)
         end
     end
-    return tab1
+    return unpack(tab1)
+end
+
+function TableUtils.remove(tab, index)
+    if type(index) == "number" then
+        tab[index] = nil
+    else
+        table.remove(tab, table.find(tab, index))
+    end
 end
 
 function TableUtils.lock(tab)
