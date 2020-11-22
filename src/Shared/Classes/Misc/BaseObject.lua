@@ -16,7 +16,7 @@ return shared.DeusFramework:Load("Deus/BaseClass").new("Deus/BaseObject", {
 
     Methods = {
         Clone = function(self)
-            print("I am being cloned!")
+            print(self.Children)
         end;
 
         Destroy = function(self)

@@ -71,15 +71,15 @@ function BaseClass.new(className, classData, superclass)
         TableUtils.merge(classData.Properties, superclass.Properties)
     end
 
+    classData.Internals.ClassName = className
+    classData.Internals.Superclass = superclass
+
     function classData.new()
         local self, metatable = TableProxy.new(
-            {
-                ClassName = className;
-                Superclass = superclass;
-            },
+            TableUtils.shallowCopy(classData.Internals),
             {
                 Events = {};
-                Methods = classData.Methods;
+                Methods = {};
                 Properties = TableUtils.shallowCopy(classData.Properties);
             }
         )
@@ -88,8 +88,22 @@ function BaseClass.new(className, classData, superclass)
         metatable.__newindex = __newindex
         metatable.__tostring = __tostring
 
+        setmetatable(metatable,
+            {
+                __index = __index;
+                __newindex = __newindex;
+            }
+        )
+
         for _,eventName in pairs(classData.Events) do
             metatable.__externals.Events[eventName] = Signal.new()
+        end
+
+        -- Wrapper to allow internal access to the functions
+        for methodName, method in pairs(classData.Methods) do
+            metatable.__externals.Methods[methodName] = function(...)
+                method(metatable, ...)
+            end
         end
 
         return self

@@ -7,19 +7,33 @@ local Metatables = setmetatable({}, {__mode = "kv"})
 local TableProxy = {}
 
 local function __index(self, i)
-    local isInternalAccess, metatable = TableProxy.isInternalAccess(self)
+    local isInternalAccess = TableProxy.isInternalAccess(self)
 
-    local internals = metatable.__internals
-    local externals = metatable.__externals
+    if not isInternalAccess then
+        self = Metatables[self]
+    end
 
-    local v = externals[i]
+    local v = self.__internals[i]
+    if v then
+        if isInternalAccess then
+            return v
+        else
+            Debug.error(2, "[TableProxy] Index '%s' cannot be accessed from externally", i)
+        end
+    end
+
+    v = self.__externalReadOnly[i]
     if v then
         return v
     end
 
-    v = internals[i]
+    v = self.__externalReadAndWrite[i]
     if v then
-        Debug.assert(isInternalAccess, "[TableProxy] Cannot read Internal '%s' from externally", i)
+        return v
+    end
+
+    v = self.__fallbackIndex(self, i, isInternalAccess)
+    if v then
         return v
     end
 
@@ -27,24 +41,48 @@ local function __index(self, i)
 end
 
 local function __newindex(self, i, v)
-    local isInternalAccess, metatable = TableProxy.isInternalAccess(self)
+    local isInternalAccess = TableProxy.isInternalAccess(self)
 
-    local internals = metatable.__internals
-    local externals = metatable.__externals
+    if not isInternalAccess then
+        self = Metatables[self]
+    end
 
-    if externals[i] then
-        externals[i] = v
+    local Internals = self.__internals
+    local ExternalReadOnly = self.__externalReadOnly
+    local ExternalReadAndWrite = self.__externalReadAndWrite
+
+    if Internals[i] then
+        if isInternalAccess then
+            Internals[i] = v
+            return true
+        else
+            Debug.error(2, "[TableProxy] Index '%s' cannot be written to from externally", i)
+        end
+    end
+
+    if ExternalReadOnly[i] then
+        ExternalReadOnly[i] = v
         return true
-    elseif internals[i] then
-        Debug.assert(isInternalAccess, "[TableProxy] Cannot write to Internal '%s' from externally", i)
-        internals[i] = v
+    end
+
+    if ExternalReadAndWrite[i] then
+        ExternalReadAndWrite[i] = v
+        return true
+    end
+
+    if self.__fallbackNewIndex(self, i, v, isInternalAccess) then
         return true
     end
 
     Debug.error(2, "[TableProxy] Index '%s' was not found", i)
 end
 
-function TableProxy.new(internals, externals)
+-- @param tableData.Internals: read/write from internal access
+-- @param tableData.ExternalReadOnly: read from external and read/write from internal access
+-- @param tableData.ExternalReadAndWrite: read/write from external and read/write from internal access
+-- @param tableData.__index: fallback index function of default index function is unable to find index
+-- @param tableData.__newindex: fallback newindex function of default newindex function is unable to find index
+function TableProxy.new(tableData)
     local self = newproxy(true)
     local metatable = getmetatable(self)
 
@@ -52,8 +90,12 @@ function TableProxy.new(internals, externals)
     metatable.__newindex = __newindex
     metatable.__metatable = "[TableProxy] Locked metatable"
 
-    metatable.__internals = internals
-    metatable.__externals = externals
+    metatable.__internals = tableData.Internals or {}
+    metatable.__externalReadOnly = tableData.ExternalReadOnly or {}
+    metatable.__externalReadAndWrite = tableData.ExternalReadAndWrite or {}
+
+    metatable.__fallbackIndex = tableData.__index
+    metatable.__fallbackNewIndex = tableData.__newindex
 
     Metatables[self] = metatable
 
@@ -61,13 +103,12 @@ function TableProxy.new(internals, externals)
 end
 
 function TableProxy.isInternalAccess(self)
-    local metatable = Metatables[self]
-    if metatable then
+    if Metatables[self] then
         -- If metatable was found then 'self' provided was from external access
-        return false, metatable
+        return false
     else
         -- If metatable was not found 'self' provided was likely internal access
-        return true, self
+        return true
     end
 end
 
