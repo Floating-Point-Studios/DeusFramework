@@ -7,45 +7,53 @@ local Debug = Deus:Load("Deus/Debug")
 
 local Connection = require(script.Connection)
 
+local SignalMetatables = {}
+
 local Signal = {}
 
 function Signal.new()
     local self, metatable = TableProxy.new(
         {
-            Connections = setmetatable({}, {__mode = "kv"});
-        },
-        {
-            LastFired = 0;
+            __index = Signal;
+
+            Internals = {
+                Connections = setmetatable({}, {__mode = "kv"});
+            };
+
+            ExternalReadOnly = {
+                LastFired = tick();
+            };
         }
     )
 
-    metatable.__index = Signal
+    SignalMetatables[self] = metatable
 
-    return self
+    return self, metatable
 end
 
 function Signal:Fire(...)
-    local isInternalAccess, metatable = TableProxy.isInternalAccess(self)
-    Debug.assert(isInternalAccess, "[Signal] Cannot fire event externally")
-
-    for _,connection in pairs(metatable.__internals.Connections) do
-        connection.Func(...)
+    Debug.assert(TableProxy.isInternalAccess(self), "[Signal] Cannot fire signal from externally")
+    for _,connection in pairs(self.Connections) do
+        if connection.Connected then
+            connection.Func(...)
+        end
     end
+    self.LastFired = tick()
 end
 
 function Signal:Connect(func)
-    local _,metatable = TableProxy.isInternalAccess(self)
-    local connectionProxy, connectionMetatable = Connection.new(func)
+    if not TableProxy.isInternalAccess(self) then
+        self = SignalMetatables[self]
+    end
 
-    table.insert(metatable.__internals.Connections, connectionMetatable)
+    local connectionProxy, connectionMetatable = Connection.new(func)
+    table.insert(self.Connections, connectionMetatable)
 
     return connectionProxy
 end
 
 function Signal:Wait(timeout)
     timeout = timeout or 30
-
-    local _,metatable = TableProxy.isInternalAccess(self)
 
     local waitStart = tick()
     repeat
@@ -54,7 +62,7 @@ function Signal:Wait(timeout)
             Debug.warn("Event wait timed out after %s seconds", timeout)
             break
         end
-    until metatable.__externals.LastFired > waitStart
+    until self.LastFired > waitStart
 
     return
 end

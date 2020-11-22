@@ -2,27 +2,31 @@ local Deus = shared.DeusFramework
 
 local TableProxy = Deus:Load("Deus/TableProxy")
 
+local ConnectionMetatables = setmetatable({}, {__mode = "kv"})
+
 local Connection = {}
 
 function Connection.new(func)
     local self, metatable = TableProxy.new(
         {
-            Func = func;
-        },
-        {
-            Connected = true;
+            __index = Connection;
+
+            Internals = {
+                Connected = true;
+                Func = func;
+            };
         }
     )
 
-    metatable.__index = Connection
+    ConnectionMetatables[self] = metatable
 
     return self, metatable
 end
 
 function Connection:Disconnect()
-    local _,metatable = TableProxy.isInternalAccess(self)
-    metatable.__internals.Func = nil
-    metatable.__externals.Connected = false
+    self = ConnectionMetatables[self]
+    self.Connected = false
+    self.Func = nil
 end
 
 return Connection

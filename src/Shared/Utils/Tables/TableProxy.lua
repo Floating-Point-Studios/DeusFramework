@@ -1,6 +1,9 @@
+-- Based on RoStrap
+
 local Deus = shared.DeusFramework
 
 local Debug = Deus:Load("Deus/Debug")
+local TypeChecker = Deus:Load("Deus/Typechecker")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 
@@ -13,28 +16,34 @@ local function __index(self, i)
         self = Metatables[self]
     end
 
-    local v = self.__internals[i]
-    if v then
-        if isInternalAccess then
+    local fallbackIndex = rawget(self, "__fallbackIndex")
+
+    local v = rawget(self, "__internals")[i]
+    if type(v) ~= nil then
+        Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
+        return v
+    end
+
+    v = rawget(self, "__externalReadOnly")[i]
+    if type(v) ~= nil then
+        return v
+    end
+
+    v = rawget(self, "__externalReadAndWrite")[i]
+    if type(v) ~= nil then
+        return v
+    end
+
+    if type(fallbackIndex) == "function" then
+        v = fallbackIndex(self, i, isInternalAccess)
+        if type(v) ~= nil then
             return v
-        else
-            Debug.error(2, "[TableProxy] Index '%s' cannot be accessed from externally", i)
         end
-    end
-
-    v = self.__externalReadOnly[i]
-    if v then
-        return v
-    end
-
-    v = self.__externalReadAndWrite[i]
-    if v then
-        return v
-    end
-
-    v = self.__fallbackIndex(self, i, isInternalAccess)
-    if v then
-        return v
+    elseif type(fallbackIndex) == "table" then
+        v = fallbackIndex[i]
+        if type(v) ~= nil then
+            return v
+        end
     end
 
     Debug.error(2, "[TableProxy] Index '%s' was not found", i)
@@ -47,31 +56,37 @@ local function __newindex(self, i, v)
         self = Metatables[self]
     end
 
-    local Internals = self.__internals
-    local ExternalReadOnly = self.__externalReadOnly
-    local ExternalReadAndWrite = self.__externalReadAndWrite
+    local internals = rawget(self, "__internals")
+    local externalReadOnly = rawget(self, "__externalReadOnly")
+    local externalReadAndWrite = rawget(self, "__externalReadAndWrite")
+    local fallbackNewIndex = rawget(self, "__fallbackNewIndex")
 
-    if Internals[i] then
-        if isInternalAccess then
-            Internals[i] = v
+    if internals[i] then
+        Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
+        internals[i] = v
+        return true
+    end
+
+    if externalReadOnly[i] then
+        Debug.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
+        externalReadOnly[i] = v
+        return true
+    end
+
+    if externalReadAndWrite[i] then
+        externalReadAndWrite[i] = v
+        return true
+    end
+
+    if type(fallbackNewIndex) == "function" then
+        if fallbackNewIndex(self, i, isInternalAccess) then
             return true
-        else
-            Debug.error(2, "[TableProxy] Index '%s' cannot be written to from externally", i)
         end
-    end
-
-    if ExternalReadOnly[i] then
-        ExternalReadOnly[i] = v
-        return true
-    end
-
-    if ExternalReadAndWrite[i] then
-        ExternalReadAndWrite[i] = v
-        return true
-    end
-
-    if self.__fallbackNewIndex(self, i, v, isInternalAccess) then
-        return true
+    elseif type(fallbackNewIndex) == "table" then
+        if fallbackNewIndex[i] then
+            fallbackNewIndex[i] = v
+            return true
+        end
     end
 
     Debug.error(2, "[TableProxy] Index '%s' was not found", i)
@@ -90,6 +105,8 @@ function TableProxy.new(tableData)
     metatable.__newindex = __newindex
     metatable.__metatable = "[TableProxy] Locked metatable"
 
+    metatable.__proxy = self
+
     metatable.__internals = tableData.Internals or {}
     metatable.__externalReadOnly = tableData.ExternalReadOnly or {}
     metatable.__externalReadAndWrite = tableData.ExternalReadAndWrite or {}
@@ -98,6 +115,13 @@ function TableProxy.new(tableData)
     metatable.__fallbackNewIndex = tableData.__newindex
 
     Metatables[self] = metatable
+
+    setmetatable(metatable,
+        {
+            __index = __index;
+            __newindex = __newindex;
+        }
+    )
 
     return self, metatable
 end
