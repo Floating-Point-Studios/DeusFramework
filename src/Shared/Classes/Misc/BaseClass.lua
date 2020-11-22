@@ -2,70 +2,68 @@
 
 local Deus = shared.DeusFramework
 
+local TableProxy = Deus:Load("Deus/TableProxy")
 local TableUtils = Deus:Load("Deus/TableUtils")
 local Signal = Deus:Load("Deus/Signal")
 local Debug = Deus:Load("Deus/Debug")
 
-local Metatables = setmetatable({}, {__mode = "kv"})
-
-local function filter(self)
-    local internalAccess = false
-    local metatable = Metatables[self]
-    if not metatable then
-        internalAccess = true
-    end
-    return internalAccess, metatable or self
-end
-
 local function __index(self, i)
-    local internalAccess, self = filter(self)
+    local isInternalAccess, metatable = TableProxy.isInternalAccess(self)
 
-    local v = self.Events[i] or self.Methods[i] or self.Properties[i]
+    local events = metatable.__externals.Events
+    local internals = metatable.__internals
+    local methods = metatable.__externals.Methods
+    local properties = metatable.__externals.Properties
+    local superclass = metatable.__internals.Superclass
+
+    local v = events[i] or methods[i] or properties[i]
     if v then
         return v
-    else
-        v = self.Internals[i]
-        if v then
-            Debug.assert(internalAccess, "[%s] Cannot read Internal '%s' from externally", self.Internals.ClassName, i)
-            return v
-        end
     end
 
-    if self.__superclass then
-        return self.__superclass[i]
+    v = internals[i]
+    if v then
+        Debug.assert(isInternalAccess, "[%s] Cannot read Internal '%s' from externally", internals.ClassName, i)
+        return v
+    end
+
+    if superclass then
+        return superclass[i]
     end
 end
 
 local function __newindex(self, i, v)
-    local internalAccess, self = filter(self)
+    local isInternalAccess, metatable = TableProxy.isInternalAccess(self)
 
-    if self.Events[i] then
-        Debug.assert(internalAccess, "[%s] Cannot write to Event '%s' from externally", self.Internals.ClassName, i)
-        self.Events[i] = v
-    elseif self.Internals[i] then
-        Debug.assert(internalAccess, "[%s] Cannot write to Internal '%s' from externally", self.Internals.ClassName, i)
-        self.Internals[i] = v
-    elseif self.Methods[i] then
-        Debug.assert(internalAccess, "[%s] Cannot write Method '%s' from externally", self.Internals.ClassName, i)
-        self.Methods[i] = v
-    elseif self.Properties[i] then
-        self.Properties[i] = v
+    local events = metatable.__externals.Events
+    local internals = metatable.__internals
+    local methods = metatable.__externals.Methods
+    local properties = metatable.__externals.Properties
+
+    if events[i] then
+        Debug.assert(isInternalAccess, "[%s] Cannot write to Event '%s' from externally", internals.ClassName, i)
+        events[i] = v
+    elseif internals[i] then
+        Debug.assert(isInternalAccess, "[%s] Cannot write to Internal '%s' from externally", internals.ClassName, i)
+        internals[i] = v
+    elseif methods[i] then
+        Debug.assert(isInternalAccess, "[%s] Cannot write Method '%s' from externally", internals.ClassName, i)
+        methods[i] = v
+    elseif properties[i] then
+        properties[i] = v
     else
         Debug.error(2, "[%s] Index '%s' was not found", self.Internals.ClassName, i)
     end
 end
 
 local function __tostring(self)
-    local _,self = filter(self)
-    return self.Internals.ClassName
+    local _,metatable = TableProxy.isInternalAccess(self)
+    return metatable.__internals.ClassName
 end
 
 local BaseClass = {}
 
 function BaseClass.new(className, classData, superclass)
-    classData.ClassName = className
-    classData.Superclass = superclass
-
     if superclass then
         TableUtils.merge(classData.Events, superclass.Events)
         TableUtils.merge(classData.Internals, superclass.Internals)
@@ -74,32 +72,30 @@ function BaseClass.new(className, classData, superclass)
     end
 
     function classData.new()
-        local self = newproxy(true)
-        local metatable = getmetatable(self)
+        local self, metatable = TableProxy.new(
+            {
+                ClassName = className;
+                Superclass = superclass;
+            },
+            {
+                Events = {};
+                Methods = classData.Methods;
+                Properties = TableUtils.shallowCopy(classData.Properties);
+            }
+        )
 
         metatable.__index = __index
         metatable.__newindex = __newindex
         metatable.__tostring = __tostring
-        metatable.__metatable = ("[%s] Locked metatable"):format(classData.ClassName)
-
-        metatable.__class = {
-            Events = {};
-            Internals = classData.Internals;
-            Methods = classData.Methods;
-            Properties = TableUtils.shallowCopy(classData.Properties)
-        }
-        metatable.__superclass = classData.Superclass
 
         for _,eventName in pairs(classData.Events) do
-            metatable.__class.Events[eventName] = Signal.new()
+            metatable.__externals.Events[eventName] = Signal.new()
         end
-
-        Metatables[self] = metatable
 
         return self
     end
 
-    return TableUtils.lock(setmetatable(classData, {__index = BaseClass}))
+    return setmetatable(classData, {__index = BaseClass})
 end
 
 return BaseClass
