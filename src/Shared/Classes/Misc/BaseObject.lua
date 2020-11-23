@@ -1,29 +1,19 @@
-return shared.DeusFramework:Load("Deus/BaseClass").new("Deus/BaseObject",
+local Deus = shared.DeusFramework
+
+local BaseClass = Deus:Load("Deus/BaseClass")
+local Maid = Deus:Load("Deus/Maid")
+
+return BaseClass.new("Deus/BaseObject",
     {
+        Events = {};
 
-        Events = {"TestEvent1"};
-
-        Internals = {
-            __index = function(self, i)
-                return self.Children[i]
-            end;
-
-            __newindex = function(self, i, v)
-                self.Children[i] = v
-                return true
-            end;
-
-            Children = {};
-        };
+        Internals = {};
 
         Methods = {
-            Clone = function(self)
-                print(self.TestEvent1)
-                self.TestEvent1:Fire("uwu")
-            end;
-
             Destroy = function(self)
-                print("I am being destroyed!")
+                self.Maid:DoCleaning()
+
+                setmetatable(self, nil)
             end;
         };
 
@@ -34,7 +24,7 @@ return shared.DeusFramework:Load("Deus/BaseClass").new("Deus/BaseObject",
         };
 
         Constructor = function(self)
-            
+            self.__internals.Maid = Maid.new()
         end
     }
 )
