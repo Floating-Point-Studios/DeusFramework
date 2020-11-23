@@ -4,7 +4,7 @@ local TableProxy = Deus:Load("Deus/TableProxy")
 local TableUtils = Deus:Load("Deus/TableUtils")
 local Signal = Deus:Load("Deus/Signal")
 local Debug = Deus:Load("Deus/Debug")
-local TypeChecker = Deus:Load("Deus/Typechecker")
+local TypeChecker = Deus:Load("Deus/TypeChecker")
 
 local function __index(self, i, isInternalAccess)
     local internals = rawget(self, "__internals")
@@ -21,13 +21,13 @@ local function __index(self, i, isInternalAccess)
     end
 
     local v = internals[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot read from Internal '%s' from externally", className, i)
         return v
     end
 
     v = externalReadOnly.Events[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         if isInternalAccess then
             return v
         else
@@ -36,28 +36,28 @@ local function __index(self, i, isInternalAccess)
     end
 
     v = externalReadOnly.Methods[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         return v
     end
 
     v = externalReadAndWrite.Properties[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         return v
     end
 
     v = superclass[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         return v
     end
 
     if type(fallbackIndex) == "function" then
         v = fallbackIndex(self, i, isInternalAccess)
-        if type(v) ~= nil then
+        if v ~= nil then
             return v
         end
     elseif type(fallbackIndex) == "table" then
         v = fallbackIndex[i]
-        if type(v) ~= nil then
+        if v ~= nil then
             return v
         end
     end
@@ -128,6 +128,11 @@ local BaseClass = {}
 function BaseClass.new(className, classData, superclass)
     local constructor = classData.Constructor
 
+    classData.Events = classData.Events or {}
+    classData.Internals = classData.Internals or {}
+    classData.Methods = classData.Methods or {}
+    classData.Properties = classData.Properties or {}
+
     if superclass then
         TableUtils.merge(classData.Events, superclass.Events)
         TableUtils.merge(classData.Internals, superclass.Internals)
@@ -171,16 +176,16 @@ function BaseClass.new(className, classData, superclass)
             end
         end
 
+        if constructor then
+            constructor(metatable)
+        end
+
         setmetatable(metatable,
             {
                 __index = __index;
                 __newindex = __newindex;
             }
         )
-
-        if constructor then
-            constructor(metatable)
-        end
 
         return self
     end

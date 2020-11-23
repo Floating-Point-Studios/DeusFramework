@@ -3,7 +3,7 @@
 local Deus = shared.DeusFramework
 
 local Debug = Deus:Load("Deus/Debug")
-local TypeChecker = Deus:Load("Deus/Typechecker")
+local TypeChecker = Deus:Load("Deus/TypeChecker")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 
@@ -19,29 +19,29 @@ local function __index(self, i)
     local fallbackIndex = rawget(self, "__fallbackIndex")
 
     local v = rawget(self, "__internals")[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
         return v
     end
 
     v = rawget(self, "__externalReadOnly")[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         return v
     end
 
     v = rawget(self, "__externalReadAndWrite")[i]
-    if type(v) ~= nil then
+    if v ~= nil then
         return v
     end
 
     if type(fallbackIndex) == "function" then
         v = fallbackIndex(self, i, isInternalAccess)
-        if type(v) ~= nil then
+        if v ~= nil then
             return v
         end
     elseif type(fallbackIndex) == "table" then
         v = fallbackIndex[i]
-        if type(v) ~= nil then
+        if v ~= nil then
             return v
         end
     end

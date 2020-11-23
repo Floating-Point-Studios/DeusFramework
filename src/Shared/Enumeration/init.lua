@@ -1,7 +1,7 @@
 local Deus = shared.DeusFramework
 
 local TableUtils = Deus:Load("Deus/TableUtils")
-local Debugging = Deus:Load("Deus/Debugging")
+local Debugging = Deus:Load("Deus/Debug")
 
 local Enumeration = {}
 
