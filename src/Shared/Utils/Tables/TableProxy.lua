@@ -3,7 +3,6 @@
 local Deus = shared.DeusFramework
 
 local Debug = Deus:Load("Deus/Debug")
-local TypeChecker = Deus:Load("Deus/TypeChecker")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 

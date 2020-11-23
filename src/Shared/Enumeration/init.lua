@@ -25,7 +25,7 @@ function Enumeration.init()
                 {
                     Name = i;
                     Value = v;
-                    EnumItem = enumItemArray;
+                    EnumType = enumItemArray;
                 }
             )
         end
