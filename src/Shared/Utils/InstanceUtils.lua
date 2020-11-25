@@ -22,4 +22,13 @@ function InstanceUtils.instanceConfig(configName, config, parent)
     return configFolder
 end
 
+function InstanceUtils.onDestroy(obj, func, ...)
+    local args = {...}
+    obj.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            func(args)
+        end
+    end)
+end
+
 return InstanceUtils

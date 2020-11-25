@@ -4,6 +4,7 @@ local TableProxy = Deus:Load("Deus/TableProxy")
 local TableUtils = Deus:Load("Deus/TableUtils")
 local Signal = Deus:Load("Deus/Signal")
 local Debug = Deus:Load("Deus/Debug")
+local Symbol = Deus:Load("Deus/Symbol")
 
 local function __index(self, i, isInternalAccess)
     local internals = rawget(self, "Internals")
@@ -74,6 +75,9 @@ local function __index(self, i, isInternalAccess)
 end
 
 local function __newindex(self, i, v, isInternalAccess)
+    -- Symbol for nil is used as if user attempts to write to this index again while it is nil it will error
+    v = v or Symbol.new("nil")
+
     local internals = rawget(self, "Internals")
     local externalReadOnly = rawget(self, "ExternalReadOnly")
     local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
@@ -157,7 +161,7 @@ function BaseClass.new(classData)
         TableUtils.merge(classData.Properties, superclass.Properties)
     end
 
-    function classData.new()
+    function classData.new(...)
         local self, metatable = TableProxy.new(
             {
                 __index = __index;
@@ -194,7 +198,7 @@ function BaseClass.new(classData)
         end
 
         if constructor then
-            constructor(metatable)
+            constructor(metatable, ...)
         end
 
         setmetatable(metatable,

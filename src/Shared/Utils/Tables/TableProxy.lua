@@ -3,6 +3,7 @@
 local Deus = shared.DeusFramework
 
 local Debug = Deus:Load("Deus/Debug")
+local Symbol = Deus:Load("Deus/Symbol")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 
@@ -56,6 +57,9 @@ local function __index(self, i)
 end
 
 local function __newindex(self, i, v)
+    -- Symbol for nil is used as if user attempts to write to this index again while it is nil it will error
+    v = v or Symbol.new("nil")
+
     local isInternalAccess = TableProxy.isInternalAccess(self)
 
     if not isInternalAccess then
