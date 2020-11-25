@@ -7,10 +7,6 @@ local Debug = Deus:Load("Deus/Debug")
 
 local EnvironmentVariablesRef = require(script.EnvironmentVariables)
 
-local function threadPermissionTest()
-    game:GetService("CoreGui")
-end
-
 local function checkForEnvVars(vars, env)
     local finds = 0
     for varName, varType in pairs(vars) do
@@ -42,7 +38,7 @@ end
 
 -- checks if thread has normal permissions
 function Security.isThreadPermissionNormal()
-    local success = pcall(threadPermissionTest)
+    local success = pcall(game.GetService, game, "CoreGui")
     return not success
 end
 
@@ -84,7 +80,7 @@ function Security.inspectThread(deepScan)
 
     test1 = Security.isThreadPermissionNormal()
 
-    if deepScan and not test1 then
+    if deepScan then
         local envs = Security.getenvs()
         test2 = Security.isExploitEnv(envs[#envs])
     end

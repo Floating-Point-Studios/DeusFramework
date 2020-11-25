@@ -27,9 +27,7 @@ end
 
 -- Returns whether the string is JSON formatted
 function StringUtils.isJSON(str)
-    return pcall(function()
-        HttpService:JSONDecode(str)
-    end)
+    return pcall(HttpService.JSONDecode, HttpService, str)
 end
 
 -- Replaces pattern repetitions such as "/////" to "/"

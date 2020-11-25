@@ -184,6 +184,7 @@ function BaseClass.new(classData)
         )
 
         rawset(metatable, "__tostring", __tostring)
+        rawset(metatable, "__proxy", self)
 
         for _,eventName in pairs(classData.Events) do
             local _,signalMetatable = Signal.new()
