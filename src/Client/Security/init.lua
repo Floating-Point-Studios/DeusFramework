@@ -11,7 +11,7 @@ end
 local function checkForEnvVars(vars, env)
     local finds = 0
     for varName, varType in pairs(vars) do
-        local v = vars[varName]
+        local v = env[varName]
         if v and type(v) == varType then
             finds += 1
         end
@@ -21,6 +21,7 @@ end
 
 local Security = {}
 
+-- returns all environments in the thread
 function Security.getenvs()
     local environments = {}
     for i = 1, math.huge do
@@ -36,11 +37,13 @@ function Security.getenvs()
     end
 end
 
+-- checks if thread has normal permissions
 function Security.isThreadPermissionNormal()
     local success = pcall(threadPermissionTest)
     return not success
 end
 
+-- checks if globals in the thread's beginning environment contains exploit globals
 function Security.isExploitEnv(env)
     for exploitName, vars in pairs(EnvironmentVariablesRef.Exploits) do
         if checkForEnvVars(vars, env) >= 3 then
@@ -50,6 +53,7 @@ function Security.isExploitEnv(env)
     return false
 end
 
+-- removes the Source container of a ModuleScript preventing decompiling, use conservatively as global injections slow down the Luau VM
 function Security.removeSource()
     local env = getfenv(2)
     local curScript = env.script
@@ -68,6 +72,8 @@ function Security.removeSource()
     return dummy
 end
 
+-- performs a series of checks if the thread was started by an exploit
+-- @param deepScan: if true, more costly tests will be run
 function Security.inspectThread(deepScan)
     local test1 = false
     local test2 = false
