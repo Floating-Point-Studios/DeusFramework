@@ -57,12 +57,13 @@ local function __index(self, i, isInternalAccess)
     end
     --]]
 
-    if type(fallbackIndex) == "function" then
+    local fallbackIndexType = type(fallbackIndex)
+    if fallbackIndexType == "function" then
         v = fallbackIndex(self, i, isInternalAccess)
         if v ~= nil then
             return v
         end
-    elseif type(fallbackIndex) == "table" then
+    elseif fallbackIndexType == "table" then
         v = fallbackIndex[i]
         if v ~= nil then
             return v
@@ -118,11 +119,12 @@ local function __newindex(self, i, v, isInternalAccess)
         return
     end
 
-    if type(fallbackNewIndex) == "function" then
+    local fallbackNewIndexType = type(fallbackNewIndex)
+    if fallbackNewIndexType == "function" then
         if fallbackNewIndex(self, i, isInternalAccess) then
             return
         end
-    elseif type(fallbackNewIndex) == "table" then
+    elseif fallbackNewIndexType == "table" then
         if fallbackNewIndex[i] then
             fallbackNewIndex[i] = v
             return
