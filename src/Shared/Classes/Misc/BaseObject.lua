@@ -3,28 +3,29 @@ local Deus = shared.DeusFramework
 local BaseClass = Deus:Load("Deus/BaseClass")
 local Maid = Deus:Load("Deus/Maid")
 
-return BaseClass.new("Deus/BaseObject",
+return BaseClass.new(
     {
-        Events = {};
+        ClassName = "Deus/BaseObject";
+
+        Superclass = nil;
+
+        Constructor = function(self)
+            self.Internals.Maid = Maid.new()
+        end;
+
+        Events = {"OnDestroy"};
 
         Internals = {};
 
         Methods = {
             Destroy = function(self)
+                self.OnDestroy:Fire()
                 self.Maid:DoCleaning()
 
                 setmetatable(self, nil)
             end;
         };
 
-        Properties = {
-            TestProperty1 = true;
-            Testproperty2 = "String";
-            TestProperty3 = Vector3.new();
-        };
-
-        Constructor = function(self)
-            self.__internals.Maid = Maid.new()
-        end
+        Properties = {}
     }
 )

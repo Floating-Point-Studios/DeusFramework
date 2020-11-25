@@ -4,7 +4,6 @@ local TableProxy = Deus:Load("Deus/TableProxy")
 local TableUtils = Deus:Load("Deus/TableUtils")
 local Signal = Deus:Load("Deus/Signal")
 local Debug = Deus:Load("Deus/Debug")
-local TypeChecker = Deus:Load("Deus/TypeChecker")
 
 local function __index(self, i, isInternalAccess)
     local internals = rawget(self, "__internals")
@@ -12,7 +11,7 @@ local function __index(self, i, isInternalAccess)
     local externalReadAndWrite = rawget(self, "__externalReadAndWrite")
 
     local className = externalReadOnly.ClassName
-    local superclass = externalReadOnly.Superclass
+    -- local superclass = externalReadOnly.Superclass
 
     local fallbackIndex = internals.__index
 
@@ -45,10 +44,12 @@ local function __index(self, i, isInternalAccess)
         return v
     end
 
-    v = superclass[i]
+    --[[
+    v = superclass.Methods[i]
     if v ~= nil then
         return v
     end
+    --]]
 
     if type(fallbackIndex) == "function" then
         v = fallbackIndex(self, i, isInternalAccess)
@@ -125,7 +126,9 @@ end
 
 local BaseClass = {}
 
-function BaseClass.new(className, classData, superclass)
+function BaseClass.new(classData)
+    local className = classData.ClassName
+    local superclass = classData.Superclass
     local constructor = classData.Constructor
 
     classData.Events = classData.Events or {}
