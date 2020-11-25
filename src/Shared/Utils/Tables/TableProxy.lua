@@ -17,19 +17,25 @@ local function __index(self, i)
 
     local fallbackIndex = rawget(self, "__fallbackIndex")
 
-    local v = rawget(self, "__internals")[i]
+    local v = rawget(self, "Internals")[i]
     if v ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
         return v
     end
 
-    v = rawget(self, "__externalReadOnly")[i]
+    v = rawget(self, "ExternalReadOnly")[i]
     if v ~= nil then
         return v
     end
 
-    v = rawget(self, "__externalReadAndWrite")[i]
+    v = rawget(self, "ExternalReadAndWrite")[i]
     if v ~= nil then
+        return v
+    end
+
+    v = rawget(self, i)
+    if v ~= nil then
+        Debug.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be read from externally", i)
         return v
     end
 
@@ -55,25 +61,31 @@ local function __newindex(self, i, v)
         self = Metatables[self]
     end
 
-    local internals = rawget(self, "__internals")
-    local externalReadOnly = rawget(self, "__externalReadOnly")
-    local externalReadAndWrite = rawget(self, "__externalReadAndWrite")
+    local internals = rawget(self, "Internals")
+    local externalReadOnly = rawget(self, "ExternalReadOnly")
+    local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
     local fallbackNewIndex = rawget(self, "__fallbackNewIndex")
 
-    if internals[i] then
+    if internals[i] ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
         internals[i] = v
         return
     end
 
-    if externalReadOnly[i] then
+    if externalReadOnly[i] ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
         externalReadOnly[i] = v
         return
     end
 
-    if externalReadAndWrite[i] then
+    if externalReadAndWrite[i] ~= nil then
         externalReadAndWrite[i] = v
+        return
+    end
+
+    if rawget(self, i) ~= nil then
+        Debug.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be written to externally", i)
+        rawset(self, i, v)
         return
     end
 
@@ -106,9 +118,9 @@ function TableProxy.new(tableData)
 
     metatable.__proxy = self
 
-    metatable.__internals = tableData.Internals or {}
-    metatable.__externalReadOnly = tableData.ExternalReadOnly or {}
-    metatable.__externalReadAndWrite = tableData.ExternalReadAndWrite or {}
+    metatable.Internals = tableData.Internals or {}
+    metatable.ExternalReadOnly = tableData.ExternalReadOnly or {}
+    metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite or {}
 
     metatable.__fallbackIndex = tableData.__index
     metatable.__fallbackNewIndex = tableData.__newindex

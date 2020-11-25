@@ -6,9 +6,9 @@ local Signal = Deus:Load("Deus/Signal")
 local Debug = Deus:Load("Deus/Debug")
 
 local function __index(self, i, isInternalAccess)
-    local internals = rawget(self, "__internals")
-    local externalReadOnly = rawget(self, "__externalReadOnly")
-    local externalReadAndWrite = rawget(self, "__externalReadAndWrite")
+    local internals = rawget(self, "Internals")
+    local externalReadOnly = rawget(self, "ExternalReadOnly")
+    local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
 
     local className = externalReadOnly.ClassName
     -- local superclass = externalReadOnly.Superclass
@@ -44,6 +44,12 @@ local function __index(self, i, isInternalAccess)
         return v
     end
 
+    v = rawget(self, i)
+    if v ~= nil then
+        Debug.assert(isInternalAccess, "[%s] Cannot read from Internal '%s' from externally", className, i)
+        return v
+    end
+
     --[[
     v = superclass.Methods[i]
     if v ~= nil then
@@ -67,9 +73,9 @@ local function __index(self, i, isInternalAccess)
 end
 
 local function __newindex(self, i, v, isInternalAccess)
-    local internals = rawget(self, "__internals")
-    local externalReadOnly = rawget(self, "__externalReadOnly")
-    local externalReadAndWrite = rawget(self, "__externalReadAndWrite")
+    local internals = rawget(self, "Internals")
+    local externalReadOnly = rawget(self, "ExternalReadOnly")
+    local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
 
     local events = externalReadOnly.Events
     local methods = externalReadOnly.Methods
@@ -82,27 +88,33 @@ local function __newindex(self, i, v, isInternalAccess)
         isInternalAccess = TableProxy.isInternalAccess(self)
     end
 
-    if internals[i] then
+    if internals[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Internal '%s' from externally", className, i)
         internals[i] = v
         return
     end
 
     -- Events shouldn't ever need to be written to but internal has permission to anyway
-    if events[i] then
+    if events[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Event '%s' from externally", className, i)
         events[i] = v
         return
     end
 
-    if methods[i] then
+    if methods[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Method '%s' from externally", className, i)
         methods[i] = v
         return
     end
 
-    if properties[i] then
+    if properties[i] ~= nil then
         properties[i] = v
+        return
+    end
+
+    if rawget(self, i) ~= nil then
+        Debug.assert(isInternalAccess, "[%s] Cannot write to index '%s' from externally", className, i)
+        rawset(self, i, v)
         return
     end
 
@@ -127,7 +139,7 @@ end
 local BaseClass = {}
 
 function BaseClass.new(classData)
-    local className = classData.ClassName
+    local className = classData.ClassName or "Deus/UnnamedObject"
     local superclass = classData.Superclass
     local constructor = classData.Constructor
 
@@ -169,12 +181,12 @@ function BaseClass.new(classData)
 
         for _,eventName in pairs(classData.Events) do
             local _,signalMetatable = Signal.new()
-            metatable.__externalReadOnly.Events[eventName] = signalMetatable
+            metatable.ExternalReadOnly.Events[eventName] = signalMetatable
         end
 
         -- Wrapper to allow internal access to the functions
         for methodName, method in pairs(classData.Methods) do
-            metatable.__externalReadOnly.Methods[methodName] = function(...)
+            metatable.ExternalReadOnly.Methods[methodName] = function(...)
                 method(metatable, ...)
             end
         end
@@ -191,6 +203,11 @@ function BaseClass.new(classData)
         )
 
         return self
+    end
+
+    function classData:Extend(classData)
+        classData.Superclass = self
+        return BaseClass.new(classData)
     end
 
     return setmetatable(classData, {__index = BaseClass})
