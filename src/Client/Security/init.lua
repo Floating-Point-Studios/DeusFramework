@@ -1,3 +1,6 @@
+-- This module can detect exploits, it is not guaranteed to as these checks can still be bypassed
+-- This module is meant to stop low-level exploits, sanity-checks should still be in place on server
+
 local Deus = shared.Deus
 
 local Debug = Deus:Load("Deus/Debug")
@@ -68,6 +71,7 @@ function Security.removeSource()
     end
 
     env.script = dummy
+    curScript:Destroy()
 
     return dummy
 end
@@ -80,7 +84,7 @@ function Security.inspectThread(deepScan)
 
     test1 = Security.isThreadPermissionNormal()
 
-    if deepScan then
+    if deepScan and not test1 then
         local envs = Security.getenvs()
         test2 = Security.isExploitEnv(envs[#envs])
     end
