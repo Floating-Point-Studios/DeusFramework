@@ -63,28 +63,28 @@ local function __newindex(self, i, v)
     if internals[i] then
         Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
         internals[i] = v
-        return true
+        return
     end
 
     if externalReadOnly[i] then
         Debug.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
         externalReadOnly[i] = v
-        return true
+        return
     end
 
     if externalReadAndWrite[i] then
         externalReadAndWrite[i] = v
-        return true
+        return
     end
 
     if type(fallbackNewIndex) == "function" then
         if fallbackNewIndex(self, i, isInternalAccess) then
-            return true
+            return
         end
     elseif type(fallbackNewIndex) == "table" then
         if fallbackNewIndex[i] then
             fallbackNewIndex[i] = v
-            return true
+            return
         end
     end
 

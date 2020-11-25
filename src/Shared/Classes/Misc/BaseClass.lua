@@ -84,35 +84,35 @@ local function __newindex(self, i, v, isInternalAccess)
     if internals[i] then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Internal '%s' from externally", className, i)
         internals[i] = v
-        return true
+        return
     end
 
     -- Events shouldn't ever need to be written to but internal has permission to anyway
     if events[i] then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Event '%s' from externally", className, i)
         events[i] = v
-        return true
+        return
     end
 
     if methods[i] then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Method '%s' from externally", className, i)
         methods[i] = v
-        return true
+        return
     end
 
     if properties[i] then
         properties[i] = v
-        return true
+        return
     end
 
     if type(fallbackNewIndex) == "function" then
         if fallbackNewIndex(self, i, isInternalAccess) then
-            return true
+            return
         end
     elseif type(fallbackNewIndex) == "table" then
         if fallbackNewIndex[i] then
             fallbackNewIndex[i] = v
-            return true
+            return
         end
     end
 

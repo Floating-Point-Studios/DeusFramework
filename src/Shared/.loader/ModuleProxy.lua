@@ -1,6 +1,14 @@
 return function(module)
     if typeof(module) == "Instance" then
-        module = require(module)
+        local success, result = pcall(function()
+            return require(module)
+        end)
+
+        if success then
+            return result
+        else
+            error(("Library '%s' failed to load due to error\n%s"):format(module.Name, result), 2)
+        end
     end
 
     -- Return may have been a userdata
