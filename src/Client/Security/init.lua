@@ -1,7 +1,7 @@
 -- This module can detect exploits, it is not guaranteed to as these checks can still be bypassed
 -- This module is meant to stop low-level exploits, sanity-checks should still be in place on server
 
-local Deus = shared.Deus
+local Deus = shared.DeusFramework
 
 local Debug = Deus:Load("Deus/Debug")
 

@@ -1,4 +1,4 @@
-local Deus = shared.Deus
+local Deus = shared.DeusFramework
 
 local RunService = game:GetService("RunService")
 
@@ -43,7 +43,7 @@ return Deus:Load("Deus/BaseObject"):Extend(
                     return output
                 end
             else
-                Debug.assert(RemoteFunction, "Unexpected RemoteFunction provided while on server")
+                Debug.assert(not RemoteFunction, "Unexpected RemoteFunction provided while on server")
 
                 RemoteFunction = Instance.new("RemoteFunction")
                 self.Internals.RemoteFunction = RemoteFunction

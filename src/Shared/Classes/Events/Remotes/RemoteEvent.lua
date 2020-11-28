@@ -1,4 +1,4 @@
-local Deus = shared.Deus
+local Deus = shared.DeusFramework
 
 local RunService = game:GetService("RunService")
 
@@ -10,15 +10,6 @@ local SymbolNone = Symbol.new("None")
 
 return Deus:Load("Deus/BaseObject"):Extend(
     {
-        __index = function(self, i)
-            return self.Internals.RemoteEvent[i]
-        end;
-
-        __newindex = function(self, i, v)
-            self.Internals.RemoteEvent[i] = v
-            return true
-        end;
-
         ClassName = "Deus/RemoteEvent";
 
         Constructor = function(self, remoteEvent)
@@ -43,7 +34,7 @@ return Deus:Load("Deus/BaseObject"):Extend(
                     end
                 end)
             else
-                Debug.assert(remoteEvent, "Unexpected RemoteEvent provided while on server")
+                Debug.assert(not remoteEvent, "Unexpected RemoteEvent provided while on server")
 
                 remoteEvent = Instance.new("RemoteEvent")
                 self.Internals.RemoteEvent = remoteEvent
@@ -67,6 +58,15 @@ return Deus:Load("Deus/BaseObject"):Extend(
         end;
 
         Internals = {
+            __index = function(self, i)
+                return self.Internals.RemoteEvent[i]
+            end;
+
+            __newindex = function(self, i, v)
+                self.Internals.RemoteEvent[i] = v
+                return true
+            end;
+
             Connections = setmetatable({}, {__mode = "kv"})
         };
 

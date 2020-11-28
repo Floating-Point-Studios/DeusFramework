@@ -1,4 +1,4 @@
-local Deus = shared.Deus
+local Deus = shared.DeusFramework
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -54,6 +54,14 @@ function NetworkService.onRemoteFunctionAdded(callback)
             callback(remote)
         end
     end
+end
+
+function NetworkService.connectRemoteEvent(remoteName, func)
+    RemoteEvents[remoteName]:Connect(func)
+end
+
+function NetworkService.connectRemoteFunction(remoteName, func)
+    RemoteFunctions[remoteName]:Connect(func)
 end
 
 function NetworkService.init()

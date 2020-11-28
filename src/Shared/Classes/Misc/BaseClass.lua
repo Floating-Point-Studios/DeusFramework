@@ -96,42 +96,42 @@ local function __newindex(self, i, v, isInternalAccess)
     if internals[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Internal '%s' from externally", className, i)
         internals[i] = v
-        return
+        return true
     end
 
     -- Events shouldn't ever need to be written to but internal has permission to anyway
     if events[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Event '%s' from externally", className, i)
         events[i] = v
-        return
+        return true
     end
 
     if methods[i] ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to Method '%s' from externally", className, i)
         methods[i] = v
-        return
+        return true
     end
 
     if properties[i] ~= nil then
         properties[i] = v
-        return
+        return true
     end
 
     if rawget(self, i) ~= nil then
         Debug.assert(isInternalAccess, "[%s] Cannot write to index '%s' from externally", className, i)
         rawset(self, i, v)
-        return
+        return true
     end
 
     local fallbackNewIndexType = type(fallbackNewIndex)
     if fallbackNewIndexType == "function" then
-        if fallbackNewIndex(self, i, isInternalAccess) then
-            return
+        if fallbackNewIndex(self, i, v, isInternalAccess) then
+            return true
         end
     elseif fallbackNewIndexType == "table" then
         if fallbackNewIndex[i] then
             fallbackNewIndex[i] = v
-            return
+            return true
         end
     end
 

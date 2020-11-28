@@ -74,35 +74,35 @@ local function __newindex(self, i, v)
     if internals[i] ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
         internals[i] = v
-        return
+        return true
     end
 
     if externalReadOnly[i] ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
         externalReadOnly[i] = v
-        return
+        return true
     end
 
     if externalReadAndWrite[i] ~= nil then
         externalReadAndWrite[i] = v
-        return
+        return true
     end
 
     if rawget(self, i) ~= nil then
         Debug.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be written to externally", i)
         rawset(self, i, v)
-        return
+        return true
     end
 
     local fallbackNewIndexType = type(fallbackNewIndex)
     if fallbackNewIndexType == "function" then
-        if fallbackNewIndex(self, i, isInternalAccess) then
-            return
+        if fallbackNewIndex(self, i, v, isInternalAccess) then
+            return true
         end
     elseif fallbackNewIndexType == "table" then
         if fallbackNewIndex[i] then
             fallbackNewIndex[i] = v
-            return
+            return true
         end
     end
 

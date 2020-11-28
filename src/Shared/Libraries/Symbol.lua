@@ -3,7 +3,7 @@
 local Symbols = {}
 
 function __tostring(self)
-    return self.__type
+    return "[Symbol] ".. Symbols[self].__type
 end
 
 local Symbol = {}
@@ -22,6 +22,7 @@ function Symbol.new(name)
     metatable.__type = name
 
     Symbols[name] = symbol
+    Symbols[self] = metatable
 
     return self
 end
