@@ -29,7 +29,7 @@ return Deus:Load("Deus/BaseObject"):Extend(
                 function RemoteFunction.OnClientInvoke(...)
                     local args = {...}
                     local receiveFilter = self.ExternalReadOnly.ReceiveFilter
-                    local returnFilter = self.ExternalReadAndWrite.ReturnFilter
+                    local returnFilter = self.ExternalReadAndWrite.SendingReturnFilter
 
                     if type(receiveFilter) == "function" then
                         args = {receiveFilter(...)}
@@ -51,14 +51,14 @@ return Deus:Load("Deus/BaseObject"):Extend(
                 function RemoteFunction.OnServerInvoke(...)
                     local args = {...}
                     local receiveFilter = self.ExternalReadOnly.ReceiveFilter
-                    local returnFilter = self.ExternalReadAndWrite.ReturnFilter
+                    local returnFilter = self.ExternalReadAndWrite.SendingReturnFilter
 
                     if type(receiveFilter) == "function" then
                         args = {receiveFilter(...)}
                     end
 
                     local output = self.Internals.Callback(args)
-                    if type(receiveFilter) == "function" then
+                    if type(returnFilter) == "function" then
                         output = {returnFilter(...)}
                     end
 
@@ -72,20 +72,27 @@ return Deus:Load("Deus/BaseObject"):Extend(
         };
 
         Methods = {
-            Fire = function(self, ...)
+            Invoke = function(self, ...)
                 local args = {...}
                 local sendFilter = self.ExternalReadAndWrite.SendFilter
-                local receiveFilter = self.ExternalReadAndWrite.ReceiveFilter
+                local returnFilter = self.ExternalReadAndWrite.ReceivingReturnFilter
 
                 if type(sendFilter) == "function" then
                     args = {sendFilter(...)}
                 end
 
+                local output
                 if RunService:IsClient() then
-                    self.Internals.RemoteFunction:InvokeServer(unpack(args))
+                    output = self.Internals.RemoteFunction:InvokeServer(unpack(args))
                 else
-                    self.Internals.RemoteFunction:InvokeClient(unpack(args))
+                    output = self.Internals.RemoteFunction:InvokeClient(unpack(args))
                 end
+
+                if type(returnFilter) == "function" then
+                    output = {returnFilter(...)}
+                end
+
+                return output
             end;
 
             Connect = function(self, func)
@@ -115,7 +122,8 @@ return Deus:Load("Deus/BaseObject"):Extend(
         ExternalReadAndWrite = {
             SendFilter = SymbolNone;
             ReceiveFilter = SymbolNone;
-            ReturnFilter = SymbolNone
+            SendingReturnFilter = SymbolNone;
+            ReceivingReturnFilter = SymbolNone
         };
     }
 )
