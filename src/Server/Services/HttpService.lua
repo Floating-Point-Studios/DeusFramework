@@ -1,3 +1,7 @@
+local Deus = shared.Deus
+
+local TableUtils = Deus:Load("Deus/TableUtils")
+
 local RBXHttpService = game:GetService("HttpService")
 
 local function requestAsync(url, method, headers, body)
@@ -53,4 +57,4 @@ function HttpService.insertPathParams(path, params)
     
 end
 
-return setmetatable(HttpService, {__index = RBXHttpService})
+return setmetatable(HttpService, {__index = TableUtils.instanceAsNewIndex(RBXHttpService)})
