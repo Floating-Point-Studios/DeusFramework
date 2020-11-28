@@ -23,29 +23,34 @@ return Deus:Load("Deus/BaseObject"):Extend(
 
         Constructor = function(self, remoteEvent)
             if RunService:IsClient() then
+                Debug.assert(remoteEvent, "Expected to be provided a RemoteEvent while on client")
+
                 self.Internals.RemoteEvent = remoteEvent
 
                 self.Internals.RemoteConnection = remoteEvent.OnClientEvent:Connect(function(...)
                     local args = {...}
-                    local sendFilter = self.ExternalReadOnly.SendFilter
+                    local receiveFilter = self.ExternalReadAndWrite.ReceiveFilter
 
-                    if type(sendFilter) == "function" then
-                        args = sendFilter(...)
+                    if type(receiveFilter) == "function" then
+                        args = {receiveFilter(...)}
                     end
 
-                    if RunService:IsClient() then
-                        self.Internals.RemoteEvent:FireServer(unpack(args))
-                    else
-                        self.Internals.RemoteEvent:FireClient(unpack(args))
+                    for _,connection in pairs(self.Internals.Connections) do
+                        -- [TO-DO] Run functions on new thread once parallel Luau is released
+                        if connection.Connected then
+                            connection.Func(unpack(args))
+                        end
                     end
                 end)
             else
+                Debug.assert(remoteEvent, "Unexpected RemoteEvent provided while on server")
+
                 remoteEvent = Instance.new("RemoteEvent")
                 self.Internals.RemoteEvent = remoteEvent
 
                 self.Internals.RemoteConnection = remoteEvent.OnServerEvent:Connect(function(...)
                     local args = {...}
-                    local receiveFilter = self.ExternalReadOnly.ReceiveFilter
+                    local receiveFilter = self.ExternalReadAndWrite.ReceiveFilter
 
                     if type(receiveFilter) == "function" then
                         args = {receiveFilter(...)}
@@ -68,7 +73,7 @@ return Deus:Load("Deus/BaseObject"):Extend(
         Methods = {
             Fire = function(self, ...)
                 local args = {...}
-                local sendFilter = self.ExternalReadOnly.SendFilter
+                local sendFilter = self.ExternalReadAndWrite.SendFilter
 
                 if type(sendFilter) == "function" then
                     args = {sendFilter(...)}

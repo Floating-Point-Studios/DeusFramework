@@ -86,4 +86,44 @@ function TableUtils.lock(tab)
     return userdata
 end
 
+-- ALlows setting an instance to __index of a metatable
+function TableUtils.instanceAsIndex(obj)
+    return function(self, i)
+        local v = rawget(self, i)
+        if v then
+            return v
+        else
+            local success, v = pcall(function()
+                return obj[i]
+            end)
+
+            if success then
+                return v
+            else
+                Debug.error(2, "'%s' is not a valid member of %s", i, obj)
+            end
+        end
+    end
+end
+
+-- ALlows setting an instance to __newindex of a metatable
+function TableUtils.instanceAsNewIndex(obj)
+    return function(self, i, v)
+        if rawget(self, i) then
+            rawset(self, i, v)
+            return
+        else
+            local success = pcall(function()
+                obj[i] = v
+            end)
+
+            if success then
+                return v
+            else
+                Debug.error(2, "'%s' is not a valid member of %s", i, obj)
+            end
+        end
+    end
+end
+
 return TableUtils
