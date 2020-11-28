@@ -1,3 +1,5 @@
+-- Custom implementation of BindableEvents due to regular events not garbage collecting connections that have ended resulting in memory leaks
+
 local Deus = shared.DeusFramework
 
 local RunService = game:GetService("RunService")
@@ -17,7 +19,7 @@ function Signal.new()
             __index = Signal;
 
             Internals = {
-                Connections = setmetatable({}, {__mode = "kv"});
+                Connections = {}
             };
 
             ExternalReadOnly = {
@@ -33,12 +35,17 @@ end
 
 function Signal:Fire(...)
     Debug.assert(TableProxy.isInternalAccess(self), "[Signal] Cannot fire signal from externally")
-    for _,connection in pairs(self.Internals.Connections) do
+
+    local connections = self.Internals.Connections
+    for i, connection in pairs(connections) do
         -- [TO-DO] Run functions on new thread once parallel Luau is released
         if connection.Connected then
             connection.Func(...)
+        else
+            connections[i] = nil
         end
     end
+
     self.ExternalReadOnly.LastFired = tick()
 end
 

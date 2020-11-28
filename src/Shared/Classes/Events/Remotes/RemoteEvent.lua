@@ -26,10 +26,13 @@ return Deus:Load("Deus/BaseObject"):Extend(
                         args = {receiveFilter(...)}
                     end
 
-                    for _,connection in pairs(self.Internals.Connections) do
+                    local connections = self.Internals.Connections
+                    for i, connection in pairs(connections) do
                         -- [TO-DO] Run functions on new thread once parallel Luau is released
                         if connection.Connected then
                             connection.Func(unpack(args))
+                        else
+                            connections[i] = nil
                         end
                     end
                 end)
@@ -47,10 +50,13 @@ return Deus:Load("Deus/BaseObject"):Extend(
                         args = {receiveFilter(...)}
                     end
 
-                    for _,connection in pairs(self.Internals.Connections) do
+                    local connections = self.Internals.Connections
+                    for i, connection in pairs(connections) do
                         -- [TO-DO] Run functions on new thread once parallel Luau is released
                         if connection.Connected then
                             connection.Func(unpack(args))
+                        else
+                            connections[i] = nil
                         end
                     end
                 end)
@@ -67,7 +73,7 @@ return Deus:Load("Deus/BaseObject"):Extend(
                 return true
             end;
 
-            Connections = setmetatable({}, {__mode = "kv"})
+            Connections = {}
         };
 
         Methods = {
