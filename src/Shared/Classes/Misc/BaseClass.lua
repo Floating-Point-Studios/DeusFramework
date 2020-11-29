@@ -194,7 +194,7 @@ function BaseClass.new(classData)
         -- Wrapper to allow internal access to the functions
         for methodName, method in pairs(classData.Methods) do
             metatable.ExternalReadOnly.Methods[methodName] = function(...)
-                method(metatable, ...)
+                method(metatable, TableUtils.sub({...}, 2))
             end
         end
 

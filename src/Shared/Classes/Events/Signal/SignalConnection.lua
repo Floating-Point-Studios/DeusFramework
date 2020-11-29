@@ -12,7 +12,7 @@ function Connection.new(func)
             __type = "RBXScriptConnection";
             __index = Connection;
 
-            Internals = {
+            ExternalReadOnly = {
                 Connected = true;
                 Func = func;
             };
@@ -21,7 +21,7 @@ function Connection.new(func)
 
     ConnectionMetatables[self] = metatable
 
-    return self, metatable
+    return self
 end
 
 function Connection:Disconnect()

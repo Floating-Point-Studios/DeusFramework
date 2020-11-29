@@ -67,6 +67,17 @@ function TableUtils.remove(tab, index)
     end
 end
 
+function TableUtils.sub(tab, indexStart, indexEnd)
+    indexEnd = indexEnd or #tab
+    local output = {}
+
+    for i = indexStart, indexEnd do
+        table.insert(output, tab[i])
+    end
+
+    return output
+end
+
 function TableUtils.lock(tab)
     local userdata = newproxy(true)
     local metatable = getmetatable(userdata)

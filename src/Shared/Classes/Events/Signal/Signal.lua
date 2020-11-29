@@ -54,10 +54,10 @@ function Signal:Connect(func)
         self = SignalMetatables[self]
     end
 
-    local connectionProxy, connectionMetatable = Connection.new(func)
-    table.insert(self.Internals.Connections, connectionMetatable)
+    local connection = Connection.new(func)
+    table.insert(self.Internals.Connections, connection)
 
-    return connectionProxy
+    return connection
 end
 
 function Signal:Wait(timeout)
