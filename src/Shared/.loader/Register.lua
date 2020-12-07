@@ -5,6 +5,7 @@ local function getModuleExtension(moduleName)
 end
 
 return function(deus, library, libraryName, extensionIgnoreList)
+    extensionIgnoreList = extensionIgnoreList or {}
     libraryName = libraryName or library.Name
 
     local modulePaths = {}
