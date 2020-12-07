@@ -1,3 +1,7 @@
+local Deus = shared.DeusFramework
+
+local Debug = Deus:Load("Deus/Debug")
+
 local MathUtils = {}
 
 -- @param x: number/vector3/vector2 to round
@@ -44,6 +48,16 @@ function MathUtils.factorial(x)
         output *= i
     end
     return output
+end
+
+function MathUtils.lerp(a, b, c)
+    local typeA, typeB = typeof(a), typeof(b)
+    Debug.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", typeA, typeB)
+    if typeA == "CFrame" then
+        return a:Lerp(b, c)
+    else
+        return a + (b - a) * c
+    end
 end
 
 return MathUtils
