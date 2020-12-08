@@ -87,24 +87,24 @@ function Bezier:CalcPoints(steps, dist)
 
     if dist then
         local unevenPoints = points
-        points = {{Position = unevenPoints[1], Percent = 0}}
+        points = {{CFrame = unevenPoints[1], Percent = 0}}
 
         for i = 2, steps do
             local point = unevenPoints[i]
             local magnitude
 
             if typeof(point) == "CFrame" then
-                magnitude = (point.p - points[#points].Position.p).Magnitude
+                magnitude = (point.p - points[#points].CFrame.p).Magnitude
             else
-                magnitude = (point - points[#points].Position).Magnitude
+                magnitude = (point - points[#points].CFrame).Magnitude
             end
 
             if magnitude >= dist then
-                table.insert(points, {Position = point, Percent = i/steps})
+                table.insert(points, {CFrame = point, Percent = i/steps})
             end
         end
 
-        table.insert(points, {Position = unevenPoints[#unevenPoints], Percent = 1})
+        table.insert(points, {CFrame = unevenPoints[#unevenPoints], Percent = 1})
     end
     return points
 end

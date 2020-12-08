@@ -1,16 +1,25 @@
-local DeusFramework = {
-    Libraries = {};
+local ServerStorage = game:GetService("ServerStorage")
 
-    -- Import libraries
-    Load = require(script.Load);
+local Load = require(script.Load)
+local Register = require(script.Register)
+local Setup = require(script.Setup)
 
-    -- Register libraries
-    Register = require(script.Register);
+local Deus = {
+    Libraries = {},
 
-    -- Setup frameworks
-    Setup = require(script.Setup);
+    Load = Load,
+    Register = Register,
+    Setup = Setup
 }
 
-shared.DeusFramework = DeusFramework
+shared.DeusFramework = Deus
 
-return DeusFramework
+local Packages = ServerStorage:WaitForChild("DeusPackages", 5)
+if Packages then
+    for _,package in pairs(Packages:GetChildren()) do
+        Deus:Setup(package)
+    end
+    Packages:Destroy()
+end
+
+return Deus

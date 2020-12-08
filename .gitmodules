@@ -1,0 +1,3 @@
+[submodule "src/Client/Libraries/UserInterface/roact"]
+	path = src/Client/Libraries/UserInterface/roact
+	url = https://github.com/roblox/roact
