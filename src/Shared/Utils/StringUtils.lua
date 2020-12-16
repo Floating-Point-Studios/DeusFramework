@@ -25,11 +25,6 @@ function StringUtils.replaceAt(str, newStr, repStart, repEnd)
     return str:sub(1, repStart - 1).. newStr.. str:sub(repEnd + 1)
 end
 
--- Returns whether the string is JSON formatted
-function StringUtils.isJSON(str)
-    return pcall(HttpService.JSONDecode, HttpService, str)
-end
-
 -- Replaces pattern repetitions such as "/////" to "/"
 function StringUtils.collapseOccurances(str, pattern)
     local rep = pattern

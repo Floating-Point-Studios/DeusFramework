@@ -19,6 +19,7 @@ function JSON.encode(data)
             data[i] = nil
         end
     end
+    return HttpService:JSONEncode(data)
 end
 
 function JSON.decode(data)
@@ -38,6 +39,11 @@ function JSON.decode(data)
             end
         end
     end
+    return HttpService:JSONDecode(data)
+end
+
+function JSON.isJSON(str)
+    return pcall(HttpService.JSONDecode, HttpService, str)
 end
 
 return JSON
