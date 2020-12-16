@@ -5,13 +5,13 @@ local JSON = {}
 function JSON.encode(data)
     for i,v in pairs(data) do
         if typeof(i) == "table" then
-            data[i] = {__TYPE = 0, __DATA = JSON.encode(v))
+            data[i] = {__TYPE = 0, __DATA = JSON.encode(v)}
         elseif typeof(i) == "Vector2" then
             data[i] = {__TYPE = 1, __DATA = {v.X, v.Y}}
         elseif typeof(i) == "Vector3" then
             data[i] = {__TYPE = 2, __DATA = {v.X, v.Y, v.Z}}
         elseif typeof(i) == "CFrame" then
-            data[i] = {__TYPE = 3, __DATA = table.pack(v:ToComponents())}
+            data[i] = {__TYPE = 3, __DATA = pack(v:ToComponents())}
         elseif typeof(i) == "Color3" then
             data[i] = {__TYPE = 4, __DATA = {v.r, v.g, v.b}}
         elseif typeof(i) == "BrickColor" then
