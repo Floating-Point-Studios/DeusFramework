@@ -1,4 +1,4 @@
-local Deus = require(game:GetService("ReplicatedStorage"):WaitForChild("Deus"))
+local Deus = shared.Deus
 
 local TableProxy = Deus:Load("Deus.TableProxy")
 local TableUtils = Deus:Load("Deus.TableUtils")

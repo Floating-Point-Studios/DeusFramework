@@ -1,4 +1,4 @@
-local Deus = require(game:GetService("ReplicatedStorage"):WaitForChild("Deus"))
+local Deus = shared.Deus
 
 local BaseClass = Deus:Load("Deus.BaseClass")
 local Maid = Deus:Load("Deus.Maid")
