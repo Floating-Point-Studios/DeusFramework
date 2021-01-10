@@ -1,6 +1,6 @@
-local Deus = shared.DeusFramework
+local Deus = require(game:GetService("ReplicatedStorage"):WaitForChild("Deus"))
 
-local Debug = Deus:Load("Deus/Debug")
+local Output = Deus:Load("Deus.Output")
 
 local MathUtils = {}
 
@@ -52,7 +52,7 @@ end
 
 function MathUtils.lerp(a, b, c)
     local typeA, typeB = typeof(a), typeof(b)
-    Debug.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", typeA, typeB)
+    Output.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", typeA, typeB)
     if typeA == "CFrame" then
         return a:Lerp(b, c)
     else

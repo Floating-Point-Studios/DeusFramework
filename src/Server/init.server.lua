@@ -1,7 +1,15 @@
-local deusFramework = script.Parent
-local loader = require(deusFramework:WaitForChild("Shared")[".loader"])
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-loader:Setup(deusFramework)
-loader:Register(script, "Deus", {"loader"})
+-- Setup server
+local Deus = script.Parent.Deus
+Deus.Parent = ReplicatedStorage
+Deus = require(Deus)
 
-deusFramework:Destroy()
+Deus:Register(script, "Deus")
+Deus:Register(script.Parent.Shared, "Deus")
+
+-- Setup client config
+
+-- Setup client

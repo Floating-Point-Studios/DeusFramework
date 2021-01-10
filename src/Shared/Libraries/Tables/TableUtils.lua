@@ -1,6 +1,6 @@
-local Deus = shared.DeusFramework
+local Deus = require(game:GetService("ReplicatedStorage"):WaitForChild("Deus"))
 
-local Debug = Deus:Load("Deus/Debug")
+local Output = Deus:Load("Deus.Output")
 
 local TableUtils = {}
 
@@ -84,12 +84,12 @@ function TableUtils.lock(tab)
 
     function metatable:__index(i)
         local v = tab[i]
-        Debug.assert(v, "'%s' does not exist in read-only table", i)
+        Output.assert(v, "'%s' does not exist in read-only table", i)
         return v
     end
 
     function metatable:__newindex(i, v)
-        Debug.error(2, "Cannot modify '%s' in read-only table", i)
+        Output.error(2, "Cannot modify '%s' in read-only table", i)
     end
 
     metatable.__metatable = ("[%s] Requested metatable of read-only table is locked"):format(getfenv(2).script.Name)
@@ -111,7 +111,7 @@ function TableUtils.instanceAsIndex(obj)
             if success then
                 return v
             else
-                Debug.error(2, "'%s' is not a valid member of %s", i, obj)
+                Output.error(2, "'%s' is not a valid member of %s", i, obj)
             end
         end
     end
@@ -131,7 +131,7 @@ function TableUtils.instanceAsNewIndex(obj)
             if success then
                 return v
             else
-                Debug.error(2, "'%s' is not a valid member of %s", i, obj)
+                Output.error(2, "'%s' is not a valid member of %s", i, obj)
             end
         end
     end

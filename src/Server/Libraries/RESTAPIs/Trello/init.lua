@@ -1,3 +1,0 @@
-local Trello = {}
-
-return Trello

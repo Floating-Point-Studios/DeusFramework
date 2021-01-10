@@ -1,9 +1,9 @@
 -- Based on RoStrap
 
-local Deus = shared.DeusFramework
+local Deus = require(game:GetService("ReplicatedStorage"):WaitForChild("Deus"))
 
-local Debug = Deus:Load("Deus/Debug")
-local Symbol = Deus:Load("Deus/Symbol")
+local Output = Deus:Load("Deus.Output")
+local Symbol = Deus:Load("Deus.Symbol")
 
 local Metatables = setmetatable({}, {__mode = "kv"})
 
@@ -16,11 +16,11 @@ local function __index(self, i)
         self = Metatables[self]
     end
 
-    local fallbackIndex = rawget(self, "__fallbackIndex")
+    local fallbackIndex = rawget(self, "FallbackIndex")
 
     local v = rawget(self, "Internals")[i]
     if v ~= nil then
-        Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
+        Output.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
         return v
     end
 
@@ -36,7 +36,7 @@ local function __index(self, i)
 
     v = rawget(self, i)
     if v ~= nil then
-        Debug.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be read from externally", i)
+        Output.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be read from externally", i)
         return v
     end
 
@@ -53,7 +53,7 @@ local function __index(self, i)
         end
     end
 
-    Debug.error(2, "[TableProxy] Index '%s' was not found", i)
+    Output.error(2, "[TableProxy] Index '%s' was not found", i)
 end
 
 local function __newindex(self, i, v)
@@ -69,16 +69,16 @@ local function __newindex(self, i, v)
     local internals = rawget(self, "Internals")
     local externalReadOnly = rawget(self, "ExternalReadOnly")
     local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
-    local fallbackNewIndex = rawget(self, "__fallbackNewIndex")
+    local fallbackNewIndex = rawget(self, "FallbackNewIndex")
 
     if internals[i] ~= nil then
-        Debug.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
+        Output.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
         internals[i] = v
         return true
     end
 
     if externalReadOnly[i] ~= nil then
-        Debug.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
+        Output.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
         externalReadOnly[i] = v
         return true
     end
@@ -89,7 +89,7 @@ local function __newindex(self, i, v)
     end
 
     if rawget(self, i) ~= nil then
-        Debug.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be written to externally", i)
+        Output.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be written to externally", i)
         rawset(self, i, v)
         return true
     end
@@ -106,7 +106,7 @@ local function __newindex(self, i, v)
         end
     end
 
-    Debug.error(2, "[TableProxy] Index '%s' was not found", i)
+    Output.error(2, "[TableProxy] Index '%s' was not found", i)
 end
 
 -- @param tableData.Internals: read/write from internal access
@@ -128,8 +128,8 @@ function TableProxy.new(tableData)
     metatable.ExternalReadOnly = tableData.ExternalReadOnly or {}
     metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite or {}
 
-    metatable.__fallbackIndex = tableData.__index
-    metatable.__fallbackNewIndex = tableData.__newindex
+    metatable.FallbackIndex = tableData.__index
+    metatable.FallbackNewIndex = tableData.__newindex
 
     Metatables[self] = metatable
 

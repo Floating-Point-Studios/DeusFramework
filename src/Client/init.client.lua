@@ -1,1 +1,1 @@
-require(script:WaitForChild("Shared")[".loader"]):Register(script.Parent, "Deus", {"loader"})
+require(game:GetService("ReplicatedStorage"):WaitForChild("Deus")):Register(script, "Deus")
