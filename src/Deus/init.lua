@@ -1,6 +1,7 @@
 local Modules = {}
 local Settings = require(script.Settings)
 local Deus = shared.Deus
+local DefaultSettings = require(script.Settings)
 
 local function __newindex()
     error("[Deus] Attempt to modify loaded module from externally")
@@ -19,13 +20,10 @@ local function loadModule(module)
     return proxy
 end
 
-local function registerModule(module, addonName)
-    local moduleName = string.split(module.Name, ".")[1]
-    local path = addonName.. ".".. moduleName
-
+local function registerModule(module, path)
     assert(not Modules[path], ("[Deus] Error on start, module path '%s' already exists"):format(path))
 
-    if moduleName:lower():match("service") then
+    if module.Name:lower():match("service") then
         Modules[path] = loadModule(module)
     else
         Modules[path] = module
@@ -35,10 +33,30 @@ end
 if not Deus then
     Deus = {}
 
+    -- Can only be used once
     function Deus:SetSettings(newSettings)
-        -- Can only be used once
+        if typeof(newSettings) == "Instance" and newSettings:IsA("ModuleScript") then
+            newSettings = require(newSettings)
+        end
         Settings = newSettings
         Deus.SetSettings = nil
+    end
+
+    function Deus:GetSetting(settingName)
+        local settingPath = string.split(settingName, ".")
+
+        local success, setting = pcall(function()
+            return Settings[settingPath[1]][settingPath[2]]
+        end)
+
+        if not success then
+            success, setting = pcall(function()
+                return DefaultSettings[settingPath[1]][settingPath[2]]
+            end)
+        end
+
+        assert(success, ("[Deus] Error finding setting %s.%s"):format(settingPath[1], settingPath[2]))
+        return setting
     end
 
     function Deus:Register(addon, addonName)
@@ -49,22 +67,31 @@ if not Deus then
         else
             for _,module in pairs(addon:GetDescendants()) do
                 if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
-                    registerModule(module, addonName)
+                    local moduleName = string.split(module.Name, ".")[1]
+                    registerModule(module, addonName.. ".".. moduleName)
                 end
             end
         end
     end
 
-    function Deus:Load(path)
+    function Deus:Load(path, timeout)
         local module = Modules[path]
 
-        assert(module, "[Deus] Error finding ".. path)
+        if not module then
+            local waitStart = tick()
+            repeat
+                module = Modules[path]
+                wait()
+            until module or tick() - waitStart > (timeout or 3)
+        end
+
+        assert(module, "[Deus] Error finding module ".. path)
 
         if type(module) == "userdata" then
-            return module
-        else
             module = loadModule(module)
             Modules[path] = module
+            return module
+        else
             return module
         end
     end
