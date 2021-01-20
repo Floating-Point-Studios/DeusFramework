@@ -1,156 +1,138 @@
--- Based on RoStrap
-
 local Deus = shared.Deus
 
 local Output = Deus:Load("Deus.Output")
-local Symbol = Deus:Load("Deus.Symbol")
 
-local Metatables = setmetatable({}, {__mode = "kv"})
+local Metatables = setmetatable({}, {__mode = "v"})
+
+local function __tostring()
+    return "[TableProxy] Locked Metatable"
+end
 
 local TableProxy = {}
 
-local function __index(self, i)
-    local isInternalAccess = TableProxy.isInternalAccess(self)
-
-    if not isInternalAccess then
+function TableProxy.__index(self, i)
+    local v
+    local internalAccess = TableProxy.IsInternalAccess(self)
+    if not internalAccess then
         self = Metatables[self]
     end
 
-    local fallbackIndex = rawget(self, "FallbackIndex")
-
-    local v = rawget(self, "Internals")[i]
-    if v ~= nil then
-        Output.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be read from externally", i)
-        return v
-    end
-
-    v = rawget(self, "ExternalReadOnly")[i]
-    if v ~= nil then
-        return v
-    end
-
-    v = rawget(self, "ExternalReadAndWrite")[i]
-    if v ~= nil then
-        return v
-    end
-
-    v = rawget(self, i)
-    if v ~= nil then
-        Output.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be read from externally", i)
-        return v
-    end
-
-    local fallbackIndexType = type(fallbackIndex)
-    if fallbackIndexType == "function" then
-        v = fallbackIndex(self, i, isInternalAccess)
-        if v ~= nil then
+    v = self.Internal[i]
+    if v then
+        if internalAccess then
             return v
+        else
+            Output.error("Attempt to read internal property")
         end
-    elseif fallbackIndexType == "table" then
-        v = fallbackIndex[i]
-        if v ~= nil then
+    end
+
+    v = self.ExternalReadOnly[i]
+    if v then
+        return v
+    end
+
+    v = self.ExternalReadAndWrite[i]
+    if v then
+        return v
+    end
+
+    for _,fallbackIndex in pairs(self.FallbackIndexes) do
+        v = fallbackIndex(self, i)
+        if v then
             return v
         end
     end
 
-    Output.error(2, "[TableProxy] Index '%s' was not found", i)
+    return nil
 end
 
-local function __newindex(self, i, v)
-    -- Symbol for nil is used as if user attempts to write to this index again while it is nil it will error
-    v = v or Symbol.new("nil")
-
-    local isInternalAccess = TableProxy.isInternalAccess(self)
-
-    if not isInternalAccess then
+function TableProxy.__newindex(self, i, v)
+    local internalAccess = TableProxy.IsInternalAccess(self)
+    if not internalAccess then
         self = Metatables[self]
     end
 
-    local internals = rawget(self, "Internals")
-    local externalReadOnly = rawget(self, "ExternalReadOnly")
-    local externalReadAndWrite = rawget(self, "ExternalReadAndWrite")
-    local fallbackNewIndex = rawget(self, "FallbackNewIndex")
-
-    if internals[i] ~= nil then
-        Output.assert(isInternalAccess, "[TableProxy] Internal '%s' cannot be written to from externally", i)
-        internals[i] = v
-        return true
-    end
-
-    if externalReadOnly[i] ~= nil then
-        Output.assert(isInternalAccess, "[TableProxy] ExternalReadOnly '%s' cannot be written to from externally", i)
-        externalReadOnly[i] = v
-        return true
-    end
-
-    if externalReadAndWrite[i] ~= nil then
-        externalReadAndWrite[i] = v
-        return true
-    end
-
-    if rawget(self, i) ~= nil then
-        Output.assert(isInternalAccess, "[TableProxy] Index '%s' cannot be written to externally", i)
-        rawset(self, i, v)
-        return true
-    end
-
-    local fallbackNewIndexType = type(fallbackNewIndex)
-    if fallbackNewIndexType == "function" then
-        if fallbackNewIndex(self, i, v, isInternalAccess) then
+    if self.Internal[i] then
+        if internalAccess then
+            self.Internal[i] = v
             return true
+        else
+            Output.error("Attempt to modify internal property")
         end
-    elseif fallbackNewIndexType == "table" then
-        if fallbackNewIndex[i] then
-            fallbackNewIndex[i] = v
+    end
+
+    if self.ExternalReadOnly[i] then
+        self.ExternalReadOnly[i] = v
+        return true
+    end
+
+    if self.ExternalReadAndWrite[i] then
+        self.ExternalReadAndWrite[i] = v
+        return true
+    end
+
+    for _,fallbackNewIndex in pairs(self.FallbackNewIndexes) do
+        if fallbackNewIndex(self, i, v) then
             return true
         end
     end
 
-    Output.error(2, "[TableProxy] Index '%s' was not found", i)
+    return false
 end
 
--- @param tableData.Internals: read/write from internal access
--- @param tableData.ExternalReadOnly: read from external and read/write from internal access
--- @param tableData.ExternalReadAndWrite: read/write from external and read/write from internal access
--- @param tableData.__index: fallback index function of default index function is unable to find index
--- @param tableData.__newindex: fallback newindex function of default newindex function is unable to find index
 function TableProxy.new(tableData)
-    local self = newproxy(true)
-    local metatable = getmetatable(self)
+    local proxy = newproxy(true)
+    local metatable = getmetatable(proxy)
 
-    metatable.__index = __index
-    metatable.__newindex = __newindex
-    metatable.__metatable = "[TableProxy] Locked metatable"
+    metatable.__metatable = "[TableProxy] Locked Metatable"
+    metatable.__index = TableProxy.__index
+    metatable.__newindex = TableProxy.__newindex
+    metatable.__tostring = tableData.__tostring or __tostring
 
-    metatable.__proxy = self
+    metatable.Proxy = proxy
+    metatable.FallbackIndexes = {tableData.__index}
+    metatable.FallbackNewIndexes = {tableData.__newindex}
 
-    metatable.Internals = tableData.Internals or {}
+    metatable.Internal = tableData.Internal or {}
     metatable.ExternalReadOnly = tableData.ExternalReadOnly or {}
-    metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite or {}
+    metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite
 
-    metatable.FallbackIndex = tableData.__index
-    metatable.FallbackNewIndex = tableData.__newindex
+    Metatables[proxy] = metatable
 
-    Metatables[self] = metatable
-
-    setmetatable(metatable,
-        {
-            __index = __index;
-            __newindex = __newindex;
-        }
-    )
-
-    return self, metatable
+    return setmetatable(metatable, TableProxy)
 end
 
-function TableProxy.isInternalAccess(self)
-    if Metatables[self] then
-        -- If metatable was found then 'self' provided was from external access
+function TableProxy:IsInternalAccess()
+    if type(self) == "userdata" then
         return false
-    else
-        -- If metatable was not found 'self' provided was likely internal access
-        return true
+    elseif type(self) == "table" then
+        if rawget(self, "Proxy") == self then
+            return false
+        else
+            return true
+        end
     end
+    return false
+end
+
+function TableProxy:AddFallbackIndex(index)
+    Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
+    table.insert(self.FallbackIndexes, index)
+end
+
+function TableProxy:SetFallbackIndexes(indexes)
+    Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
+    self.FallbackIndexes = indexes
+end
+
+function TableProxy:AddFallbackNewIndexes(newindex)
+    Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
+    table.insert(self.FallbackIndexes, newindex)
+end
+
+function TableProxy:SetFallbackNewIndexes(newindexes)
+    Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
+    self.FallbackIndexes = newindexes
 end
 
 return TableProxy

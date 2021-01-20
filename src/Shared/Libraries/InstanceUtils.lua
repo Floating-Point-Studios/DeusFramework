@@ -17,11 +17,39 @@ function InstanceUtils.findFirstAncestorWithName(obj, name)
     end
 end
 
-function InstanceUtils.findFirstChildNoCase(obj, name)
+function InstanceUtils.findFirstChildNoCase(obj, name, recursive)
     name = name:lower()
-    for _,child in pairs(obj:GetChildren()) do
+    local tree
+    if recursive then
+        tree = obj:GetDescendants()
+    else
+        tree = obj:GetChildren()
+    end
+    for _,child in pairs(tree) do
         if child.Name:lower() == name then
             return child
+        end
+    end
+end
+
+function InstanceUtils.findFirstChildWithAttribute(obj, name, attribute, recursive)
+    local tree
+    if recursive then
+        tree = obj:GetDescendants()
+    else
+        tree = obj:GetChildren()
+    end
+    for _,child in pairs(tree) do
+        if child:GetAttribute(name) == attribute then
+            return child
+        end
+    end
+end
+
+function InstanceUtils.findFirstAncestorWithAttribute(obj, name, attribute)
+    for _,ancestor in pairs(InstanceUtils.getAncestors(obj)) do
+        if ancestor:GetAttribute(name) == attribute then
+            return ancestor
         end
     end
 end
