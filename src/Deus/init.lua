@@ -87,7 +87,7 @@ if not Deus then
 
         assert(module, "[Deus] Error finding module ".. path)
 
-        if type(module) == "userdata" then
+        if typeof(module) == "Instance" then
             module = loadModule(module)
             Modules[path] = module
             return module

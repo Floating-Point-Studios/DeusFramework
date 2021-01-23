@@ -16,7 +16,7 @@ function TableUtils.deepCopy(tab)
     local copy = {}
     for i, v in pairs(tab) do
         if type(v) == "table" then
-            v = TableUtils.DeepCopy(v)
+            v = TableUtils.deepCopy(v)
         end
         copy[i] = v
     end
@@ -79,22 +79,35 @@ function TableUtils.sub(tab, indexStart, indexEnd)
 end
 
 function TableUtils.lock(tab)
-    local userdata = newproxy(true)
-    local metatable = getmetatable(userdata)
+    local proxy = newproxy(true)
+    local meta = getmetatable(proxy)
 
-    function metatable:__index(i)
+    function meta.__index(_, i)
+        print(i)
         local v = tab[i]
-        Output.assert(v, "'%s' does not exist in read-only table", i)
+        -- Output.assert(v, "'%s' does not exist in read-only table", i)
         return v
     end
 
-    function metatable:__newindex(i, v)
+    function meta.__newindex(_, i)
         Output.error(2, "Cannot modify '%s' in read-only table", i)
     end
 
-    metatable.__metatable = ("[%s] Requested metatable of read-only table is locked"):format(getfenv(2).script.Name)
+    function meta:Copy()
+        return TableUtils.deepCopy(tab)
+    end
 
-    return userdata
+    function meta:GetKeys()
+        return TableUtils.getKeys(tab)
+    end
+
+    function meta:GetValues()
+        return TableUtils.getValues(tab)
+    end
+
+    meta.__metatable = ("[%s] Requested metatable of read-only table is locked"):format(getfenv(2).script.Name)
+
+    return meta
 end
 
 -- ALlows setting an instance to __index of a metatable
