@@ -137,7 +137,7 @@ function BaseObject.new(objData)
 
             Events = objData.Events or {},
 
-            new = function()
+            new = function(...)
                 local obj = {
                     __tostring = __tostring,
                     __index = __index,
@@ -164,7 +164,7 @@ function BaseObject.new(objData)
                         if obj == self then
                             internalAccess = true
                         end
-                        method(obj, internalAccess, ...)
+                        return method(obj, internalAccess, ...)
                     end
                 end
 
@@ -198,7 +198,7 @@ function BaseObject.new(objData)
                 obj = TableProxy.new(obj)
 
                 if objData.Constructor then
-                    objData.Constructor(obj)
+                    objData.Constructor(obj, ...)
                 end
 
                 return obj

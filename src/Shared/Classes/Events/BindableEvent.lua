@@ -10,6 +10,7 @@ return BaseObject.new(
         Methods = {
             Fire = function(self, internalAccess, ...)
                 Output.assert(internalAccess, "Attempt to fire remote from externally")
+                self.LastFiredTick = tick()
                 self.RBXEvent:Fire(...)
             end,
 
@@ -23,7 +24,7 @@ return BaseObject.new(
         },
 
         PublicReadOnlyProperties = {
-            LastFired = 0,
+            LastFiredTick = 0,
         },
 
         Constructor = function(self)
