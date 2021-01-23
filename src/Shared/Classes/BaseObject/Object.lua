@@ -11,6 +11,24 @@ function Object:FireEvent(internalAccess, eventName, ...)
     self.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
 end
 
+function Object:GetPropertyChangedSignal(internalAccess, eventName, func)
+    Output.assert(self.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
+    local event = Instance.new("BindableEvent")
+    local proxySignal = event.Event:Connect(func)
+    local mainSignal
+
+    mainSignal = self.DEUSOBJECT_LockedTables.Events[eventName]:Connect(function(...)
+        if proxySignal.Connected then
+            event:Fire(...)
+        else
+            mainSignal:Disconnect()
+            event:Destroy()
+        end
+    end)
+
+    return proxySignal
+end
+
 function Object:GetMethods()
     return self.DEUSOBJECT_Methods:GetKeys()
 end

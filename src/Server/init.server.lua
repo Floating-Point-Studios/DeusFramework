@@ -44,12 +44,12 @@ if ServerConfig then
             if addon:IsA("ModuleScript") then
                 addon:Clone().Parent = ClientConfig.Addons
                 Deus:Register(addon)
+            elseif addon:IsA("LocalScript") then
+                addon.Parent = ReplicatedFirst
+                addon.Disabled = false
             elseif addon:IsA("Script") then
                 addon = addon:Clone()
                 addon.Parent = ServerScriptService
-                addon.Disabled = false
-            elseif addon:IsA("LocalScript") then
-                addon.Parent = ReplicatedFirst
                 addon.Disabled = false
             else
                 local serverAddon = InstanceUtils.findFirstChildNoCase(addon, "server")
@@ -88,5 +88,6 @@ if ServerConfig then
 end
 
 -- Setup client
-
-script.Parent.Client.Parent = ReplicatedFirst
+local Client = script.Parent.Client
+script.Parent.Shared:Clone().Parent = Client
+Client.Parent = ReplicatedFirst
