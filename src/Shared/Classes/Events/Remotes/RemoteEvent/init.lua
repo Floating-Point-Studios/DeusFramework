@@ -8,7 +8,7 @@ local Output = Deus:Load("Deus.Output")
 local RemoteEvent ={
     ClassName = "Deus.RemoteEvent",
 
-    PublicReadOnly = {
+    PublicReadOnlyProperties = {
         LastSendTick = 0,
         LastReceiveTick = 0,
     },
