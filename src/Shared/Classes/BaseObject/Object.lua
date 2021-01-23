@@ -1,8 +1,15 @@
 local Deus = shared.Deus
 
 local TableUtils = Deus:Load("Deus.TableUtils")
+local Output = Deus:Load("Deus.Output")
 
 local Object = {}
+
+function Object:FireEvent(internalAccess, eventName, ...)
+    Output.assert(internalAccess, "Object events can only be fired with internal access")
+    Output.assert(self.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
+    self.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
+end
 
 function Object:GetMethods()
     return self.DEUSOBJECT_Methods:GetKeys()

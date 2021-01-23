@@ -11,13 +11,13 @@ local function loadModule(module)
     module = require(module)
 
     local proxy = newproxy(true)
-    local metatable = getmetatable(proxy)
+    local meta = getmetatable(proxy)
 
-    metatable.__metatable = "[Deus] Locked Metatable"
-    metatable.__index = module
-    metatable.__newindex = __newindex
+    meta.__metatable = "[Deus] Locked Metatable"
+    meta.__index = module
+    meta.__newindex = __newindex
 
-    return proxy
+    return proxy, meta
 end
 
 local function registerModule(module, path)
@@ -88,9 +88,15 @@ if not Deus then
         assert(module, "[Deus] Error finding module ".. path)
 
         if typeof(module) == "Instance" then
-            module = loadModule(module)
-            Modules[path] = module
-            return module
+            local proxy, meta = loadModule(module)
+            Modules[path] = proxy
+
+            if meta.__index.init then
+                meta.__index.init()
+                meta.__index.init = nil
+            end
+
+            return proxy
         else
             return module
         end

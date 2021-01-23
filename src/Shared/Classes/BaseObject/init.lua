@@ -8,6 +8,7 @@ local TableUtils = Deus:Load("Deus.TableUtils")
 
 local BlueprintMeta = require(script.Blueprint)
 local ObjectMeta = require(script.Object)
+local BindableEvent
 
 local ClassList = {}
 
@@ -32,7 +33,11 @@ function __index(self, i, internalAccess)
 
     v = Events[i]
     if v then
-        return v
+        if internalAccess then
+            return v
+        else
+            return v.Proxy
+        end
     end
 
     v = InternalProperties[i]
@@ -55,6 +60,8 @@ function __index(self, i, internalAccess)
 end
 
 function __newindex(self, i, v, internalAccess)
+    local oldv
+
     local Internal = rawget(self, "Internal")
     local Methods = Internal.DEUSOBJECT_LockedTables.Methods
     local Events = Internal.DEUSOBJECT_LockedTables.Events
@@ -62,32 +69,47 @@ function __newindex(self, i, v, internalAccess)
     local ExternalReadOnlyProperties = Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
     local ExternalReadAndWriteProperties = Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
 
-    if Methods[i] then
+    oldv = Methods[i]
+    if oldv then
         Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName)
         Methods[i] = v
+        if Events.Changed then
+            Events.Changed:Fire(i, v, oldv)
+        end
         return true
     end
 
     if Events[i] then
-        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName)
-        Events[i] = v
-        return true
+        Output.error("Events cannot be modified after object creation")
+        return false
     end
 
-    if InternalProperties[i] then
+    oldv = InternalProperties[i]
+    if oldv then
         Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName)
         InternalProperties[i] = v
+        if Events.Changed then
+            Events.Changed:Fire(i, v, oldv)
+        end
         return true
     end
 
-    if ExternalReadOnlyProperties[i] then
+    oldv = ExternalReadOnlyProperties[i]
+    if oldv then
         Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify read-only property", ExternalReadOnlyProperties.ClassName)
         ExternalReadOnlyProperties[i] = v
+        if Events.Changed then
+            Events.Changed:Fire(i, v, oldv)
+        end
         return true
     end
 
-    if ExternalReadAndWriteProperties[i] then
+    oldv = ExternalReadAndWriteProperties[i]
+    if oldv then
         ExternalReadAndWriteProperties[i] = v
+        if Events.Changed then
+            Events.Changed:Fire(i, v, oldv)
+        end
         return true
     end
 
@@ -103,16 +125,14 @@ function BaseObject.new(objData)
 
     return setmetatable(
         {
-            Constructor = objData.Constructor,
+            -- Constructor = objData.Constructor,
 
             ClassName = objData.ClassName,
 
             Methods = objData.Methods or {},
 
             PublicReadAndWriteProperties = objData.PublicReadAndWriteProperties or {},
-
             PublicReadOnlyProperties = objData.PublicReadOnlyProperties or {},
-
             PrivateProperties = objData.PrivateProperties or {},
 
             Events = objData.Events or {},
@@ -125,25 +145,38 @@ function BaseObject.new(objData)
 
                     Internal = {
                         DEUSOBJECT_Properties = TableUtils.deepCopy(objData.PrivateProperties or {}),
-                        DEUSOBJECT_LockedTables = {},
+                        DEUSOBJECT_LockedTables = {
+                            Events = {},
+                        },
                     },
 
                     ExternalReadOnly = {
                         DEUSOBJECT_Methods = TableUtils.deepCopy(TableUtils.merge(ObjectMeta, objData.Methods or {})),
                         DEUSOBJECT_ReadOnlyProperties = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
                         DEUSOBJECT_ReadAndWriteProperties = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
-                        DEUSOBJECT_Events = {},
+                        DEUSOBJECT_Events = objData.Events or {},
                     }
                 }
 
                 for methodName, method in pairs(obj.ExternalReadOnly.DEUSOBJECT_Methods) do
-                    obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(...)
-                        method(obj, ...)
+                    obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(self, ...)
+                        local internalAccess = false
+                        if obj == self then
+                            internalAccess = true
+                        end
+                        method(obj, internalAccess, ...)
                     end
                 end
 
+                -- Special exemption for objects that should not inherit base events
+                if objData.ClassName ~= "Deus.BindableEvent" then
+                    table.insert(obj.ExternalReadOnly.DEUSOBJECT_Events, "Changed")
+                end
+
                 for _,eventName in pairs(obj.ExternalReadOnly.DEUSOBJECT_Events) do
-                    -- todo: add events
+                    local eventProxy, eventMeta = BindableEvent.new()
+                    obj.Internal.DEUSOBJECT_LockedTables.Events[eventName] = eventMeta
+                    obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
                 end
 
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName = objData.ClassName
@@ -164,7 +197,11 @@ function BaseObject.new(objData)
 
                 obj = TableProxy.new(obj)
 
-                return obj.Proxy
+                if objData.Constructor then
+                    objData.Constructor(obj)
+                end
+
+                return obj
             end
         },
         BlueprintMeta
@@ -173,6 +210,10 @@ end
 
 function BaseObject.getClassList()
     return TableUtils.shallowCopy(ClassList)
+end
+
+function BaseObject.init()
+    BindableEvent = Deus:Load("Deus.BindableEvent")
 end
 
 return BaseObject

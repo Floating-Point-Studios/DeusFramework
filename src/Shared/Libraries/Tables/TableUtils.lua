@@ -40,23 +40,25 @@ function TableUtils.getValues(tab)
 end
 
 -- Merges dictionaries together, for merging arrays use {TableUtils.unpack(...)}
-function TableUtils.merge(tab1, ...)
-    for _,tab2 in pairs({...}) do
-        for i,v in pairs(tab2) do
-            tab1[i] = v
+function TableUtils.merge(...)
+    local mergedTab = {}
+    for _,tab in pairs({...}) do
+        for i,v in pairs(tab) do
+            mergedTab[i] = v
         end
     end
-    return tab1
+    return mergedTab
 end
 
 -- Allows unpacking of multiple tables
-function TableUtils.unpack(tab1, ...)
-    for _,tab2 in pairs({...}) do
-        for _,v in pairs(tab2) do
-            table.insert(tab1, v)
+function TableUtils.unpack(...)
+    local packedTab = {}
+    for _,tab in pairs({...}) do
+        for _,v in pairs(tab) do
+            table.insert(tab, v)
         end
     end
-    return unpack(tab1)
+    return unpack(packedTab)
 end
 
 function TableUtils.remove(tab, index)
