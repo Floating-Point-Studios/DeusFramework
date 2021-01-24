@@ -18,6 +18,7 @@ local RemoteEvent ={
         local remoteEvent
         if RunService:IsServer() then
             remoteEvent = Instance.new("RemoteEvent")
+            remoteEvent.Name = args[2]
             remoteEvent.Parent = args[1]
             self.Internal.RBXEvent = remoteEvent
 

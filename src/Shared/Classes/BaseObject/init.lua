@@ -1,10 +1,13 @@
+local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
 local Deus = shared.Deus
 
 local Output = Deus:Load("Deus.Output")
+local Symbol = Deus:Load("Deus.Symbol")
 local TableProxy = Deus:Load("Deus.TableProxy")
 local TableUtils = Deus:Load("Deus.TableUtils")
+local InstanceUtils = Deus:Load("Deus.InstanceUtils")
 
 local BlueprintMeta = require(script.Blueprint)
 local ObjectMeta = require(script.Object)
@@ -61,6 +64,7 @@ end
 
 function __newindex(self, i, v, internalAccess)
     local oldv
+    v = v or Symbol.new("None")
 
     local Internal = rawget(self, "Internal")
     local Methods = Internal.DEUSOBJECT_LockedTables.Methods
@@ -179,17 +183,19 @@ function BaseObject.new(objData)
                     obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
                 end
 
+                -- Properties inherited by all objects
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName = objData.ClassName
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId = HttpService:GenerateGUID(false)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated = tick()
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.IsReplicated = false
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.NetworkOwner = nil
+                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ReplicationTarget = Symbol.new("None")
 
+                -- Allows editing of properties locked externally
                 obj.Internal.DEUSOBJECT_LockedTables.Methods = obj.ExternalReadOnly.DEUSOBJECT_Methods
                 obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties = obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties
                 obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties = obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties
                 obj.Internal.DEUSOBJECT_LockedTables.Events = obj.ExternalReadOnly.DEUSOBJECT_Events
 
+                -- Locks properties to be only readable externally
                 obj.ExternalReadOnly.DEUSOBJECT_Methods = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Methods)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
@@ -199,6 +205,21 @@ function BaseObject.new(objData)
 
                 if objData.Constructor then
                     objData.Constructor(obj, ...)
+                end
+
+                if obj.Changed then
+                    if RunService:IsServer() then
+                        obj.Changed:Connect(function(propertyName, newValue)
+                            if newValue == Symbol.new("None") then
+                                newValue = nil
+                            end
+
+                            local replicationTarget = obj.ReplicationTarget
+                            if typeof(replicationTarget) == "Instance" and InstanceUtils.isTypeAttributeSupported(typeof(newValue)) then
+                                replicationTarget:SetAttribute("DEUS_".. propertyName, newValue)
+                            end
+                        end)
+                    end
                 end
 
                 return obj

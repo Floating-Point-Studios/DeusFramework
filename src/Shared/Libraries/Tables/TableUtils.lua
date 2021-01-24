@@ -80,6 +80,15 @@ function TableUtils.sub(tab, indexStart, indexEnd)
     return output
 end
 
+-- Returns the sum of a table of numbers
+function TableUtils.sum(tab)
+    local sum = 0
+    for _,v in pairs(tab) do
+        sum += v
+    end
+    return sum
+end
+
 function TableUtils.lock(tab)
     local proxy = newproxy(true)
     local meta = getmetatable(proxy)

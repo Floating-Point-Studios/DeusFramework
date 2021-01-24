@@ -54,6 +54,37 @@ function InstanceUtils.findFirstAncestorWithAttribute(obj, name, attribute)
     end
 end
 
+-- For mass setting attributes at once
+function InstanceUtils.setAttributes(obj, attributes)
+    for i,v in pairs(attributes) do
+        obj:SetAttribute(i, v)
+    end
+end
+
+local attributeSupportedDataTypes = {
+    "nil",
+    "string",
+    "boolean",
+    "number",
+    "UDim",
+    "UDim2",
+    "BrickColor",
+    "Color3",
+    "Vector2",
+    "Vector3",
+    "NumberSequence",
+    "ColorSequence",
+    "NumberRange",
+    "Rect",
+}
+
+function InstanceUtils.isTypeAttributeSupported(dataType)
+    if table.find(attributeSupportedDataTypes, dataType) then
+        return true
+    end
+    return false
+end
+
 function InstanceUtils.make(objData, ...)
     local className = objData[1]
     local properties = objData[2]

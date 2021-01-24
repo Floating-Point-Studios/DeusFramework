@@ -13,6 +13,7 @@ local RemoteFunction = {
         local remoteFunction
         if RunService:IsServer() then
             remoteFunction = Instance.new("RemoteFunction")
+            remoteFunction.Name = args[2]
             remoteFunction.Parent = args[1]
             self.Internal.RBXEvent = remoteFunction
         else

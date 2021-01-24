@@ -82,7 +82,7 @@ if not Deus then
             repeat
                 module = Modules[path]
                 wait()
-            until module or tick() - waitStart > (timeout or 3)
+            until module or tick() - waitStart > (timeout or 10)
         end
 
         assert(module, "[Deus] Error finding module ".. path)

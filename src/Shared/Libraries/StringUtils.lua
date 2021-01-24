@@ -1,4 +1,6 @@
-local HttpService = game:GetService("HttpService")
+local Deus = shared.Deus
+
+local TableUtils = Deus:Load("Deus.TableUtils")
 
 local StringUtils = {}
 
@@ -33,6 +35,11 @@ function StringUtils.collapseOccurances(str, pattern)
         str = str:gsub(pattern, rep)
     until not str:match(rep)
     return str
+end
+
+function StringUtils.hash(str)
+    local bytes = TableUtils.sum({string.byte(str, 1, #str)})
+    return Random.new(bytes):NextInteger(10000000, 99999999)
 end
 
 return StringUtils
