@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
 local Deus = shared.Deus
@@ -73,6 +74,7 @@ end
 
 local function cleanupReplication(self)
     local obj = self.ReplicationTarget
+    CollectionService:RemoveTag(obj, "DeusObject")
     self.ReplicationTarget = nil
 
     for i in pairs(obj:GetAttributes()) do
@@ -86,6 +88,7 @@ function Object:Replicate(internalAccess, obj)
     Output.assert(internalAccess, "Object replication can only be set internally")
 
     if obj then
+        CollectionService:AddTag(obj, "DeusObject")
         self.ReplicationTarget = obj
 
         if RunService:IsServer() then
