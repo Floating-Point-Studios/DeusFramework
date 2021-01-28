@@ -1,16 +1,29 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 
 -- Setup server
 local DeusCore = script.Parent.Deus
-DeusCore.Parent = ReplicatedStorage
 
-local Deus = require(DeusCore)
+local DeusSettingsModule = script.Parent.Parent:FindFirstChild("DeusSettings")
+local DeusSettings
+if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
+    DeusSettings = require(DeusSettings)
+end
+
+local Deus = require(DeusCore)(DeusSettings)
+
+function shared.Deus()
+    return Deus
+end
+
 Deus:Register(script, "Deus")
 Deus:Register(script.Parent.Shared, "Deus")
 
+if not DeusSettings.PubliclyAccessibleLoader then
+    shared.Deus = nil
+end
+
+--[[
 local InstanceUtils = Deus:Load("Deus.InstanceUtils")
 
 -- Setup client config
@@ -30,8 +43,12 @@ local ClientConfig = InstanceUtils.make(
         }
     }
 )
+--]]
 
-if ServerConfig then
+if DeusSettingsModule then
+    --[[
+    Outsourced to CardinalEngine
+
     local deusSettings = ServerConfig:FindFirstChild("Settings")
     if deusSettings then
         deusSettings:Clone().Parent = ClientConfig
@@ -85,9 +102,18 @@ if ServerConfig then
         end
     end
     ClientConfig.Parent = ReplicatedStorage
+    --]]
+    DeusSettingsModule.Parent = ReplicatedStorage
 end
 
 -- Setup client
 local Client = script.Parent.Client
 script.Parent.Shared:Clone().Parent = Client
-Client.Parent = ReplicatedFirst
+
+if (DeusSettings and DeusSettings.PubliclyAccessibleLoader) or not DeusSettings then
+    DeusCore.Parent = ReplicatedStorage
+    Client.Parent = ReplicatedFirst
+else
+    DeusCore.Parent = ReplicatedFirst
+    Client.Parent = DeusCore
+end

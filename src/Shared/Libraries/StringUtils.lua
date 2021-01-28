@@ -1,4 +1,4 @@
-local Deus = shared.Deus
+local Deus = shared.Deus()
 
 local TableUtils = Deus:Load("Deus.TableUtils")
 

@@ -1,4 +1,4 @@
-local Deus = shared.Deus
+local Deus = shared.Deus()
 local Output = Deus:Load("Deus.Output")
 
 local RemoteEvent = {}

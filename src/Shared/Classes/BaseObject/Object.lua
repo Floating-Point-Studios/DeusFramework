@@ -1,7 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local Deus = shared.Deus
+local Deus = shared.Deus()
 
 local JSON = Deus:Load("Deus.JSON")
 local Output = Deus:Load("Deus.Output")

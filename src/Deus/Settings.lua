@@ -1,9 +1,16 @@
 return {
-    Loader = {
+    -- Ignores scripts that end in specific extensions such as "Example.config" by adding ".config"
+    IgnoredExtensions = {},
 
-        IgnoredExtensions = {},
-        LazyLoadModules = true,
-        IgnoreSubmodules = true,
+    -- Doesn't laod modules until they are needed
+    LazyLoadModules = true,
 
-    }
+    -- Ignores modules parented to modules
+    IgnoreSubmodules = true,
+
+    -- Adds Deus table to global shared table
+    AttachToShared = true,
+
+    -- Creates a module in ReplicatedStorage that can be used by any script
+    PubliclyAccessibleLoader = true,
 }

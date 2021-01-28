@@ -1,7 +1,11 @@
 local Modules = {}
-local Settings = require(script.Settings)
 local Deus = shared.Deus
-local DefaultSettings = require(script.Settings)
+
+if Deus and type(Deus) == "function" then
+    Deus = Deus()
+else
+    Deus = nil
+end
 
 local function __newindex()
     error("[Deus] Attempt to modify loaded module from externally")
@@ -30,79 +34,59 @@ local function registerModule(module, path)
     end
 end
 
-if not Deus then
-    Deus = {}
+return function(deusSettings)
+    deusSettings = deusSettings or require(script.Settings)
 
-    -- Can only be used once
-    function Deus:SetSettings(newSettings)
-        if typeof(newSettings) == "Instance" and newSettings:IsA("ModuleScript") then
-            newSettings = require(newSettings)
-        end
-        Settings = newSettings
-        Deus.SetSettings = nil
-    end
+    if not Deus then
+        Deus = {}
 
-    function Deus:GetSetting(settingName)
-        local settingPath = string.split(settingName, ".")
+        function Deus:Register(addon, addonName)
+            addonName = addonName or addon.Name
 
-        local success, setting = pcall(function()
-            return Settings[settingPath[1]][settingPath[2]]
-        end)
-
-        if not success then
-            success, setting = pcall(function()
-                return DefaultSettings[settingPath[1]][settingPath[2]]
-            end)
-        end
-
-        assert(success, ("[Deus] Error finding setting %s.%s"):format(settingPath[1], settingPath[2]))
-        return setting
-    end
-
-    function Deus:Register(addon, addonName)
-        addonName = addonName or addon.Name
-
-        if addon:IsA("ModuleScript") then
-            registerModule(addon, addonName)
-        else
-            for _,module in pairs(addon:GetDescendants()) do
-                if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
-                    local moduleName = string.split(module.Name, ".")[1]
-                    registerModule(module, addonName.. ".".. moduleName)
+            if addon:IsA("ModuleScript") then
+                registerModule(addon, addonName)
+            else
+                for _,module in pairs(addon:GetDescendants()) do
+                    if module:IsA("ModuleScript") and (not module:FindFirstAncestorWhichIsA("ModuleScript") or not deusSettings.IgnoreSubmodules) then
+                        local moduleName = string.split(module.Name, ".")[1]
+                        registerModule(module, addonName.. ".".. moduleName)
+                    end
                 end
             end
         end
-    end
 
-    function Deus:Load(path, timeout)
-        local module = Modules[path]
+        function Deus:Load(path, timeout)
+            local module = Modules[path]
 
-        if not module then
-            local waitStart = tick()
-            repeat
-                module = Modules[path]
-                wait()
-            until module or tick() - waitStart > (timeout or 10)
-        end
-
-        assert(module, "[Deus] Error finding module ".. path)
-
-        if typeof(module) == "Instance" then
-            local proxy, meta = loadModule(module)
-            Modules[path] = proxy
-
-            if meta.__index.init then
-                meta.__index.init()
-                meta.__index.init = nil
+            if not module then
+                local waitStart = tick()
+                repeat
+                    module = Modules[path]
+                    wait()
+                until module or tick() - waitStart > (timeout or 10)
             end
 
-            return proxy
-        else
-            return module
+            assert(module, "[Deus] Error finding module ".. path)
+
+            if typeof(module) == "Instance" then
+                local proxy, meta = loadModule(module)
+                Modules[path] = proxy
+
+                if meta.__index.init then
+                    meta.__index.init()
+                    meta.__index.init = nil
+                end
+
+                return proxy
+            else
+                return module
+            end
+        end
+
+        if deusSettings.AttachToShared then
+            shared.Deus = Deus
         end
     end
 
-    shared.Deus = Deus
+    return Deus
 end
-
-return Deus

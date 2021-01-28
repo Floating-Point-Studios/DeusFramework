@@ -1,7 +1,7 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
-local Deus = shared.Deus
+local Deus = shared.Deus()
 
 local Output = Deus:Load("Deus.Output")
 local Symbol = Deus:Load("Deus.Symbol")
