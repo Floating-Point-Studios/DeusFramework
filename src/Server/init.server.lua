@@ -19,8 +19,13 @@ end
 Deus:Register(script, "Deus")
 Deus:Register(script.Parent.Shared, "Deus")
 
-if not DeusSettings.PubliclyAccessibleLoader then
+if DeusSettings.PubliclyAccessibleLoader and not DeusSettings.AttachToShared then
     shared.Deus = nil
+else
+    function shared.Deus()
+        shared.Deus = nil
+        return Deus
+    end
 end
 
 --[[
@@ -111,9 +116,9 @@ local Client = script.Parent.Client
 script.Parent.Shared:Clone().Parent = Client
 
 if (DeusSettings and DeusSettings.PubliclyAccessibleLoader) or not DeusSettings then
-    DeusCore.Parent = ReplicatedStorage
+    DeusCore:Clone().Parent = ReplicatedStorage
     Client.Parent = ReplicatedFirst
 else
-    DeusCore.Parent = ReplicatedFirst
+    DeusCore:Clone().Parent = ReplicatedFirst
     Client.Parent = DeusCore
 end

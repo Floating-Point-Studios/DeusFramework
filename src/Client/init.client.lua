@@ -14,8 +14,13 @@ end
 
 Deus:Register(script, "Deus")
 
-if not DeusSettings.PubliclyAccessibleLoader then
+if DeusSettings.PubliclyAccessibleLoader and not DeusSettings.AttachToShared then
     shared.Deus = nil
+else
+    function shared.Deus()
+        shared.Deus = nil
+        return Deus
+    end
 end
 
 --[[
