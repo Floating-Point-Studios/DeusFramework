@@ -1,3 +1,8 @@
+--[[
+    Objects that require permissions, object inheritance, events, replication across the client-server boundary, or attaching to Roblox instances via attributes
+    are inherited from BaseObject. Objects that do not require any of this should be constructed from a basic metatable.
+]]
+
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 

@@ -52,7 +52,7 @@ local ClientConfig = InstanceUtils.make(
         }
     }
 )
---]]
+]]
 
 if DeusSettingsModule then
     --[[
@@ -111,7 +111,7 @@ if DeusSettingsModule then
         end
     end
     ClientConfig.Parent = ReplicatedStorage
-    --]]
+    ]]
     DeusSettingsModule.Parent = ReplicatedStorage
 end
 
