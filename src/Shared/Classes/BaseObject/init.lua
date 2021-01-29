@@ -133,6 +133,8 @@ function BaseObject.new(objData)
 
             ClassName = objData.ClassName,
 
+            Extendable = objData.Extendable or true,
+
             Methods = objData.Methods or {},
 
             PublicReadAndWriteProperties = objData.PublicReadAndWriteProperties or {},

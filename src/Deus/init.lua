@@ -76,6 +76,14 @@ return function(deusSettings)
                 return module
             end
         end
+
+        function Deus:IsRegistered(path)
+            if Modules[path] then
+                return true
+            end
+            return false
+        end
+
     elseif type(Deus) == "function" then
         Deus = Deus()
     end
