@@ -7,7 +7,9 @@ local DeusCore = script.Parent.Deus
 local DeusSettingsModule = script.Parent.Parent:FindFirstChild("DeusSettings")
 local DeusSettings
 if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
-    DeusSettings = require(DeusSettings)
+    DeusSettings = require(DeusSettingsModule)
+else
+    DeusSettings = require(DeusCore.Settings)
 end
 
 local Deus = require(DeusCore)(DeusSettings)
@@ -19,12 +21,14 @@ end
 Deus:Register(script, "Deus")
 Deus:Register(script.Parent.Shared, "Deus")
 
-if DeusSettings.PubliclyAccessibleLoader and not DeusSettings.AttachToShared then
-    shared.Deus = nil
-else
-    function shared.Deus()
+if not DeusSettings.AttachToShared then
+    if not DeusSettings.PubliclyAccessibleLoader then
+        function shared.Deus()
+            shared.Deus = nil
+            return Deus
+        end
+    else
         shared.Deus = nil
-        return Deus
     end
 end
 

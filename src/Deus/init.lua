@@ -1,12 +1,6 @@
 local Modules = {}
 local Deus = shared.Deus
 
-if Deus and type(Deus) == "function" then
-    Deus = Deus()
-else
-    Deus = nil
-end
-
 local function __newindex()
     error("[Deus] Attempt to modify loaded module from externally")
 end
@@ -82,10 +76,8 @@ return function(deusSettings)
                 return module
             end
         end
-
-        if deusSettings.AttachToShared then
-            shared.Deus = Deus
-        end
+    elseif type(Deus) == "function" then
+        Deus = Deus()
     end
 
     return Deus
