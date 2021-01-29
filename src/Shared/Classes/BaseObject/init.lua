@@ -187,6 +187,7 @@ function BaseObject.new(objData)
 
                 -- Properties inherited by all objects
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName = objData.ClassName
+                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable = objData.Extendable or true
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId = HttpService:GenerateGUID(false)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated = tick()
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ReplicationTarget = Symbol.new("None")
