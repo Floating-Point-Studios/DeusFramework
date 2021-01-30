@@ -12,6 +12,11 @@ local BaseObject = Deus:Load("Deus.BaseObject")
 local function isInputActionActive(self)
     local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
     local keyDown = UserInputService:IsKeyDown(ReadAndWriteProperties.KeyCode)
+
+    if not keyDown then
+        return false
+    end
+
     local ctrlDown = false
     local altDown = false
     local shiftDown = false
@@ -28,7 +33,7 @@ local function isInputActionActive(self)
         shiftDown = true
     end
 
-    if keyDown and ctrlDown and altDown and shiftDown then
+    if ctrlDown and altDown and shiftDown then
         return true
     end
     return false
@@ -48,21 +53,23 @@ local function isModifierKey(keyCode)
 end
 
 local function updateAction(self, inputObject)
-    local Events = self.Internal.DEUSOBJECT_LockedTables.Events
-    local ReadOnlyProperties = self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
-    local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
+    if not (self.DisableWhenTyping and UserInputService:GetFocusedTextBox()) then
+        local Events = self.Internal.DEUSOBJECT_LockedTables.Events
+        local ReadOnlyProperties = self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
+        local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
 
-    if not inputObject or (inputObject.KeyCode == ReadAndWriteProperties.KeyCode or isModifierKey(inputObject.KeyCode)) then
-        if ReadOnlyProperties.Enabled then
-            local isActive = isInputActionActive(self)
-            if isActive and not ReadOnlyProperties.Active then
-                ReadOnlyProperties.Active = true
-                ReadOnlyProperties.ActionStart = tick()
-                Events.InputBegan:Fire(inputObject)
-            elseif not isActive and ReadOnlyProperties.Active then
-                ReadOnlyProperties.Active = false
-                 ReadOnlyProperties.ActionStart = 0
-                Events.InputEnded:Fire(inputObject, tick() - ReadOnlyProperties.ActionStart)
+        if not inputObject or (inputObject.KeyCode == ReadAndWriteProperties.KeyCode or isModifierKey(inputObject.KeyCode)) then
+            if ReadOnlyProperties.Enabled then
+                local isActive = isInputActionActive(self)
+                if isActive and not ReadOnlyProperties.Active then
+                    ReadOnlyProperties.Active = true
+                    ReadOnlyProperties.ActionStart = tick()
+                    Events.InputBegan:Fire(inputObject)
+                elseif not isActive and ReadOnlyProperties.Active then
+                    ReadOnlyProperties.Active = false
+                    ReadOnlyProperties.ActionStart = 0
+                    Events.InputEnded:Fire(inputObject, tick() - ReadOnlyProperties.ActionStart)
+                end
             end
         end
     end
@@ -92,6 +99,10 @@ return BaseObject.new(
 
             PrivateProperties.InputEndedConnection = UserInputService.InputEnded:Connect(function(inputObject)
                 updateAction(self, inputObject)
+            end)
+
+            PrivateProperties.TextBoxReleasedConnection = UserInputService.TextBoxFocusReleased:Connect(function()
+                updateAction(self)
             end)
 
             PrivateProperties.ChangedConnection = Events.Changed:Connect(function()
@@ -125,6 +136,7 @@ return BaseObject.new(
         },
 
         PublicReadAndWriteProperties = {
+            DisableWhenTyping = false,
             Ctrl = false,
             Alt = false,
             Shift = false
