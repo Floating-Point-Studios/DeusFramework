@@ -21,15 +21,15 @@ local function isInputActionActive(self)
     local altDown = false
     local shiftDown = false
 
-    if not ReadAndWriteProperties.Ctrl or (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)) then
+    if not ReadAndWriteProperties.ModifierCtrlRequired or (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)) then
         ctrlDown = true
     end
 
-    if not ReadAndWriteProperties.Alt or (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or UserInputService:IsKeyDown(Enum.KeyCode.RightAlt)) then
+    if not ReadAndWriteProperties.ModifierAltRequired or (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or UserInputService:IsKeyDown(Enum.KeyCode.RightAlt)) then
         altDown = true
     end
 
-    if not ReadAndWriteProperties.Shift or (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)) then
+    if not ReadAndWriteProperties.ModifierShiftRequired or (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)) then
         shiftDown = true
     end
 
@@ -89,9 +89,9 @@ return BaseObject.new(
             local PrivateProperties = self.Internal.DEUSOBJECT_Properties
             local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
             ReadAndWriteProperties.KeyCode = keyCode
-            ReadAndWriteProperties.Ctrl = reqCtrl or false
-            ReadAndWriteProperties.Alt = reqAlt or false
-            ReadAndWriteProperties.Shift = reqShift or false
+            ReadAndWriteProperties.ModifierCtrlRequired = reqCtrl or false
+            ReadAndWriteProperties.ModifierAltRequired = reqAlt or false
+            ReadAndWriteProperties.ModifierShiftRequired = reqShift or false
 
             PrivateProperties.InputBeganConnection = UserInputService.InputBegan:Connect(function(inputObject)
                 updateAction(self, inputObject)
@@ -137,9 +137,9 @@ return BaseObject.new(
 
         PublicReadAndWriteProperties = {
             DisableWhenTyping = false,
-            Ctrl = false,
-            Alt = false,
-            Shift = false
+            ModifierCtrlRequired = false,
+            ModifierAltRequired = false,
+            ModifierShiftRequired = false
         }
     }
 )
