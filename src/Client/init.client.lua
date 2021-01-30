@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local DeusSettingsModule = script.Parent.Parent:FindFirstChild("DeusSettings")
+local DeusSettingsModule = ReplicatedStorage:WaitForChild("DeusSettings")
 local DeusSettings
 if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
-    DeusSettings = require(DeusSettings)
+    DeusSettings = require(DeusSettingsModule)
 end
 
 local Deus = require(ReplicatedStorage:WaitForChild("Deus"))(DeusSettings)

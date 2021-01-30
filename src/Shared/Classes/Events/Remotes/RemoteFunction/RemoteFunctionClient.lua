@@ -5,12 +5,12 @@ local RemoteEvent = {}
 
 function RemoteEvent:InvokeServer(internalAccess, ...)
     Output.assert(internalAccess, "Attempt to use internal method")
-    return self.RBXEvent:InvokeServer(...)
+    return self.Internal.DEUSOBJECT_Properties.RBXEvent:InvokeServer(...)
 end
 
 function RemoteEvent:Listen(internalAccess, callback)
     Output.assert(callback, "Expected callback")
-    function self.RBXEvent.OnClientInvoke(...)
+    function self.Internal.DEUSOBJECT_Properties.RBXEvent.OnClientInvoke(...)
         return callback(...)
     end
 end

@@ -11,15 +11,15 @@ return BaseObject.new(
             Fire = function(self, internalAccess, ...)
                 Output.assert(internalAccess, "Attempt to fire remote from externally")
                 self.LastFiredTick = tick()
-                self.RBXEvent:Fire(...)
+                self.Internal.DEUSOBJECT_Properties.RBXEvent:Fire(...)
             end,
 
             Connect = function(self, internalAccess, func)
-                return self.RBXEvent.Event:Connect(func)
+                return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Connect(func)
             end,
 
             Wait = function(self)
-                return self.RBXEvent.Event:Wait()
+                return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Wait()
             end
         },
 
@@ -28,7 +28,7 @@ return BaseObject.new(
         },
 
         Constructor = function(self)
-            self.Internal.RBXEvent = Instance.new("BindableEvent")
+            self.Internal.DEUSOBJECT_Properties.RBXEvent = Instance.new("BindableEvent")
         end
     }
 )

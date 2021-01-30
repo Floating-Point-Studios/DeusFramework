@@ -20,7 +20,7 @@ local RemoteEvent ={
             remoteEvent = Instance.new("RemoteEvent")
             remoteEvent.Name = args[2]
             remoteEvent.Parent = args[1]
-            self.Internal.RBXEvent = remoteEvent
+            self.Internal.DEUSOBJECT_Properties.RBXEvent = remoteEvent
 
             remoteEvent.OnServerEvent:Connect(function()
                 self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.LastReceiveTick = tick()
@@ -28,13 +28,13 @@ local RemoteEvent ={
         else
             remoteEvent = args[1]
             Output.assert(remoteEvent, "Expected to be provided a RemoteEvent")
-            self.Internal.RBXEvent = remoteEvent
+            self.Internal.DEUSOBJECT_Properties.RBXEvent = remoteEvent
 
             remoteEvent.OnClientEvent:Connect(function()
                 self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.LastReceiveTick = tick()
             end)
         end
-    end
+    end,
 }
 
 if RunService:IsServer() then

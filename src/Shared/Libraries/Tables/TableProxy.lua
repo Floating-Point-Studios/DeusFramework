@@ -18,7 +18,7 @@ function TableProxy.__index(self, i)
     end
 
     v = rawget(self, "Internal")[i]
-    if v then
+    if v ~= nil then
         if internalAccess then
             return v
         else
@@ -27,18 +27,18 @@ function TableProxy.__index(self, i)
     end
 
     v = rawget(self, "ExternalReadOnly")[i]
-    if v then
+    if v ~= nil then
         return v
     end
 
     v = rawget(self, "ExternalReadAndWrite")[i]
-    if v then
+    if v ~= nil then
         return v
     end
 
     for _,fallbackIndex in pairs(rawget(self, "FallbackIndexes")) do
         v = fallbackIndex(self, i, internalAccess)
-        if v then
+        if v ~= nil then
             return v
         end
     end
@@ -57,7 +57,7 @@ function TableProxy.__newindex(self, i, v)
     local ExternalReadAndWrite = rawget(self, "ExternalReadAndWrite")
     local FallbackNewIndexes = rawget(self, "FallbackNewIndexes")
 
-    if Internal[i] then
+    if Internal[i] ~= nil then
         if internalAccess then
             Internal[i] = v
             return true
@@ -66,12 +66,12 @@ function TableProxy.__newindex(self, i, v)
         end
     end
 
-    if ExternalReadOnly[i] then
+    if ExternalReadOnly[i] ~= nil then
         ExternalReadOnly[i] = v
         return true
     end
 
-    if ExternalReadAndWrite[i] then
+    if ExternalReadAndWrite[i] ~= nil then
         ExternalReadAndWrite[i] = v
         return true
     end

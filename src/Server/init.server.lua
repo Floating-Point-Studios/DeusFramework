@@ -9,7 +9,8 @@ local DeusSettings
 if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
     DeusSettings = require(DeusSettingsModule)
 else
-    DeusSettings = require(DeusCore.Settings)
+    DeusSettingsModule = DeusCore.Settings
+    DeusSettings = require(DeusSettingsModule)
 end
 
 local Deus = require(DeusCore)(DeusSettings)
@@ -54,8 +55,8 @@ local ClientConfig = InstanceUtils.make(
 )
 ]]
 
+--[[
 if DeusSettingsModule then
-    --[[
     Outsourced to CardinalEngine
 
     local deusSettings = ServerConfig:FindFirstChild("Settings")
@@ -111,9 +112,12 @@ if DeusSettingsModule then
         end
     end
     ClientConfig.Parent = ReplicatedStorage
-    ]]
-    DeusSettingsModule.Parent = ReplicatedStorage
 end
+]]
+
+DeusSettingsModule = DeusSettingsModule:Clone()
+DeusSettingsModule.Parent = ReplicatedStorage
+DeusSettingsModule.Name = "DeusSettings"
 
 -- Setup client
 local Client = script.Parent.Client

@@ -15,11 +15,11 @@ local RemoteFunction = {
             remoteFunction = Instance.new("RemoteFunction")
             remoteFunction.Name = args[2]
             remoteFunction.Parent = args[1]
-            self.Internal.RBXEvent = remoteFunction
+            self.Internal.DEUSOBJECT_Properties.RBXEvent = remoteFunction
         else
             remoteFunction = args[1]
             Output.assert(remoteFunction, "Expected to be provided a RemoteFunction")
-            self.Internal.RBXEvent = remoteFunction
+            self.Internal.DEUSOBJECT_Properties.RBXEvent = remoteFunction
         end
     end
 }
