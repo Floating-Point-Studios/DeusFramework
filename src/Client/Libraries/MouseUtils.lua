@@ -17,8 +17,6 @@ function MouseUtils.getTargetAtPosition(x, y, filterType, filterDescendantsInsta
     if result then
         return result.Instance
     end
-
-    return nil
 end
 
 function MouseUtils.getGuiObjectsAtPositionWithWhitelist(x, y, filter)
