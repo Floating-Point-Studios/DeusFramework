@@ -3,6 +3,12 @@ local Deus = shared.Deus()
 local Output = Deus:Load("Deus.Output")
 local TableUtils = Deus:Load("Deus.TableUtils")
 
+local function __index(self, i)
+    if i == "Name" or i == "Value" or i == "EnumType" then
+        return rawget(self, i)
+    end
+end
+
 local function __tostring(self)
     return ("Deus.Enumeration.%s.%s"):format(self.EnumType, self.Name)
 end
@@ -24,6 +30,7 @@ function Enumeration.addEnumItem(enumName, enumItemName, value)
     local meta = getmetatable(proxy)
 
     meta.__metatable = "[Enumeration] Locked metatable"
+    meta.__index = __index
     meta.__tostring = __tostring
 
     meta.Name = enumItemName
