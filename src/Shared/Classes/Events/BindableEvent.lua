@@ -1,7 +1,12 @@
+local HttpService = game:GetService("HttpService")
+
 local Deus = shared.Deus()
 
 local BaseObject = Deus:Load("Deus.BaseObject")
 local Output = Deus:Load("Deus.Output")
+
+-- BindableEvents do not support userdata types made from newproxy() so instead we cache the payload and send a Uuid to retrieve the payload
+local Cache = {}
 
 return BaseObject.new(
     {
@@ -11,11 +16,18 @@ return BaseObject.new(
             Fire = function(self, internalAccess, ...)
                 Output.assert(internalAccess, "Attempt to fire remote from externally")
                 self.LastFiredTick = tick()
-                self.Internal.DEUSOBJECT_Properties.RBXEvent:Fire(...)
+                local Uuid = HttpService:GenerateGUID(false)
+                Cache[Uuid] = {...}
+                self.Internal.DEUSOBJECT_Properties.RBXEvent:Fire(Uuid)
+                wait()
+                -- May not work with lag, may have to change
+                Cache[Uuid] = nil
             end,
 
             Connect = function(self, internalAccess, func)
-                return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Connect(func)
+                return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Connect(function(Uuid)
+                    func(unpack(Cache[Uuid]))
+                end)
             end,
 
             Wait = function(self)
