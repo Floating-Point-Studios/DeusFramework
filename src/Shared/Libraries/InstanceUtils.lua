@@ -1,7 +1,11 @@
+local Deus = shared.Deus()
+
+local Output = Deus:Load("Deus.Output")
+
 local InstanceUtils = {}
 
 function InstanceUtils.anchor(obj, state)
-    state = state or true
+    Output.assert(state ~= nil and type(state) == "boolean", "Expected boolean as 2nd argument")
     for _,part in pairs(obj:GetDescendants()) do
         if part:IsA("BasePart") then
             part.Anchored = state
