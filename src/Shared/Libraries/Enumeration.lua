@@ -31,6 +31,7 @@ function Enumeration.addEnumItem(enumName, enumItemName, value)
     meta.EnumType = enumName
 
     enum[enumItemName] = proxy
+    Enumeration[enumName] = enum
 
     return proxy
 end
