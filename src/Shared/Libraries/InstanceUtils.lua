@@ -4,7 +4,7 @@ function InstanceUtils.anchor(obj, state)
     state = state or true
     for _,part in pairs(obj:GetDescendants()) do
         if part:IsA("BasePart") then
-            obj.Anchored = state
+            part.Anchored = state
         end
     end
 end
