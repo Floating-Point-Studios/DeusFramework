@@ -53,11 +53,12 @@ return function(deusSettings)
             local module = Modules[path]
 
             if not module then
+                warn(("[Deus] Error finding module '%s' beginning yield"):format(path))
                 local waitStart = tick()
                 repeat
                     module = Modules[path]
                     wait()
-                until module or tick() - waitStart > (timeout or 10)
+                until module or tick() - waitStart > (timeout or 5)
             end
 
             assert(module, "[Deus] Error finding module ".. path)
