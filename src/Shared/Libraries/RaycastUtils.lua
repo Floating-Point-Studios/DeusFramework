@@ -11,11 +11,15 @@ function RaycastUtils.castCollideOnly(origin, dir, params)
     local dirUnit = dir.Unit
     repeat
         local result = workspace:Raycast(origin, dir, params)
-        if result and result.Instance.CanCollide then
-            return result
+        if result then
+            if result.Instance.CanCollide then
+                return result
+            else
+                origin = result.Position
+                dir = dirUnit * (dir.Magnitude - (origin - result.Position).Magnitude)
+            end
         else
-            origin = result.Position
-            dir = dirUnit * (dir.Magnitude - (origin - result.Position).Magnitude)
+            return nil
         end
     until not result
 end
