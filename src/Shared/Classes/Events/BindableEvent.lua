@@ -8,6 +8,15 @@ local Output = Deus:Load("Deus.Output")
 -- BindableEvents do not support userdata types made from newproxy() so instead we cache the payload and send a Uuid to retrieve the payload
 local Cache = {}
 
+function clearCache()
+    local time = tick()
+    for i,v in pairs(Cache) do
+        if v.LastAccessed and time - v.LastAccessed > 0.5 then
+            Cache[i] = nil
+        end
+    end
+end
+
 return BaseObject.new(
     {
         ClassName = "Deus.BindableEvent",
@@ -16,17 +25,21 @@ return BaseObject.new(
             Fire = function(self, internalAccess, ...)
                 Output.assert(internalAccess, "Attempt to fire remote from externally")
                 self.LastFiredTick = tick()
+
+                spawn(clearCache)
+
                 local Uuid = HttpService:GenerateGUID(false)
                 Cache[Uuid] = {...}
+
                 self.Internal.DEUSOBJECT_Properties.RBXEvent:Fire(Uuid)
-                wait()
-                -- May not work with lag, may have to change
-                Cache[Uuid] = nil
             end,
 
             Connect = function(self, internalAccess, func)
                 return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Connect(function(Uuid)
-                    func(unpack(Cache[Uuid]))
+                    local payload = Cache[Uuid]
+                    payload.LastAccessed = tick()
+
+                    func(unpack(payload))
                 end)
             end,
 
