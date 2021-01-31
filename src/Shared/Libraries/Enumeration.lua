@@ -3,10 +3,10 @@ local Deus = shared.Deus()
 local Output = Deus:Load("Deus.Output")
 local TableUtils = Deus:Load("Deus.TableUtils")
 
+local EnumList = {}
+
 local function __index(self, i)
-    if i == "Name" or i == "Value" or i == "EnumType" then
-        return rawget(self, i)
-    end
+    return EnumList[self][i]
 end
 
 local function __tostring(self)
@@ -33,9 +33,11 @@ function Enumeration.addEnumItem(enumName, enumItemName, value)
     meta.__index = __index
     meta.__tostring = __tostring
 
-    meta.Name = enumItemName
-    meta.Value = value
-    meta.EnumType = enumName
+    EnumList[proxy] = {
+        Name = enumItemName,
+        Value = value,
+        EnumType = enumName
+    }
 
     enum[enumItemName] = proxy
     Enumeration[enumName] = enum
