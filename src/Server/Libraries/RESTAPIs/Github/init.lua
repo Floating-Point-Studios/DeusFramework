@@ -1,3 +1,0 @@
-local Github = {}
-
-return Github
