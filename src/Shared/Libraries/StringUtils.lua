@@ -42,4 +42,11 @@ function StringUtils.hash(str)
     return Random.new(bytes):NextInteger(10000000, 99999999)
 end
 
+function StringUtils.reverseSub(str, subStart, subEnd)
+    local strLength = #str
+    subStart = subStart or 1
+    subEnd = subEnd or strLength
+    return str:sub(strLength - subEnd + 1, strLength - subStart + 1)
+end
+
 return StringUtils
