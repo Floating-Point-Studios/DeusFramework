@@ -199,7 +199,7 @@ function BaseObject.new(objData)
                         DEUSOBJECT_Methods                  = TableUtils.deepCopy(TableUtils.merge(ObjectMeta, objData.Methods or {})),
                         DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
                         DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
-                        DEUSOBJECT_Events                   = objData.Events or {},
+                        DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
                     }
                 }
 
