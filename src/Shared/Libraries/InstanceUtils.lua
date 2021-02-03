@@ -45,7 +45,7 @@ function InstanceUtils.findFirstChildNoCase(obj, name, recursive)
     end
 end
 
-function InstanceUtils.findFirstChildWithAttribute(obj, name, attribute, recursive)
+function InstanceUtils.findFirstChildWithAttribute(obj, name, recursive)
     local tree
     if recursive then
         tree = obj:GetDescendants()
@@ -53,15 +53,15 @@ function InstanceUtils.findFirstChildWithAttribute(obj, name, attribute, recursi
         tree = obj:GetChildren()
     end
     for _,child in pairs(tree) do
-        if child:GetAttribute(name) == attribute then
+        if child:GetAttribute(name) ~= nil then
             return child
         end
     end
 end
 
-function InstanceUtils.findFirstAncestorWithAttribute(obj, name, attribute)
+function InstanceUtils.findFirstAncestorWithAttribute(obj, name)
     for _,ancestor in pairs(InstanceUtils.getAncestors(obj)) do
-        if ancestor:GetAttribute(name) == attribute then
+        if ancestor:GetAttribute(name) ~= nil then
             return ancestor
         end
     end

@@ -30,10 +30,10 @@ end
 -- Replaces pattern repetitions such as "/////" to "/"
 function StringUtils.collapseOccurances(str, pattern)
     local rep = pattern
-    pattern = pattern.rep(2)
+    pattern = pattern:rep(2)
     repeat
         str = str:gsub(pattern, rep)
-    until not str:match(rep)
+	until not str:match(pattern)
     return str
 end
 

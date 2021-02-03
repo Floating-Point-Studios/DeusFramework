@@ -13,7 +13,7 @@ function JSON.serialize(tab)
         elseif dataType == "Vector3" then
             tab[i] = {_TYPE = 2, _DATA = {v.X, v.Y, v.Z}}
         elseif dataType == "CFrame" then
-            tab[i] = {_TYPE = 3, _DATA = {v:ToComponents()}}
+            tab[i] = {_TYPE = 3, _DATA = {v:GetComponents()}}
         elseif dataType == "Color3" then
             tab[i] = {_TYPE = 4, _DATA = {v.r, v.g, v.b}}
         elseif dataType == "BrickColor" then
@@ -51,7 +51,7 @@ function JSON.deserialize(tab)
 end
 
 function JSON.isJSON(str)
-    local success = pcall(HttpService.JSONDecode, HttpService, str)
+    local success = pcall(JSON.deserialize, str)
     return success
 end
 
