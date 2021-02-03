@@ -16,7 +16,7 @@ function StringUtils.getMatches(str, pattern)
     local init = 1
     repeat
         local matchStart, matchEnd = str:find(pattern, init)
-        output[str:sub(matchStart, matchEnd)] = {Start = matchStart, End = matchEnd}
+        table.insert(output, {Match = str:sub(matchStart, matchEnd), Start = matchStart, End = matchEnd})
         init += 1
     until not str:match(pattern, init)
     return output
