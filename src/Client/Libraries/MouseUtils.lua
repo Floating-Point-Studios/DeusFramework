@@ -1,8 +1,6 @@
 local StarterGui = game:GetService("StarterGui")
 
-local Deus = shared.Deus
-
-local RaycastUtils = Deus:Load("Deus.RaycastUtils")
+local RaycastUtils
 
 local MouseUtils = {}
 
@@ -32,6 +30,10 @@ function MouseUtils.getGuiObjectsAtPositionWithWhitelist(x, y, filter)
     end
 
     return filteredObjects
+end
+
+function MouseUtils.start()
+    RaycastUtils = MouseUtils:Load("Deus.RaycastUtils")
 end
 
 return MouseUtils

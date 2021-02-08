@@ -19,9 +19,7 @@ Deus:Register(script, "Deus")
 Deus:Register(script.Parent.Shared, "Deus")
 
 if not DeusSettings.AttachToShared then
-    if not DeusSettings.PubliclyAccessibleLoader then
-        shared.Deus = nil
-    end
+    shared.Deus = nil
 end
 
 --[[

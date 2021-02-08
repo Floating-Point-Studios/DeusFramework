@@ -4,10 +4,8 @@
 
 local UserInputService = game:GetService("UserInputService")
 
-local Deus = shared.Deus
-
-local Output = Deus:Load("Deus.Output")
-local BaseObject = Deus:Load("Deus.BaseObject")
+local Output
+local BaseObject
 
 local function isInputActionActive(self)
     local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
@@ -75,71 +73,80 @@ local function updateAction(self, inputObject)
     end
 end
 
-return BaseObject.new(
-    {
-        ClassName = "Deus.InputAction",
+local InputActionObjData = {
+    ClassName = "Deus.InputAction",
 
-        Constructor = function(self, keyCode, reqCtrl, reqAlt, reqShift)
-            Output.assert(typeof(keyCode) == "EnumItem" and keyCode.EnumType == Enum.KeyCode, "Expected KeyCode")
-            Output.assert(not reqCtrl or type(reqCtrl) == "boolean", "Expected nil or boolean as 2nd argument")
-            Output.assert(not reqCtrl or type(reqAlt) == "boolean", "Expected nil or boolean as 3rd argument")
-            Output.assert(not reqCtrl or type(reqShift) == "boolean", "Expected nil or boolean as 4th argument")
+    Constructor = function(self, keyCode, reqCtrl, reqAlt, reqShift)
+        Output.assert(typeof(keyCode) == "EnumItem" and keyCode.EnumType == Enum.KeyCode, "Expected KeyCode")
+        Output.assert(not reqCtrl or type(reqCtrl) == "boolean", "Expected nil or boolean as 2nd argument")
+        Output.assert(not reqCtrl or type(reqAlt) == "boolean", "Expected nil or boolean as 3rd argument")
+        Output.assert(not reqCtrl or type(reqShift) == "boolean", "Expected nil or boolean as 4th argument")
 
+        local Events = self.Internal.DEUSOBJECT_LockedTables.Events
+        local PrivateProperties = self.Internal.DEUSOBJECT_Properties
+        local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
+        ReadAndWriteProperties.KeyCode = keyCode
+        ReadAndWriteProperties.ModifierCtrlRequired = reqCtrl or false
+        ReadAndWriteProperties.ModifierAltRequired = reqAlt or false
+        ReadAndWriteProperties.ModifierShiftRequired = reqShift or false
+
+        PrivateProperties.InputBeganConnection = UserInputService.InputBegan:Connect(function(inputObject)
+            updateAction(self, inputObject)
+        end)
+
+        PrivateProperties.InputEndedConnection = UserInputService.InputEnded:Connect(function(inputObject)
+            updateAction(self, inputObject)
+        end)
+
+        PrivateProperties.TextBoxReleasedConnection = UserInputService.TextBoxFocusReleased:Connect(function()
+            updateAction(self)
+        end)
+
+        PrivateProperties.ChangedConnection = Events.Changed:Connect(function()
+            updateAction(self)
+        end)
+    end,
+
+    Methods = {
+        Toggle = function(self, internalAccess, state)
             local Events = self.Internal.DEUSOBJECT_LockedTables.Events
-            local PrivateProperties = self.Internal.DEUSOBJECT_Properties
-            local ReadAndWriteProperties = self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
-            ReadAndWriteProperties.KeyCode = keyCode
-            ReadAndWriteProperties.ModifierCtrlRequired = reqCtrl or false
-            ReadAndWriteProperties.ModifierAltRequired = reqAlt or false
-            ReadAndWriteProperties.ModifierShiftRequired = reqShift or false
+            local ReadOnlyProperties = self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
 
-            PrivateProperties.InputBeganConnection = UserInputService.InputBegan:Connect(function(inputObject)
-                updateAction(self, inputObject)
-            end)
+            Output.assert(internalAccess, "InputAction can only be toggled with internal access")
+            Output.assert(state ~= nil and type(state) == "boolean", "Boolean expected as 2nd argument")
 
-            PrivateProperties.InputEndedConnection = UserInputService.InputEnded:Connect(function(inputObject)
-                updateAction(self, inputObject)
-            end)
+            ReadOnlyProperties.Enabled = state
 
-            PrivateProperties.TextBoxReleasedConnection = UserInputService.TextBoxFocusReleased:Connect(function()
-                updateAction(self)
-            end)
-
-            PrivateProperties.ChangedConnection = Events.Changed:Connect(function()
-                updateAction(self)
-            end)
-        end,
-
-        Methods = {
-            Toggle = function(self, internalAccess, state)
-                local Events = self.Internal.DEUSOBJECT_LockedTables.Events
-                local ReadOnlyProperties = self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
-
-                Output.assert(internalAccess, "InputAction can only be toggled with internal access")
-                Output.assert(state ~= nil and type(state) == "boolean", "Boolean expected as 2nd argument")
-
-                ReadOnlyProperties.Enabled = state
-
-                if not state then
-                    Events.InputEnded:Fire()
-                    ReadOnlyProperties.Active = false
-                end
+            if not state then
+                Events.InputEnded:Fire()
+                ReadOnlyProperties.Active = false
             end
-        },
+        end
+    },
 
-        Events = {"InputBegan", "InputEnded"},
+    Events = {"InputBegan", "InputEnded"},
 
-        PublicReadOnlyProperties = {
-            Enabled = true,
-            Active = false,
-            ActionStart = 0,
-        },
+    PublicReadOnlyProperties = {
+        Enabled = true,
+        Active = false,
+        ActionStart = 0,
+    },
 
-        PublicReadAndWriteProperties = {
-            DisableWhenTyping = false,
-            ModifierCtrlRequired = false,
-            ModifierAltRequired = false,
-            ModifierShiftRequired = false
-        }
+    PublicReadAndWriteProperties = {
+        DisableWhenTyping = false,
+        ModifierCtrlRequired = false,
+        ModifierAltRequired = false,
+        ModifierShiftRequired = false
     }
-)
+}
+
+local InputAction = {}
+
+function InputAction.start()
+    Output = InputAction:Load("Deus.Output")
+    BaseObject = InputAction:Load("Deus.BaseObject")
+
+    return BaseObject.new(InputActionObjData)
+end
+
+return InputAction

@@ -11,9 +11,7 @@ local Deus = require(ReplicatedStorage:WaitForChild("Deus"))
 Deus:Register(script, "Deus")
 
 if not DeusSettings.AttachToShared then
-    if not DeusSettings.PubliclyAccessibleLoader then
-        shared.Deus = nil
-    end
+    shared.Deus = nil
 end
 
 --[[

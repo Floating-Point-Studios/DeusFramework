@@ -1,11 +1,9 @@
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Deus = shared.Deus
-
-local RemoteEvent = Deus:Load("Deus.RemoteEvent")
-local RemoteFunction = Deus:Load("Deus.RemoteFunction")
-local Output = Deus:Load("Deus.Output")
+local RemoteEvent
+local RemoteFunction
+local Output
 
 local RemotesFolder
 local RemoteEvents = {}
@@ -87,6 +85,12 @@ else
     RemotesFolder.ChildAdded:Connect(function(remote)
         registerRemote(remote)
     end)
+end
+
+function NetworkService.start()
+    RemoteEvent = NetworkService:Load("Deus.RemoteEvent")
+    RemoteFunction = NetworkService:Load("Deus.RemoteFunction")
+    Output = NetworkService:Load("Deus.Output")
 end
 
 return NetworkService
