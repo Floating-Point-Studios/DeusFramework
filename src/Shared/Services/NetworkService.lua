@@ -1,7 +1,7 @@
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Deus = shared.Deus()
+local Deus = shared.Deus
 
 local RemoteEvent = Deus:Load("Deus.RemoteEvent")
 local RemoteFunction = Deus:Load("Deus.RemoteFunction")

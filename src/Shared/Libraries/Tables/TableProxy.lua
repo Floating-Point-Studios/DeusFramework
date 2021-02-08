@@ -1,6 +1,4 @@
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
+local Output
 
 local Metatables = setmetatable({}, {__mode = "v"})
 
@@ -142,6 +140,10 @@ function TableProxy:SetFallbackNewIndexes(newindexes)
     Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
     Output.assert(type(newindexes) == "table", "Expected 'table' got '%s'", type(newindexes))
     self.FallbackIndexes = newindexes
+end
+
+function TableProxy.start()
+    Output = TableProxy:Load("Deus.Output")
 end
 
 return TableProxy

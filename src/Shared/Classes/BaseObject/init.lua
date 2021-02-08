@@ -20,7 +20,7 @@
         end,
 
         Methods = {},
-            Direct: obj.Internal.DEUSOBJECT_LockedTables.Methods
+            Direct: self.Internal.DEUSOBJECT_LockedTables.Methods
 
         Events = {},
             Direct: self.Internal.DEUSOBJECT_LockedTables.Events
@@ -39,17 +39,14 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
-local Symbol = Deus:Load("Deus.Symbol")
-local TableProxy = Deus:Load("Deus.TableProxy")
-local TableUtils = Deus:Load("Deus.TableUtils")
-local InstanceUtils = Deus:Load("Deus.InstanceUtils")
-
-local BlueprintMeta = require(script.Blueprint)
-local ObjectMeta = require(script.Object)
+local Output
+local Symbol
+local TableProxy
+local TableUtils
+local InstanceUtils
 local BindableEvent
+local BlueprintMeta
+local ObjectMeta
 
 local ClassList = {}
 
@@ -130,9 +127,11 @@ function __newindex(self, i, v, internalAccess)
     if oldv ~= nil then
         Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName)
         InternalProperties[i] = v
+        --[[
         if Events.Changed then
             Events.Changed:Fire(i, v, oldv)
         end
+        ]]
         return true
     end
 
@@ -213,10 +212,12 @@ function BaseObject.new(objData)
                     end
                 end
 
+                --[[
                 -- Special exemption for objects that should not inherit base events
                 if objData.ClassName ~= "Deus.BindableEvent" then
                     table.insert(obj.ExternalReadOnly.DEUSOBJECT_Events, "Changed")
                 end
+                --]]
 
                 for _,eventName in pairs(obj.ExternalReadOnly.DEUSOBJECT_Events) do
                     local eventProxy, eventMeta = BindableEvent.new()
@@ -276,8 +277,18 @@ function BaseObject.getClassList()
     return TableUtils.shallowCopy(ClassList)
 end
 
+function BaseObject.start()
+    Output = BaseObject:Load("Deus.Output")
+    Symbol = BaseObject:Load("Deus.Symbol")
+    TableProxy = BaseObject:Load("Deus.TableProxy")
+    TableUtils = BaseObject:Load("Deus.TableUtils")
+    InstanceUtils = BaseObject:Load("Deus.InstanceUtils")
+    BindableEvent = BaseObject:Load("Deus.BindableEvent")
+end
+
 function BaseObject.init()
-    BindableEvent = Deus:Load("Deus.BindableEvent")
+    BlueprintMeta = BaseObject:WrapModule(script.Blueprint)
+    ObjectMeta = BaseObject:WrapModule(script.Object)
 end
 
 return BaseObject

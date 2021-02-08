@@ -1,6 +1,4 @@
-local Deus = shared.Deus()
-
-local TableUtils = Deus:Load("Deus.TableUtils")
+local TableUtils
 
 local StringUtils = {}
 
@@ -47,6 +45,10 @@ function StringUtils.reverseSub(str, subStart, subEnd)
     subStart = subStart or 1
     subEnd = subEnd or strLength
     return str:sub(strLength - subEnd + 1, strLength - subStart + 1)
+end
+
+function StringUtils.start()
+    TableUtils = StringUtils:Load("Deus.TableUtils")
 end
 
 return StringUtils

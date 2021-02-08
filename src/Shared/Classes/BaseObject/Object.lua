@@ -1,14 +1,12 @@
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local Deus = shared.Deus()
-
-local JSON = Deus:Load("Deus.JSON")
-local Output = Deus:Load("Deus.Output")
-local Symbol = Deus:Load("Deus.Symbol")
-local StringUtils = Deus:Load("Deus.StringUtils")
-local TableUtils = Deus:Load("Deus.TableUtils")
-local InstanceUtils = Deus:Load("Deus.InstanceUtils")
+local JSON
+local Output
+local Symbol
+local TableUtils
+local StringUtils
+local InstanceUtils
 
 local Object = {}
 
@@ -20,7 +18,7 @@ function Object:FireEvent(internalAccess, eventName, ...)
 end
 
 -- Returns a ScriptSignalConnection for a specific property
-function Object:GetPropertyChangedSignal(internalAccess, eventName, func)
+function Object:GetPropertyChangedSignal(_, eventName, func)
     Output.assert(self.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
     local event = Instance.new("BindableEvent")
     local proxySignal = event.Event:Connect(func)
@@ -148,6 +146,15 @@ function Object:Replicate(internalAccess, obj)
     else
         cleanupReplication(self)
     end
+end
+
+function Object.start()
+    JSON = Object:Load("Deus.JSON")
+    Output = Object:Load("Deus.Output")
+    Symbol = Object:Load("Deus.Symbol")
+    TableUtils = Object:Load("Deus.TableUtils")
+    StringUtils = Object:Load("Deus.StringUtils")
+    InstanceUtils = Object:Load("Deus.InstanceUtils")
 end
 
 return Object

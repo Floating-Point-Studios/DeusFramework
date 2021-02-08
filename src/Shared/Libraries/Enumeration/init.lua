@@ -1,7 +1,5 @@
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
-local TableUtils = Deus:Load("Deus.TableUtils")
+local Output
+local TableUtils
 
 local Enums = {}
 local CustomEnum = require(script.Enum)
@@ -42,6 +40,11 @@ function Enumeration.waitForEnum(enumName)
     local enum = Enums[enumName]
     Output.assert(enum, "Enum name '%s' could not be found", enumName)
     return enum
+end
+
+function Enumeration.start()
+    Output = Enumeration:Load("Deus.Output")
+    TableUtils = Enumeration:Load("Deus.TableUtils")
 end
 
 return setmetatable(Enumeration, Enumeration)

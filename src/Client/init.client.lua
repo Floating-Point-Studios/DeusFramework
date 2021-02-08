@@ -8,7 +8,7 @@ end
 
 local Deus = require(ReplicatedStorage:WaitForChild("Deus"))(DeusSettings)
 
-function shared.Deus()
+function shared.Deus
     return Deus
 end
 
@@ -18,7 +18,7 @@ if not DeusSettings.AttachToShared then
     if DeusSettings.PubliclyAccessibleLoader then
         shared.Deus = nil
     else
-        function shared.Deus()
+        function shared.Deus
             shared.Deus = nil
             return Deus
         end

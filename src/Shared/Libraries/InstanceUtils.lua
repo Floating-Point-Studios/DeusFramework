@@ -1,6 +1,4 @@
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
+local Output
 
 local InstanceUtils = {}
 
@@ -123,6 +121,10 @@ function InstanceUtils.make(objData, ...)
     end
 
     return unpack(objs)
+end
+
+function InstanceUtils.start()
+    Output = InstanceUtils:Load("Deus.Output")
 end
 
 return InstanceUtils

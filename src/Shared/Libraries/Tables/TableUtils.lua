@@ -1,6 +1,4 @@
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
+local Output
 
 local TableUtils = {}
 
@@ -159,6 +157,10 @@ function TableUtils.instanceAsNewIndex(obj)
             end
         end
     end
+end
+
+function TableUtils.start()
+    Output = TableUtils:Load("Deus.Output")
 end
 
 return TableUtils

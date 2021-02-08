@@ -1,11 +1,9 @@
 local RunService = game:GetService("RunService")
 
-local Deus = shared.Deus()
+local BaseObject
+local Output
 
-local BaseObject = Deus:Load("Deus.BaseObject")
-local Output = Deus:Load("Deus.Output")
-
-local RemoteEvent ={
+local RemoteEventObjData = {
     ClassName = "Deus.RemoteEvent",
 
     PublicReadOnlyProperties = {
@@ -37,10 +35,21 @@ local RemoteEvent ={
     end,
 }
 
-if RunService:IsServer() then
-    RemoteEvent.Methods = require(script.RemoteEventServer)
-else
-    RemoteEvent.Methods = require(script.RemoteEventClient)
+local RemoteEvent = {}
+
+function RemoteEvent.start()
+    BaseObject = RemoteEvent:Load("Deus.BaseObject")
+    Output = RemoteEvent:Load("Deus.Output")
+
+    return BaseObject.new(RemoteEventObjData)
 end
 
-return BaseObject.new(RemoteEvent)
+function RemoteEvent.init()
+    if RunService:IsServer() then
+        RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventServer)
+    else
+        RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventClient)
+    end
+end
+
+return RemoteEvent

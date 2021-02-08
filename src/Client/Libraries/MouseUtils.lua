@@ -1,6 +1,6 @@
 local StarterGui = game:GetService("StarterGui")
 
-local Deus = shared.Deus()
+local Deus = shared.Deus
 
 local RaycastUtils = Deus:Load("Deus.RaycastUtils")
 

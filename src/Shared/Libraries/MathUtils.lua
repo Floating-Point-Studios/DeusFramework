@@ -1,8 +1,10 @@
-local Deus = shared.Deus()
-
-local Output = Deus:Load("Deus.Output")
+local Output
 
 local MathUtils = {}
+
+function MathUtils.isNaN(x)
+    return x ~= x
+end
 
 -- @param x: number/vector3/vector2 to round
 -- @param accuracy: number to round x to
@@ -58,6 +60,10 @@ function MathUtils.lerp(a, b, c)
     else
         return a + (b - a) * c
     end
+end
+
+function MathUtils.start()
+    Output = MathUtils:Load("Deus.Output")
 end
 
 return MathUtils

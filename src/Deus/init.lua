@@ -1,3 +1,4 @@
+--[[
 local Modules = {}
 local Deus = shared.Deus
 
@@ -91,3 +92,18 @@ return function(deusSettings)
 
     return Deus
 end
+]]
+
+local Deus = shared.Deus
+
+if not Deus then
+    Deus = newproxy(true)
+    local meta = getmetatable(Deus)
+
+    meta.__metatable = "[Deus] Locked metatable"
+    meta.__index = require(script.LoaderMeta)
+
+    shared.Deus = Deus
+end
+
+return Deus

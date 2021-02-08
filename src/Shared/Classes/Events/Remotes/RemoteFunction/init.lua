@@ -1,11 +1,9 @@
 local RunService = game:GetService("RunService")
 
-local Deus = shared.Deus()
+local BaseObject
+local Output
 
-local BaseObject = Deus:Load("Deus.BaseObject")
-local Output = Deus:Load("Deus.Output")
-
-local RemoteFunction = {
+local RemoteFunctionObjData = {
     ClassName = "Deus.RemoteFunction",
 
     Constructor = function(self, ...)
@@ -24,10 +22,21 @@ local RemoteFunction = {
     end
 }
 
-if RunService:IsServer() then
-    RemoteFunction.Methods = require(script.RemoteFunctionServer)
-else
-    RemoteFunction.Methods = require(script.RemoteFunctionClient)
+local RemoteFunction = {}
+
+function RemoteFunction.start()
+    BaseObject = RemoteFunction:Load("Deus.BaseObject")
+    Output = RemoteFunction:Load("Deus.Output")
+
+    return BaseObject.new(RemoteFunctionObjData)
 end
 
-return BaseObject.new(RemoteFunction)
+function RemoteFunction.init()
+    if RunService:IsServer() then
+        RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionServer, true, true)
+    else
+        RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionClient, true, true)
+    end
+end
+
+return RemoteFunction

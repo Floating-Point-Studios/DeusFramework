@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 
-local Deus = shared.Deus()
-local Output = Deus:Load("Deus.Output")
+local Output
 
 local RemoteEvent = {}
 
@@ -38,8 +37,12 @@ function RemoteEvent:FireNearbyClients(internalAccess, pos, radius, ...)
     end
 end
 
-function RemoteEvent:Listen(internalAccess, func)
+function RemoteEvent:Listen(_, func)
     return self.Internal.DEUSOBJECT_Properties.RBXEvent.OnServerEvent:Connect(func)
+end
+
+function RemoteEvent.start()
+    Output = RemoteEvent:Load("Deus.Output")
 end
 
 return RemoteEvent

@@ -13,23 +13,14 @@ else
     DeusSettings = require(DeusSettingsModule)
 end
 
-local Deus = require(DeusCore)(DeusSettings)
-
-function shared.Deus()
-    return Deus
-end
+local Deus = require(DeusCore)
 
 Deus:Register(script, "Deus")
 Deus:Register(script.Parent.Shared, "Deus")
 
 if not DeusSettings.AttachToShared then
-    if DeusSettings.PubliclyAccessibleLoader then
+    if not DeusSettings.PubliclyAccessibleLoader then
         shared.Deus = nil
-    else
-        function shared.Deus()
-            shared.Deus = nil
-            return Deus
-        end
     end
 end
 
