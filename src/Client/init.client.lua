@@ -6,22 +6,13 @@ if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
     DeusSettings = require(DeusSettingsModule)
 end
 
-local Deus = require(ReplicatedStorage:WaitForChild("Deus"))(DeusSettings)
-
-function shared.Deus
-    return Deus
-end
+local Deus = require(ReplicatedStorage:WaitForChild("Deus"))
 
 Deus:Register(script, "Deus")
 
 if not DeusSettings.AttachToShared then
-    if DeusSettings.PubliclyAccessibleLoader then
+    if not DeusSettings.PubliclyAccessibleLoader then
         shared.Deus = nil
-    else
-        function shared.Deus
-            shared.Deus = nil
-            return Deus
-        end
     end
 end
 
