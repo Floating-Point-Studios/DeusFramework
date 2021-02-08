@@ -109,41 +109,45 @@ function LoaderMeta:WrapModule(module, init, start)
 end
 
 function LoaderMeta:Register(instance, moduleName)
-    local libraries = {}
-    local classes = {}
-    local services = {}
-    local misc = {}
+    if instance:IsA("ModuleScript") then
+        Modules[("%s.%s"):format(moduleName, instance.Name)] = LoaderMeta:WrapModule(instance, true, true)
+    else
+        local libraries = {}
+        local classes = {}
+        local services = {}
+        local misc = {}
 
-    for _,module in pairs(instance:GetDescendants()) do
-        -- Check if module is a submodule
-        if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
-            -- Attempt to classify the module
-            if module:FindFirstAncestor("Libraries") or module:FindFirstAncestor("libraries") or module.Name:sub(#module.Name - 5, #module.Name) == "Utils" then
-                table.insert(libraries, module)
-            elseif module:FindFirstAncestor("Classes") or module:FindFirstAncestor("classes") then
-                table.insert(classes, module)
-            elseif module:FindFirstAncestor("Services") or module:FindFirstAncestor("services") or module.Name:sub(#module.Name - 7, #module.Name) == "Service" then
-                table.insert(services, module)
-            else
-                table.insert(misc, module)
+        for _,module in pairs(instance:GetDescendants()) do
+            -- Check if module is a submodule
+            if module:IsA("ModuleScript") and not module:FindFirstAncestorWhichIsA("ModuleScript") then
+                -- Attempt to classify the module
+                if module:FindFirstAncestor("Libraries") or module:FindFirstAncestor("libraries") or module.Name:sub(#module.Name - 5, #module.Name) == "Utils" then
+                    table.insert(libraries, module)
+                elseif module:FindFirstAncestor("Classes") or module:FindFirstAncestor("classes") then
+                    table.insert(classes, module)
+                elseif module:FindFirstAncestor("Services") or module:FindFirstAncestor("services") or module.Name:sub(#module.Name - 7, #module.Name) == "Service" then
+                    table.insert(services, module)
+                else
+                    table.insert(misc, module)
+                end
             end
         end
-    end
 
-    for _,module in pairs(libraries) do
-        Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
-    end
+        for _,module in pairs(libraries) do
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+        end
 
-    for _,module in pairs(classes) do
-        Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
-    end
+        for _,module in pairs(classes) do
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+        end
 
-    for _,module in pairs(misc) do
-        Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
-    end
+        for _,module in pairs(misc) do
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+        end
 
-    for _,module in pairs(services) do
-        Modules[("%s.%s"):format(moduleName, module.Name)] = LoaderMeta:WrapModule(module, true, true)
+        for _,module in pairs(services) do
+            Modules[("%s.%s"):format(moduleName, module.Name)] = LoaderMeta:WrapModule(module, true, true)
+        end
     end
 end
 
