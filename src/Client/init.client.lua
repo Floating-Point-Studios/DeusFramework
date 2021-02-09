@@ -9,7 +9,11 @@ end
 
 local Deus
 if script:IsDescendantOf(ReplicatedFirst) then
-    Deus = require(script.Parent)
+    Deus = require(ReplicatedFirst:WaitForChild("Deus"))
+
+    if not DeusSettings then
+        DeusSettings = require(Deus.Settings)
+    end
 else
     Deus = require(ReplicatedStorage:WaitForChild("Deus"))
 end

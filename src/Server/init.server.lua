@@ -119,5 +119,5 @@ if (DeusSettings and DeusSettings.PubliclyAccessibleLoader) or not DeusSettings 
 else
     DeusCore = DeusCore:Clone()
     DeusCore.Parent = ReplicatedFirst
-    Client.Parent = DeusCore
+    Client.Parent = ReplicatedFirst
 end
