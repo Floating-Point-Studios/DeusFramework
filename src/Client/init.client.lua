@@ -8,7 +8,7 @@ if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
 end
 
 local Deus
-if script:IsAncestorOf(ReplicatedFirst) then
+if script:IsDescendantOf(ReplicatedFirst) then
     Deus = require(script.Parent)
 else
     Deus = require(ReplicatedStorage:WaitForChild("Deus"))
