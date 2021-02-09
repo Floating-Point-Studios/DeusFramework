@@ -102,8 +102,6 @@ if not Deus then
 
     meta.__metatable = "[Deus] Locked metatable"
     meta.__index = require(script.LoaderMeta)
-
-    shared.Deus = Deus
 end
 
 return Deus
