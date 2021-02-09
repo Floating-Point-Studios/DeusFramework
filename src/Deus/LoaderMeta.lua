@@ -109,8 +109,10 @@ function LoaderMeta:WrapModule(module, init, start)
 end
 
 function LoaderMeta:Register(instance, moduleName)
+    moduleName = moduleName or instance.Name
+
     if instance:IsA("ModuleScript") then
-        Modules[moduleName or instance.Name] = LoaderMeta:WrapModule(instance, true)
+        Modules[moduleName] = LoaderMeta:WrapModule(instance, true)
     else
         local libraries = {}
         local classes = {}
