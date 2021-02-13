@@ -16,7 +16,7 @@ function AdornmentUtils.make(className, parent, cframe, isWorldSpace, properties
 
     local adornment = Instance.new(className)
 
-    if isWorldSpace and parent then
+    if isWorldSpace and parent and parent:IsA("BasePart") then
         adornment.CFrame = parent.CFrame:ToObjectSpace(cframe)
     elseif not isWorldSpace then
         adornment.CFrame = cframe

@@ -136,19 +136,29 @@ function LoaderMeta:Register(instance, moduleName)
         end
 
         for _,module in pairs(libraries) do
-            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module -- LoaderMeta:WrapModule(module, true)
         end
 
         for _,module in pairs(classes) do
-            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module -- LoaderMeta:WrapModule(module, true)
         end
 
         for _,module in pairs(misc) do
-            Modules[("%s.%s"):format(moduleName, module.Name)] = module --LoaderMeta:WrapModule(module, true)
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module -- LoaderMeta:WrapModule(module, true)
+        end
+
+        -- Services is split so the path is registered first in case any services depend on other services
+        for _,module in pairs(services) do
+            Modules[("%s.%s"):format(moduleName, module.Name)] = module -- LoaderMeta:WrapModule(module, true, true)
         end
 
         for _,module in pairs(services) do
-            Modules[("%s.%s"):format(moduleName, module.Name)] = LoaderMeta:WrapModule(module, true, true)
+            local path = ("%s.%s"):format(moduleName, module.Name)
+            module = Modules[path]
+
+            if type(module) == "table" then
+                Modules[path] = LoaderMeta:WrapModule(module, true, true)
+            end
         end
     end
 end
