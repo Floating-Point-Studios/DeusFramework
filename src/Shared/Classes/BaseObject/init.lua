@@ -45,6 +45,8 @@ local TableProxy
 local TableUtils
 local InstanceUtils
 local BindableEvent
+local ObjectService
+
 local BlueprintMeta
 local ObjectMeta
 
@@ -202,6 +204,7 @@ function BaseObject.new(objData)
                     }
                 }
 
+                -- Wrap methods
                 for methodName, method in pairs(obj.ExternalReadOnly.DEUSOBJECT_Methods) do
                     obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(self, ...)
                         local internalAccess = false
@@ -217,21 +220,25 @@ function BaseObject.new(objData)
                 if objData.ClassName ~= "Deus.BindableEvent" then
                     table.insert(obj.ExternalReadOnly.DEUSOBJECT_Events, "Changed")
                 end
-                --]]
+                ]]
 
+                -- Add events
                 for _,eventName in pairs(obj.ExternalReadOnly.DEUSOBJECT_Events) do
                     local eventProxy, eventMeta = BindableEvent.new()
                     obj.Internal.DEUSOBJECT_LockedTables.Events[eventName] = eventMeta
                     obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
                 end
 
-                -- Properties inherited by all objects
+                -- Internal properties inherited by all objects
+                obj.Internal.Deconstructor = objData.Deconstructor
+
+                -- Read-only properties inherited by all objects
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId             = HttpService:GenerateGUID(false)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated          = tick()
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ReplicationTarget    = Symbol.new("None")
+                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
 
                 -- Allows editing of properties locked externally
                 obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods
@@ -258,13 +265,15 @@ function BaseObject.new(objData)
                                 newValue = nil
                             end
 
-                            local replicationTarget = obj.ReplicationTarget
-                            if typeof(replicationTarget) == "Instance" and InstanceUtils.isTypeAttributeSupported(typeof(newValue)) then
-                                replicationTarget:SetAttribute("DEUS_".. propertyName, newValue)
+                            local propertyReplicationTarget = obj.PropertyReplicationTarget
+                            if typeof(propertyReplicationTarget) == "Instance" and InstanceUtils.isTypeAttributeSupported(typeof(newValue)) then
+                                propertyReplicationTarget:SetAttribute("DEUS_".. propertyName, newValue)
                             end
                         end)
                     end
                 end
+
+                ObjectService:TrackObject(obj)
 
                 return obj
             end
@@ -284,6 +293,7 @@ function BaseObject.start()
     TableUtils = BaseObject:Load("Deus.TableUtils")
     InstanceUtils = BaseObject:Load("Deus.InstanceUtils")
     BindableEvent = BaseObject:Load("Deus.BindableEvent")
+    ObjectService = BaseObject:Load("Deus.ObjectService")
 end
 
 function BaseObject.init()

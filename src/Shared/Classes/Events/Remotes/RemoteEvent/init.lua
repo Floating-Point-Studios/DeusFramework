@@ -47,6 +47,10 @@ end
 function RemoteEvent.init()
     if RunService:IsServer() then
         RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventServer)
+
+        RemoteEventObjData.Deconstructor = function(self)
+            self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
+        end
     else
         RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventClient)
     end

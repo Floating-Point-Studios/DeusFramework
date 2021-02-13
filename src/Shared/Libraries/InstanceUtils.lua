@@ -1,3 +1,5 @@
+local CollectionService = game:GetService("CollectionService")
+
 local Output
 
 local InstanceUtils = {}
@@ -60,6 +62,14 @@ end
 function InstanceUtils.findFirstAncestorWithAttribute(obj, name)
     for _,ancestor in pairs(InstanceUtils.getAncestors(obj)) do
         if ancestor:GetAttribute(name) ~= nil then
+            return ancestor
+        end
+    end
+end
+
+function InstanceUtils.findFirstAncestorWithTag(obj, tag)
+    for _,ancestor in pairs(InstanceUtils.getAncestors(obj)) do
+        if CollectionService:HasTag(ancestor, tag) then
             return ancestor
         end
     end

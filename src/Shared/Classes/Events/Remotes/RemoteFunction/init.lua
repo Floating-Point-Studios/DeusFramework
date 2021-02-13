@@ -34,6 +34,10 @@ end
 function RemoteFunction.init()
     if RunService:IsServer() then
         RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionServer, true, true)
+
+        RemoteFunctionObjData.Deconstructor = function(self)
+            self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
+        end
     else
         RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionClient, true, true)
     end

@@ -51,6 +51,10 @@ local BindableEventObjData = {
 
     Constructor = function(self)
         self.Internal.DEUSOBJECT_Properties.RBXEvent = Instance.new("BindableEvent")
+    end,
+
+    Deconstructor = function(self)
+        self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
     end
 }
 
