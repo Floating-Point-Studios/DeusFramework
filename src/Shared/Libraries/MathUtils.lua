@@ -27,9 +27,11 @@ function MathUtils.clampVector(vector, min, max)
     if type(min) == "number" then
         min = Vector3.new(min, min, min)
     end
+
     if type(max) == "number" then
         max = Vector3.new(max, max, max)
     end
+
     if typeof(vector) == "Vector3" then
         return Vector3.new(math.clamp(vector.X, min.X, max.X), math.clamp(vector.Y, min.Y, max.Y), math.clamp(vector.Z, min.Z, max.Z))
     else
@@ -55,11 +57,30 @@ end
 function MathUtils.lerp(a, b, c)
     local typeA, typeB = typeof(a), typeof(b)
     Output.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", typeA, typeB)
+
     if typeA == "CFrame" then
         return a:Lerp(b, c)
     else
         return a + (b - a) * c
     end
+end
+
+function MathUtils.getFactors(x)
+    local factors = {}
+    local sqrtx = math.sqrt(x)
+
+    for i = 1, sqrtx do
+        if x % i == 0 then
+            table.insert(factors, i)
+            if i ~= sqrtx then
+                table.insert(factors, x / i)
+            end
+        end
+    end
+
+    table.sort(factors)
+
+    return factors
 end
 
 function MathUtils.start()
