@@ -24,6 +24,9 @@ end
 -- @param min: number/vecto3/vector2, minimum value
 -- @param max: number/vecto3/vector2, maximum value
 function MathUtils.clampVector(vector, min, max)
+    min = min or Vector3.new(-math.huge, -math.huge, -math.huge)
+    max = max or Vector3.new(math.huge, math.huge, math.huge)
+
     if type(min) == "number" then
         min = Vector3.new(min, min, min)
     end
@@ -81,6 +84,28 @@ function MathUtils.getFactors(x)
     table.sort(factors)
 
     return factors
+end
+
+-- Returns the closest number to 'x' from a table of numbers
+function MathUtils.snap(x, numbers, snapUp)
+    local bestMatch = numbers[1]
+    local diff = math.abs(x - numbers[1])
+
+    for i = 2, #numbers do
+        local v = numbers[i]
+        local testDiff = math.abs(x - v)
+
+        if testDiff < diff then
+            bestMatch = v
+            diff = testDiff
+        end
+    end
+
+    if snapUp and bestMatch < x then
+        return numbers[table.find(numbers, bestMatch) + 1]
+    end
+
+    return bestMatch
 end
 
 function MathUtils.start()
