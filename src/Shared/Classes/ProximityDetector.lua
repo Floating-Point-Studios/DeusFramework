@@ -1,6 +1,6 @@
 local ProximityDetector = {}
 
-ProximityDetector.ClassName = "ProximityDetector"
+ProximityDetector.ClassName = "Deus.ProximityDetector"
 
 ProximityDetector.Events = {"Entered", "Left"}
 

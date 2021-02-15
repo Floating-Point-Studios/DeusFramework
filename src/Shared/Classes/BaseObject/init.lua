@@ -101,7 +101,9 @@ end
 
 function __newindex(self, i, v, internalAccess)
     local oldv
-    v = v or Symbol.new("None")
+    if v == nil then
+        v = Symbol.new("None") 
+    end
 
     local Internal = rawget(self, "Internal")
     local Methods = Internal.DEUSOBJECT_LockedTables.Methods

@@ -99,7 +99,7 @@ function TableUtils.lock(tab)
     end
 
     function meta.__newindex(_, i)
-        Output.error(2, "Cannot modify '%s' in read-only table", i)
+        Output.error("Cannot modify '%s' in read-only table", i, 2)
     end
 
     function meta:Copy()
@@ -133,7 +133,7 @@ function TableUtils.instanceAsIndex(obj)
             if success then
                 return v
             else
-                Output.error(2, "'%s' is not a valid member of %s", i, obj)
+                Output.error("'%s' is not a valid member of %s", {i, obj}, 2)
             end
         end
     end
@@ -153,7 +153,7 @@ function TableUtils.instanceAsNewIndex(obj)
             if success then
                 return v
             else
-                Output.error(2, "'%s' is not a valid member of %s", i, obj)
+                Output.error("'%s' is not a valid member of %s", {i, obj}, 2)
             end
         end
     end
