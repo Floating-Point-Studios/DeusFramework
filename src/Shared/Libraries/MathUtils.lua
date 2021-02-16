@@ -2,6 +2,11 @@ local Output
 
 local MathUtils = {}
 
+-- Golden Ratio
+MathUtils.phi = (math.sqrt(5) + 1) / 2
+-- Golden Angle in radians
+MathUtils.ga = math.pi * (3 - math.sqrt(5))
+
 function MathUtils.isNaN(x)
     return x ~= x
 end
@@ -18,28 +23,6 @@ end
 
 function MathUtils.roundFloor(x, accuracy)
     return math.floor(x / accuracy) * accuracy
-end
-
--- @param vector: vector3/vector2 to clamp
--- @param min: number/vecto3/vector2, minimum value
--- @param max: number/vecto3/vector2, maximum value
-function MathUtils.clampVector(vector, min, max)
-    min = min or Vector3.new(-math.huge, -math.huge, -math.huge)
-    max = max or Vector3.new(math.huge, math.huge, math.huge)
-
-    if type(min) == "number" then
-        min = Vector3.new(min, min, min)
-    end
-
-    if type(max) == "number" then
-        max = Vector3.new(max, max, max)
-    end
-
-    if typeof(vector) == "Vector3" then
-        return Vector3.new(math.clamp(vector.X, min.X, max.X), math.clamp(vector.Y, min.Y, max.Y), math.clamp(vector.Z, min.Z, max.Z))
-    else
-        return Vector2.new(math.clamp(vector.X, min.X, max.X), math.clamp(vector.Y, min.Y, max.Y))
-    end
 end
 
 -- @param color: Color3 to multiply
@@ -84,6 +67,15 @@ function MathUtils.getFactors(x)
     table.sort(factors)
 
     return factors
+end
+
+function MathUtils.isPrime(x)
+    for i = 2, math.sqrt(x) do
+        if x % i == 0 then
+            return false
+        end
+    end
+    return true
 end
 
 -- Returns the closest number to 'x' from a table of numbers

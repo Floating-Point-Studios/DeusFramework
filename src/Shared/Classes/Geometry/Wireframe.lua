@@ -58,13 +58,17 @@ Wireframe.Methods = {}
 
 Wireframe.Events = {}
 
-function Wireframe.Constructor(self, mesh, adornee)
+function Wireframe:Constructor(mesh, adornee)
     self.Adornee = adornee or None
     self.Mesh = mesh or None
     self.Wires = Instance.new("Folder")
+
+    if mesh then
+        self:Update()
+    end
 end
 
-function Wireframe.Deconstructor(self)
+function Wireframe:Deconstructor()
    self.Wires:Destroy()
 end
 
@@ -85,13 +89,13 @@ function Wireframe.Methods:Update()
             if self.ShowVertexId then
                 local gui = sphere:FindFirstChild("Id")
                 if gui then
-                    gui.Text = vertex.VertexId
+                    gui.TextLabel.Text = vertex.VertexId
                 else
                     gui = VisualDebug.makeBillboardGui("Id", Vector2.new(1, 1), vertex.VertexId)
-                    gui.Adornee = self.Adornee
-                    gui.StudsOffsetWorldSpace = vertex.Position
                     gui.Parent = sphere
                 end
+                gui.Adornee = self.Adornee
+                gui.StudsOffsetWorldSpace = vertex.Position
             end
 
             i += 1

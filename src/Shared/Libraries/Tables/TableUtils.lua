@@ -78,13 +78,18 @@ function TableUtils.sub(tab, indexStart, indexEnd)
     return output
 end
 
--- Returns the sum of a table of numbers
+-- Returns the sum of a array of numbers
 function TableUtils.sum(tab)
-    local sum = 0
-    for _,v in pairs(tab) do
-        sum += v
+    local sum = tab[1]
+    for i = 2, #tab do
+        sum += tab[i]
     end
     return sum
+end
+
+-- Returns the average of a array of numbers
+function TableUtils.average(tab)
+    return TableUtils.sum(tab) / #tab
 end
 
 function TableUtils.lock(tab)

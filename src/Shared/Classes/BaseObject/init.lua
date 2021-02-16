@@ -284,6 +284,27 @@ function BaseObject.new(objData)
     )
 end
 
+-- Creates a class without events, methods are automatically setup, and all properties are set to Public Read & Write
+function BaseObject.newSimple(objData)
+    local parsedObjData = {
+        ClassName                       = objData.ClassName,
+        Methods                         = objData.Methods or {},
+        PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
+        Constructor                     = objData.Constructor,
+        Deconstructor                   = objData.Deconstructor
+    }
+
+    for i,v in pairs(objData) do
+        if type(v) == "function" then
+            parsedObjData.Methods[i] = v
+        else
+            parsedObjData.PublicReadAndWriteProperties[i] = v
+        end
+    end
+
+    return BaseObject.new(parsedObjData)
+end
+
 function BaseObject.getClassList()
     return TableUtils.shallowCopy(ClassList)
 end
