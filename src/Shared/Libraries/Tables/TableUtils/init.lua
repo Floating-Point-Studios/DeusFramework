@@ -92,38 +92,6 @@ function TableUtils.average(tab)
     return TableUtils.sum(tab) / #tab
 end
 
-function TableUtils.lock(tab)
-    local proxy = newproxy(true)
-    local meta = getmetatable(proxy)
-
-    function meta.__index(_, i)
-        print(i)
-        local v = tab[i]
-        -- Output.assert(v, "'%s' does not exist in read-only table", i)
-        return v
-    end
-
-    function meta.__newindex(_, i)
-        Output.error("Cannot modify '%s' in read-only table", i, 2)
-    end
-
-    function meta:Copy()
-        return TableUtils.deepCopy(tab)
-    end
-
-    function meta:GetKeys()
-        return TableUtils.getKeys(tab)
-    end
-
-    function meta:GetValues()
-        return TableUtils.getValues(tab)
-    end
-
-    meta.__metatable = ("[%s] Requested metatable of read-only table is locked"):format(getfenv(2).script.Name)
-
-    return meta
-end
-
 -- ALlows setting an instance to __index of a metatable
 function TableUtils.instanceAsIndex(obj)
     return function(self, i)
@@ -165,6 +133,8 @@ function TableUtils.instanceAsNewIndex(obj)
 end
 
 function TableUtils.start()
+    TableUtils.lock = TableUtils:WrapModule(script.LockedTable).new
+
     Output = TableUtils:Load("Deus.Output")
 end
 

@@ -15,30 +15,38 @@ function TableProxy.__index(self, i)
         self = Metatables[self]
     end
 
-    v = rawget(self, "Internal")[i]
-    if v ~= nil then
-        if internalAccess then
-            return v
-        else
-            Output.error("Attempt to read internal property")
+    local Internal = rawget(self, "Internal")
+    local ExternalReadOnly = rawget(self, "ExternalReadOnly")
+    local ExternalReadAndWrite = rawget(self, "ExternalReadAndWrite")
+
+    if Internal then
+        v = Internal[i]
+        if v ~= nil then
+            if internalAccess then
+                return v
+            else
+                Output.error("Attempt to read internal property")
+            end
         end
     end
 
-    v = rawget(self, "ExternalReadOnly")[i]
-    if v ~= nil then
-        return v
-    end
-
-    v = rawget(self, "ExternalReadAndWrite")[i]
-    if v ~= nil then
-        return v
-    end
-
-    for _,fallbackIndex in pairs(rawget(self, "FallbackIndexes")) do
-        v = fallbackIndex(self, i, internalAccess)
+    if ExternalReadOnly then
+        v = ExternalReadOnly[i]
         if v ~= nil then
             return v
         end
+    end
+
+    if ExternalReadAndWrite then
+        v = ExternalReadAndWrite[i]
+        if v ~= nil then
+            return v
+        end
+    end
+
+    v = rawget(self, "Index")(self, i, internalAccess)
+    if v ~= nil then
+        return v
     end
 
     return nil
@@ -53,9 +61,9 @@ function TableProxy.__newindex(self, i, v)
     local Internal = rawget(self, "Internal")
     local ExternalReadOnly = rawget(self, "ExternalReadOnly")
     local ExternalReadAndWrite = rawget(self, "ExternalReadAndWrite")
-    local FallbackNewIndexes = rawget(self, "FallbackNewIndexes")
+    local NewIndex = rawget(self, "NewIndex")
 
-    if Internal[i] ~= nil then
+    if Internal and Internal[i] ~= nil then
         if internalAccess then
             Internal[i] = v
             return true
@@ -64,20 +72,18 @@ function TableProxy.__newindex(self, i, v)
         end
     end
 
-    if ExternalReadOnly[i] ~= nil then
+    if ExternalReadOnly and ExternalReadOnly[i] ~= nil then
         ExternalReadOnly[i] = v
         return true
     end
 
-    if ExternalReadAndWrite[i] ~= nil then
+    if ExternalReadAndWrite and ExternalReadAndWrite[i] ~= nil then
         ExternalReadAndWrite[i] = v
         return true
     end
 
-    for _,fallbackNewIndex in pairs(FallbackNewIndexes) do
-        if fallbackNewIndex(self, i, v, internalAccess) then
-            return true
-        end
+    if NewIndex(self, i, v, internalAccess) then
+        return true
     end
 
     return false
@@ -93,12 +99,12 @@ function TableProxy.new(tableData)
     metatable.__tostring = tableData.__tostring or __tostring
 
     metatable.Proxy = proxy
-    metatable.FallbackIndexes = {tableData.__index}
-    metatable.FallbackNewIndexes = {tableData.__newindex}
+    metatable.Index = tableData.__index
+    metatable.NewIndex = tableData.__newindex
 
-    metatable.Internal = tableData.Internal or {}
-    metatable.ExternalReadOnly = tableData.ExternalReadOnly or {}
-    metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite or {}
+    metatable.Internal = tableData.Internal
+    metatable.ExternalReadOnly = tableData.ExternalReadOnly
+    metatable.ExternalReadAndWrite = tableData.ExternalReadAndWrite
 
     Metatables[proxy] = metatable
 
@@ -118,6 +124,7 @@ function TableProxy:IsInternalAccess()
     return false
 end
 
+--[[
 function TableProxy:AddFallbackIndex(index)
     Output.assert(self:IsInternalAccess(), "Attempt to modify internal property")
     Output.assert(type(index) == "function", "Expected 'function' got '%s'", type(index))
@@ -141,6 +148,7 @@ function TableProxy:SetFallbackNewIndexes(newindexes)
     Output.assert(type(newindexes) == "table", "Expected 'table' got '%s'", type(newindexes))
     self.FallbackIndexes = newindexes
 end
+]]
 
 function TableProxy.start()
     Output = TableProxy:Load("Deus.Output")

@@ -31,7 +31,7 @@ Mesh.PublicReadAndWriteProperties = {}
 
 --[[
 -- Creates a face from VertexId's
-function Mesh.Methods:AddFace(_, ...)
+function Mesh.Methods:AddFace(...)
     self.FacesCount += 1
 
     local faceId = tostring(self.FacesCount)
@@ -42,7 +42,7 @@ function Mesh.Methods:AddFace(_, ...)
 end
 
 -- Deletes a face given the FaceId
-function Mesh.Methods:DeleteFace(_, faceId)
+function Mesh.Methods:DeleteFace(faceId)
     local face = self.Faces[faceId]
 
     Output.assert(faceId, "FaceId '%s' is not a face", faceId)
@@ -55,7 +55,7 @@ function Mesh.Methods:DeleteFace(_, faceId)
 end
 
 -- Adds vertices to a face
-function Mesh.Methods:AddVerticesToFace(_, faceId, ...)
+function Mesh.Methods:AddVerticesToFace(faceId, ...)
     local face = self.Faces[faceId]
 
     Output.assert(faceId, "FaceId '%s' is not a face", faceId)
@@ -72,7 +72,7 @@ end
 ]]
 
 -- Creates a line from 2 VertexId's and returns the LineId
-function Mesh.Methods:AddLine(_, vertexId1, vertexId2)
+function Mesh.Methods:AddLine(vertexId1, vertexId2)
     local vertex1
     local vertex2
 
@@ -121,7 +121,7 @@ function Mesh.Methods:AddLine(_, vertexId1, vertexId2)
 end
 
 -- Deletes a line from LineId
-function Mesh.Methods:DeleteLine(_, lineId)
+function Mesh.Methods:DeleteLine(lineId)
     lineId = tostring(lineId)
     local line = self.Lines[lineId]
 
@@ -139,7 +139,7 @@ function Mesh.Methods:DeleteLine(_, lineId)
 end
 
 -- Creates a new vertex and returns the VertexId
-function Mesh.Methods:AddVertex(_, pos)
+function Mesh.Methods:AddVertex(pos)
     local vertexId = self.VerticesVec3[pos]
     if vertexId then
         return vertexId
@@ -161,7 +161,7 @@ function Mesh.Methods:AddVertex(_, pos)
 end
 
 -- Deletes a vertex from VertexId
-function Mesh.Methods:DeleteVertex(_, vertexId)
+function Mesh.Methods:DeleteVertex(vertexId)
     vertexId = tostring(vertexId)
     local vertex = self.Vertices[vertexId]
 
@@ -181,7 +181,7 @@ function Mesh.Methods:DeleteVertex(_, vertexId)
 end
 
 -- Always merges vertex 2 into vertex 1
-function Mesh.Methods:MergeVertices(_, vertexId1, vertexId2)
+function Mesh.Methods:MergeVertices(vertexId1, vertexId2)
     vertexId1 = tostring(vertexId1)
     vertexId2 = tostring(vertexId2)
 
@@ -199,7 +199,7 @@ function Mesh.Methods:MergeVertices(_, vertexId1, vertexId2)
 end
 
 -- Sets the position of a vertex from the VertexId
-function Mesh.Methods:SetVertexPosition(_, vertexId, pos)
+function Mesh.Methods:SetVertexPosition(vertexId, pos)
     vertexId = tostring(vertexId)
 
     local vertex = self.Vertices[vertexId]
@@ -210,7 +210,7 @@ function Mesh.Methods:SetVertexPosition(_, vertexId, pos)
 end
 
 -- Deletes the line between 2 vertices given 2 VertexId's
-function Mesh.Methods:UnlinkVertices(_, vertexId1, vertexId2)
+function Mesh.Methods:UnlinkVertices(vertexId1, vertexId2)
     vertexId1 = tostring(vertexId1)
     vertexId2 = tostring(vertexId2)
 
@@ -221,7 +221,7 @@ function Mesh.Methods:UnlinkVertices(_, vertexId1, vertexId2)
     self:DeleteLine(vertex1.Lines[vertexId2])
 end
 
-function Mesh.Methods:GetLinkedVertices(_, vertexId)
+function Mesh.Methods:GetLinkedVertices(vertexId)
     vertexId = tostring(vertexId)
 
     local vertex = self.Vertices[vertexId]
@@ -240,7 +240,7 @@ function Mesh.Methods:GetLines()
 end
 
 -- Returns vertices within the radius of the given position
-function Mesh.Methods:GetVerticesInRadius(_, pos, radius)
+function Mesh.Methods:GetVerticesInRadius(pos, radius)
     local vertices = {}
 
     for _,vertex in pairs(self.Vertices) do
@@ -253,7 +253,7 @@ function Mesh.Methods:GetVerticesInRadius(_, pos, radius)
 end
 
 -- Returns vertices in order of distance of the given position
-function Mesh.Methods:GetVerticesByDistance(_, pos)
+function Mesh.Methods:GetVerticesByDistance(pos)
     local vertices = TableUtils.getValues(self.Vertices)
 
     table.sort(vertices, function(a, b)
@@ -288,7 +288,7 @@ function Mesh.Methods:GetLinesAsVector3()
     return lines
 end
 
-function Mesh.Methods:MergeVerticesByDistance(_, distance, mergeMode)
+function Mesh.Methods:MergeVerticesByDistance(distance, mergeMode)
     local merges = 0
     for _,vertex1 in pairs(self.Vertices) do
         local vertices = self:GetVerticesInRadius(vertex1.Position, distance)
@@ -304,7 +304,7 @@ function Mesh.Methods:MergeVerticesByDistance(_, distance, mergeMode)
     return merges
 end
 
-function Mesh.Methods:Translate(_, vec3)
+function Mesh.Methods:Translate(vec3)
     if type(vec3) == "number" then
         vec3 = Vector3.new(vec3, vec3, vec3)
     end
@@ -314,7 +314,7 @@ function Mesh.Methods:Translate(_, vec3)
     end
 end
 
-function Mesh.Methods:Scale(_, vec3)
+function Mesh.Methods:Scale(vec3)
     for _,vertex in pairs(self.Vertices) do
         self:SetVertexPosition(vertex.VertexId, vertex.Position * vec3)
     end

@@ -18,7 +18,7 @@ function Output.error(msg, args, level)
     if type(args) ~= "table" then
         args = {args}
     end
-    error(("[Deus][%s] "):format(getfenv(2).script.Name).. msg:format(unpack(args)), level)
+    error(("[Deus][%s] "):format(getfenv(2).script.Name).. msg:format(unpack(args)), 2 + (level or 0))
 end
 
 function Output.assert(condition, msg, args, level)
@@ -26,7 +26,7 @@ function Output.assert(condition, msg, args, level)
         args = {args}
     end
     if not condition then
-        error(("[Deus][%s] "):format(getfenv(2).script.Name).. msg:format(unpack(args)), level)
+        error(("[Deus][%s] "):format(getfenv(2).script.Name).. msg:format(unpack(args)), 2 + (level or 0))
     end
 end
 

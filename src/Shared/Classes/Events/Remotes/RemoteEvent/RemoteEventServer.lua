@@ -37,7 +37,7 @@ function RemoteEvent:FireNearbyClients(internalAccess, pos, radius, ...)
     end
 end
 
-function RemoteEvent:Listen(_, func)
+function RemoteEvent:Listen(func)
     return self.Internal.DEUSOBJECT_Properties.RBXEvent.OnServerEvent:Connect(func)
 end
 

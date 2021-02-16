@@ -47,8 +47,8 @@ local InstanceUtils
 local BindableEvent
 local ObjectService
 
-local BlueprintMeta
-local ObjectMeta
+local BlueprintSuperclass
+local BaseObjectSuperclass
 
 local ClassList = {}
 
@@ -166,16 +166,27 @@ local BaseObject = {}
 function BaseObject.new(objData)
     objData.ClassName = objData.ClassName or ("Deus.UnnamedObject [%s]"):format(HttpService:GenerateGUID(false))
 
+    if objData.Superclass then
+        setmetatable(objData.Methods, {__index = objData.Superclass.Methods})
+    else
+        setmetatable(objData.Methods, {__index = BaseObjectSuperclass})
+    end
+
     table.insert(ClassList, objData.ClassName)
+
+    local Metadata = {
+        ClassName                   = objData.ClassName,
+
+        Extendable                  = objData.Extendable or true,
+        Replicable                  = objData.Replicable or true,
+        Superclass                  = objData.Superclass or "BaseObject",
+    }
 
     return setmetatable(
         {
             -- Constructor = objData.Constructor,
 
-            ClassName                       = objData.ClassName,
-
-            Extendable                      = objData.Extendable or true,
-            Replicable                      = objData.Replicable or true,
+            Metadata                        = Metadata,
 
             Methods                         = objData.Methods or {},
 
@@ -199,13 +210,14 @@ function BaseObject.new(objData)
                     },
 
                     ExternalReadOnly = {
-                        DEUSOBJECT_Methods                  = TableUtils.deepCopy(TableUtils.merge(ObjectMeta, objData.Methods or {})),
+                        DEUSOBJECT_Methods                  = objData.Methods or {},
                         DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
                         DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
                         DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
                     }
                 }
 
+                --[[
                 -- Wrap methods
                 for methodName, method in pairs(obj.ExternalReadOnly.DEUSOBJECT_Methods) do
                     obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(self, ...)
@@ -216,6 +228,7 @@ function BaseObject.new(objData)
                         return method(obj, internalAccess, ...)
                     end
                 end
+                ]]
 
                 --[[
                 -- Special exemption for objects that should not inherit base events
@@ -235,9 +248,9 @@ function BaseObject.new(objData)
                 obj.Internal.Deconstructor = objData.Deconstructor
 
                 -- Read-only properties inherited by all objects
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
+                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
+                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
+                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId             = HttpService:GenerateGUID(false)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated          = tick()
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
@@ -253,6 +266,9 @@ function BaseObject.new(objData)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties                      = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties)
                 obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
                 obj.ExternalReadOnly.DEUSOBJECT_Events                                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Events)
+
+                -- Inherit class metadata
+                setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = Metadata})
 
                 obj = TableProxy.new(obj)
 
@@ -280,7 +296,7 @@ function BaseObject.new(objData)
                 return obj
             end
         },
-        BlueprintMeta
+        BlueprintSuperclass
     )
 end
 
@@ -288,17 +304,22 @@ end
 function BaseObject.newSimple(objData)
     local parsedObjData = {
         ClassName                       = objData.ClassName,
-        Methods                         = objData.Methods or {},
-        PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
+        Superclass                      = objData.Superclass,
+        Methods                         = {},
+        PublicReadAndWriteProperties    = {},
         Constructor                     = objData.Constructor,
         Deconstructor                   = objData.Deconstructor
     }
 
     for i,v in pairs(objData) do
-        if type(v) == "function" then
-            parsedObjData.Methods[i] = v
-        else
-            parsedObjData.PublicReadAndWriteProperties[i] = v
+        -- Check the index isn't a object configuration
+        if not parsedObjData[i] then
+            -- Check if index is a method or property
+            if type(v) == "function" then
+                parsedObjData.Methods[i] = v
+            else
+                parsedObjData.PublicReadAndWriteProperties[i] = v
+            end
         end
     end
 
@@ -320,8 +341,8 @@ function BaseObject.start()
 end
 
 function BaseObject.init()
-    BlueprintMeta = BaseObject:WrapModule(script.Blueprint)
-    ObjectMeta = BaseObject:WrapModule(script.Object)
+    BlueprintSuperclass = BaseObject:WrapModule(script.Blueprint)
+    BaseObjectSuperclass = BaseObject:WrapModule(script.Object)
 end
 
 return BaseObject

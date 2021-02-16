@@ -27,14 +27,14 @@ function Object:Destroy()
 end
 
 -- Fires an event of the object
-function Object:FireEvent(internalAccess, eventName, ...)
-    Output.assert(internalAccess, "Object events can only be fired with internal access")
+function Object:FireEvent(eventName, ...)
+    Output.assert(self:IsInternalAccess(), "Object events can only be fired with internal access")
     Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
     self.Internal.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
 end
 
 -- Returns a ScriptSignalConnection for a specific property
-function Object:GetPropertyChangedSignal(_, eventName, func)
+function Object:GetPropertyChangedSignal(eventName, func)
     Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
     local event = Instance.new("BindableEvent")
     local proxySignal = event.Event:Connect(func)
@@ -98,8 +98,8 @@ local function cleanupPropertyReplication(self)
     end
 end
 
-function Object:ReplicateProperties(internalAccess, obj)
-    Output.assert(internalAccess, "Object replication can only be set internally")
+function Object:ReplicateProperties(obj)
+    Output.assert(self:IsInternalAccess(), "Object replication can only be set internally")
 
     if obj then
         CollectionService:AddTag(obj, "DeusObject")
@@ -162,6 +162,10 @@ function Object:ReplicateProperties(internalAccess, obj)
     else
         cleanupPropertyReplication(self)
     end
+end
+
+function Object:IsInternalAccess()
+    return typeof(self) ~= "userdata"
 end
 
 function Object.start()

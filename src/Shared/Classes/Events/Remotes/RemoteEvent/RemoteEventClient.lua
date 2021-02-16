@@ -8,7 +8,7 @@ function RemoteEvent:FireServer(internalAccess, ...)
     self.Internal.DEUSOBJECT_Properties.RBXEvent:FireServer(...)
 end
 
-function RemoteEvent:Listen(_, func)
+function RemoteEvent:Listen(func)
     return self.Internal.DEUSOBJECT_Properties.RBXEvent.OnClientEvent:Connect(func)
 end
 

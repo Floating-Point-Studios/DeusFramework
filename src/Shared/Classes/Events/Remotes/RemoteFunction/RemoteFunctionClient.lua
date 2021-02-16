@@ -7,7 +7,7 @@ function RemoteFunction:InvokeServer(internalAccess, ...)
     return self.Internal.DEUSOBJECT_Properties.RBXEvent:InvokeServer(...)
 end
 
-function RemoteFunction:Listen(_, callback)
+function RemoteFunction:Listen(callback)
     Output.assert(callback, "Expected callback")
     function self.Internal.DEUSOBJECT_Properties.RBXEvent.OnClientInvoke(...)
         return callback(...)
