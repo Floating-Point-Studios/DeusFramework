@@ -112,12 +112,5 @@ DeusSettingsModule.Name = "DeusSettings"
 local Client = script.Parent.Client
 script.Parent.Shared:Clone().Parent = Client
 
-if (DeusSettings and DeusSettings.PubliclyAccessibleLoader) or not DeusSettings then
-    DeusCore = DeusCore:Clone()
-    DeusCore.Parent = ReplicatedStorage
-    Client.Parent = ReplicatedFirst
-else
-    DeusCore = DeusCore:Clone()
-    DeusCore.Parent = ReplicatedFirst
-    Client.Parent = ReplicatedFirst
-end
+Client.Parent = ReplicatedFirst
+DeusCore.Parent = ReplicatedStorage

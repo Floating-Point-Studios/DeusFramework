@@ -10,7 +10,4 @@ return {
 
     -- Adds Deus table to global shared table
     AttachToShared = true,
-
-    -- Creates a module in ReplicatedStorage that can be used by any script
-    PubliclyAccessibleLoader = true,
 }
