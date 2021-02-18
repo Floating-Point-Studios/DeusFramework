@@ -44,7 +44,23 @@ function StringUtils.reverseSub(str, subStart, subEnd)
     local strLength = #str
     subStart = subStart or 1
     subEnd = subEnd or strLength
+
     return str:sub(strLength - subEnd + 1, strLength - subStart + 1)
+end
+
+function StringUtils.sub(str, subStart, subEnd)
+    local strLength = #str
+    subStart = subStart or 1
+    subEnd = subEnd or strLength
+
+    if subStart < 0 then
+        subStart %= strLength
+    end
+    if subEnd < 0 then
+        subEnd %= strLength
+    end
+
+    return str:sub(str, subStart, subEnd)
 end
 
 function StringUtils.start()
