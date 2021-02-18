@@ -1,3 +1,5 @@
+-- TODO: Refactor with new class standard
+
 --[[
     Key press event that can have its keys re-mapped or enabled/disabled.
 ]]
@@ -108,11 +110,11 @@ local InputActionObjData = {
     end,
 
     Methods = {
-        Toggle = function(self, internalAccess, state)
+        Toggle = function(self, state)
             local Events = self.Internal.DEUSOBJECT_LockedTables.Events
             local ReadOnlyProperties = self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
 
-            Output.assert(internalAccess, "InputAction can only be toggled with internal access")
+            Output.assert(self:IsInternalAccess(), "InputAction can only be toggled with internal access")
             Output.assert(state ~= nil and type(state) == "boolean", "Boolean expected as 2nd argument")
 
             ReadOnlyProperties.Enabled = state

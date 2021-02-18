@@ -2,8 +2,8 @@ local Output
 
 local RemoteFunction = {}
 
-function RemoteFunction:InvokeClient(internalAccess, player, ...)
-    Output.assert(internalAccess, "Attempt to use internal method")
+function RemoteFunction:InvokeClient(player, ...)
+    Output.assert(self:IsInternalAccess(), "Attempt to use internal method")
     self.LastSendTick = tick()
     return self.Internal.DEUSOBJECT_Properties.RBXEvent:InvokeClient(player, ...)
 end

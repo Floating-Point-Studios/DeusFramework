@@ -7,7 +7,8 @@ if DeusSettingsModule and DeusSettingsModule:IsA("ModuleScript") then
     DeusSettings = require(DeusSettingsModule)
 end
 
-local Deus
+local Deus = require(ReplicatedStorage:WaitForChild("Deus"))
+--[[
 if script:IsDescendantOf(ReplicatedFirst) then
     Deus = require(ReplicatedFirst:WaitForChild("Deus"))
 
@@ -17,6 +18,7 @@ if script:IsDescendantOf(ReplicatedFirst) then
 else
     Deus = require(ReplicatedStorage:WaitForChild("Deus"))
 end
+]]
 
 Deus:Register(script, "Deus")
 

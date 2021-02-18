@@ -2,8 +2,8 @@ local Output
 
 local RemoteFunction = {}
 
-function RemoteFunction:InvokeServer(internalAccess, ...)
-    Output.assert(internalAccess, "Attempt to use internal method")
+function RemoteFunction:InvokeServer(...)
+    Output.assert(self:IsInternalAccess(), "Attempt to use internal method")
     return self.Internal.DEUSOBJECT_Properties.RBXEvent:InvokeServer(...)
 end
 

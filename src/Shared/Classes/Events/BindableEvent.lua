@@ -19,8 +19,8 @@ local BindableEventObjData = {
     ClassName = "Deus.BindableEvent",
 
     Methods = {
-        Fire = function(self, internalAccess, ...)
-            Output.assert(internalAccess, "Attempt to fire remote from externally")
+        Fire = function(self, ...)
+            Output.assert(self:IsInternalAccess(), "Attempt to fire remote from externally")
             self.LastFiredTick = tick()
 
             spawn(clearCache)

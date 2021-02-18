@@ -63,7 +63,10 @@ function TableUtils.remove(tab, index)
     if type(index) == "number" then
         tab[index] = nil
     else
-        table.remove(tab, table.find(tab, index))
+        local i = table.find(tab, index)
+        if i then
+            table.remove(tab, i)
+        end
     end
 end
 

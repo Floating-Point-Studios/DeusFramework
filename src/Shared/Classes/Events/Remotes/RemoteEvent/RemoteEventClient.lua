@@ -2,8 +2,8 @@ local Output
 
 local RemoteEvent = {}
 
-function RemoteEvent:FireServer(internalAccess, ...)
-    Output.assert(internalAccess, "Attempt to use internal method")
+function RemoteEvent:FireServer(...)
+    Output.assert(self:IsInternalAccess(), "Attempt to use internal method")
     self.LastSendTick = tick()
     self.Internal.DEUSOBJECT_Properties.RBXEvent:FireServer(...)
 end
