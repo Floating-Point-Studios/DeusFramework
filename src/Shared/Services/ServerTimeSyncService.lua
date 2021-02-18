@@ -1,3 +1,5 @@
+-- TODO: Refactor to match new service convention
+
 local RunService = game:GetService("RunService")
 
 local NetworkService
@@ -5,15 +7,15 @@ local NetworkService
 local ServerTimeOffset = 0
 local ServerTimeSyncService = {}
 
-function ServerTimeSyncService.start()
-    NetworkService = ServerTimeSyncService:Load("Deus.NetworkService")
+function ServerTimeSyncService:start()
+    NetworkService = self:Load("Deus.NetworkService")
 
     if RunService:IsServer() then
             NetworkService.makeRemoteFunction("ServerTimeSync"):Listen(function()
             return tick()
         end)
     else
-        function ServerTimeSyncService.getServerTime()
+        function self.getServerTime()
             return tick() - ServerTimeOffset
         end
 

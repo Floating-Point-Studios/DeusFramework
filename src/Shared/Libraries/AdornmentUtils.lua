@@ -31,8 +31,8 @@ function AdornmentUtils.make(className, parent, cframe, isWorldSpace, properties
     return adornment
 end
 
-function AdornmentUtils.start()
-    Output = AdornmentUtils:Load("Deus.Output")
+function AdornmentUtils:start()
+    Output = self:Load("Deus.Output")
 end
 
 return AdornmentUtils

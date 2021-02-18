@@ -41,8 +41,8 @@ function RemoteEvent:Listen(func)
     return self.Internal.DEUSOBJECT_Properties.RBXEvent.OnServerEvent:Connect(func)
 end
 
-function RemoteEvent.start()
-    Output = RemoteEvent:Load("Deus.Output")
+function RemoteEvent:start()
+    Output = self:Load("Deus.Output")
 end
 
 return RemoteEvent

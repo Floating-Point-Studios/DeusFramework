@@ -21,9 +21,9 @@ function ObjectService:TrackObject(obj)
     Objects[obj.ObjectId] = obj
 end
 
-function ObjectService.start()
-    Output = ObjectService:Load("Deus.Output")
-    InstanceUtils = ObjectService:Load("Deus.InstanceUtils")
+function ObjectService:start()
+    Output = self:Load("Deus.Output")
+    InstanceUtils = self:Load("Deus.InstanceUtils")
 end
 
 return ObjectService

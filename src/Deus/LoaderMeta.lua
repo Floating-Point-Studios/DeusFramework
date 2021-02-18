@@ -50,11 +50,11 @@ function LoaderMeta:Load(path)
     end
 
     if module.init then
-        module.init()
+        module.init(module)
     end
 
     if module.start then
-        local substituteModule = module.start()
+        local substituteModule = module.start(module)
 
         if substituteModule then
             module = substituteModule

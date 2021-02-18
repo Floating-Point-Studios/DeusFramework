@@ -15,8 +15,8 @@ function RemoteFunction:Listen(callback)
     end
 end
 
-function RemoteFunction.start()
-    Output = RemoteFunction:Load("Deus.Output")
+function RemoteFunction:start()
+    Output = self:Load("Deus.Output")
 end
 
 return RemoteFunction

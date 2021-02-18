@@ -128,8 +128,8 @@ function VisualDebug.makeBillboardGui(name, size, text)
     return billboardGui
 end
 
-function VisualDebug.start()
-    AdornmentUtils = VisualDebug:Load("Deus.AdornmentUtils")
+function VisualDebug:start()
+    AdornmentUtils = self:Load("Deus.AdornmentUtils")
 end
 
 return VisualDebug

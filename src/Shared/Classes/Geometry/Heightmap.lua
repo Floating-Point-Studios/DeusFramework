@@ -86,11 +86,11 @@ function Heightmap.generate(corner0, corner1, resolution, canCollideOnly, averag
     return mesh
 end
 
-function Heightmap.start()
-    Mesh = Heightmap:Load("Deus.Mesh")
-    MathUtils = Heightmap:Load("Deus.MathUtils")
-    TableUtils = Heightmap:Load("Deus.TableUtils")
-    RaycastUtils = Heightmap:Load("Deus.RaycastUtils")
+function Heightmap:start()
+    Mesh = self:Load("Deus.Mesh")
+    MathUtils = self:Load("Deus.MathUtils")
+    TableUtils = self:Load("Deus.TableUtils")
+    RaycastUtils = self:Load("Deus.RaycastUtils")
 end
 
 return Heightmap

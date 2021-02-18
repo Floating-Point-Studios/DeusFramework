@@ -20,8 +20,8 @@ function ParallelService.run(module, funcName, ...)
     return unpack(result)
 end
 
-function ParallelService.start()
-    Worker = ParallelService:WrapModule(script.Worker, true, true)
+function ParallelService:start()
+    Worker = self:WrapModule(script.Worker, true, true)
 end
 
 return ParallelService

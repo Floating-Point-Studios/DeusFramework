@@ -320,11 +320,11 @@ function Mesh.Methods:Scale(vec3)
     end
 end
 
-function Mesh.start()
-    TableUtils = Mesh:Load("Deus.TableUtils")
-    Output = Mesh:Load("Deus.Output")
+function Mesh:start()
+    TableUtils = self:Load("Deus.TableUtils")
+    Output = self:Load("Deus.Output")
 
-    return Mesh:Load("Deus.BaseObject").new(Mesh)
+    return self:Load("Deus.BaseObject").new(self)
 end
 
 return Mesh

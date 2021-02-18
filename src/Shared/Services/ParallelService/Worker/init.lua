@@ -56,22 +56,22 @@ function Worker:Deconstructor()
     self.Actor:Destroy()
 end
 
-function Worker.start()
+function Worker:start()
     Workers = Instance.new("Folder")
     Workers.Name = "Workers"
     Workers.Parent = workspace
 
-    Worker.PrivateProperties = {
-        Actor = Worker:Load("Deus.Symbol").new("None")
+    self.PrivateProperties = {
+        Actor = self:Load("Deus.Symbol").new("None")
     }
 
-    Worker.PublicReadOnlyProperties = {
+    self.PublicReadOnlyProperties = {
         Busy = false
     }
 
-    Worker.PublicReadAndWriteProperties = {}
+    self.PublicReadAndWriteProperties = {}
 
-    return Worker:Load("Deus.BaseObject").new(Worker)
+    return self:Load("Deus.BaseObject").new(self)
 end
 
 return Worker

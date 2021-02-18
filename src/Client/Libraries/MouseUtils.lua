@@ -41,8 +41,8 @@ function MouseUtils.getGuiObjectsAtPositionWithWhitelist(x, y, filter, recursive
     return filteredObjects
 end
 
-function MouseUtils.start()
-    RaycastUtils = MouseUtils:Load("Deus.RaycastUtils")
+function MouseUtils:start()
+    RaycastUtils = self:Load("Deus.RaycastUtils")
 end
 
 return MouseUtils

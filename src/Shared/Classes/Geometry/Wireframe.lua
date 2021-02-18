@@ -127,23 +127,23 @@ function Wireframe.Methods:Update()
     end
 end
 
-function Wireframe.start()
-    VisualDebug = Wireframe:Load("Deus.VisualDebug")
-    Output = Wireframe:Load("Deus.Output")
-    Symbol = Wireframe:Load("Deus.Symbol")
+function Wireframe:start()
+    VisualDebug = self:Load("Deus.VisualDebug")
+    Output = self:Load("Deus.Output")
+    Symbol = self:Load("Deus.Symbol")
 
     None = Symbol.new("None")
 
-    Wireframe.PrivateProperties = {
+    self.PrivateProperties = {
         LineAdornments = {},
         SphereAdornments = {}
     }
 
-    Wireframe.PublicReadOnlyProperties = {
+    self.PublicReadOnlyProperties = {
         Wires = None
     }
 
-    Wireframe.PublicReadAndWriteProperties = {
+    self.PublicReadAndWriteProperties = {
         Adornee = None,
         Mesh = None,
         ShowLines = true,
@@ -155,7 +155,7 @@ function Wireframe.start()
         Color3 = Color3.new(1, 1, 1)
     }
 
-    return Wireframe:Load("Deus.BaseObject").new(Wireframe)
+    return self:Load("Deus.BaseObject").new(self)
 end
 
 return Wireframe

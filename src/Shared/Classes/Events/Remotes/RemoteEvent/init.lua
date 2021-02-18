@@ -37,22 +37,22 @@ local RemoteEventObjData = {
 
 local RemoteEvent = {}
 
-function RemoteEvent.start()
-    BaseObject = RemoteEvent:Load("Deus.BaseObject")
-    Output = RemoteEvent:Load("Deus.Output")
+function RemoteEvent:start()
+    BaseObject = self:Load("Deus.BaseObject")
+    Output = self:Load("Deus.Output")
 
     return BaseObject.new(RemoteEventObjData)
 end
 
-function RemoteEvent.init()
+function RemoteEvent:init()
     if RunService:IsServer() then
-        RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventServer)
+        self.Methods = self:WrapModule(script.RemoteEventServer)
 
         RemoteEventObjData.Deconstructor = function(self)
             self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
         end
     else
-        RemoteEvent.Methods = RemoteEvent:WrapModule(script.RemoteEventClient)
+        self.Methods = self:WrapModule(script.RemoteEventClient)
     end
 end
 

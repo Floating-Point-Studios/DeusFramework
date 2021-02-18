@@ -168,14 +168,14 @@ function Object:IsInternalAccess()
     return typeof(self) ~= "userdata"
 end
 
-function Object.start()
-    Maid = Object:Load("Deus.Maid")
-    JSON = Object:Load("Deus.JSON")
-    Output = Object:Load("Deus.Output")
-    Symbol = Object:Load("Deus.Symbol")
-    TableUtils = Object:Load("Deus.TableUtils")
-    StringUtils = Object:Load("Deus.StringUtils")
-    InstanceUtils = Object:Load("Deus.InstanceUtils")
+function Object:start()
+    Maid = self:Load("Deus.Maid")
+    JSON = self:Load("Deus.JSON")
+    Output = self:Load("Deus.Output")
+    Symbol = self:Load("Deus.Symbol")
+    TableUtils = self:Load("Deus.TableUtils")
+    StringUtils = self:Load("Deus.StringUtils")
+    InstanceUtils = self:Load("Deus.InstanceUtils")
 end
 
 return Object

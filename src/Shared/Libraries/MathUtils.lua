@@ -100,8 +100,8 @@ function MathUtils.snap(x, numbers, snapUp)
     return bestMatch
 end
 
-function MathUtils.start()
-    Output = MathUtils:Load("Deus.Output")
+function MathUtils:start()
+    Output = self:Load("Deus.Output")
 end
 
 return MathUtils

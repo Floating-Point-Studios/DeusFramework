@@ -144,9 +144,9 @@ local InputActionObjData = {
 
 local InputAction = {}
 
-function InputAction.start()
-    Output = InputAction:Load("Deus.Output")
-    BaseObject = InputAction:Load("Deus.BaseObject")
+function InputAction:start()
+    Output = self:Load("Deus.Output")
+    BaseObject = self:Load("Deus.BaseObject")
 
     return BaseObject.new(InputActionObjData)
 end

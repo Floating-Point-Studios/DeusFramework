@@ -1,6 +1,0 @@
-[submodule "src/Client/Libraries/UserInterface/roact"]
-	path = src/Client/Libraries/UserInterface/roact
-	url = https://github.com/roblox/roact
-[submodule "src/Shared/Libraries/Base64"]
-	path = src/Shared/Libraries/Base64
-	url = https://github.com/Reselim/Base64

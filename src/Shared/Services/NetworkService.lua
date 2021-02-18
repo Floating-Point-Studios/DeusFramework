@@ -1,3 +1,5 @@
+-- TODO: Refactor to match new module convention
+
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -51,10 +53,10 @@ function NetworkService.getRemoteFunction(remoteName)
     return remote
 end
 
-function NetworkService.start()
-    RemoteEvent = NetworkService:Load("Deus.RemoteEvent")
-    RemoteFunction = NetworkService:Load("Deus.RemoteFunction")
-    Output = NetworkService:Load("Deus.Output")
+function NetworkService:start()
+    RemoteEvent = self:Load("Deus.RemoteEvent")
+    RemoteFunction = self:Load("Deus.RemoteFunction")
+    Output = self:Load("Deus.Output")
 
     if RunService:IsServer() then
         RemotesFolder = Instance.new("Folder")

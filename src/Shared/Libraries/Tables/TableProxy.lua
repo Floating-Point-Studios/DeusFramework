@@ -150,8 +150,8 @@ function TableProxy:SetFallbackNewIndexes(newindexes)
 end
 ]]
 
-function TableProxy.start()
-    Output = TableProxy:Load("Deus.Output")
+function TableProxy:start()
+    Output = self:Load("Deus.Output")
 end
 
 return TableProxy

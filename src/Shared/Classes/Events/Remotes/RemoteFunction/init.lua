@@ -24,22 +24,22 @@ local RemoteFunctionObjData = {
 
 local RemoteFunction = {}
 
-function RemoteFunction.start()
-    BaseObject = RemoteFunction:Load("Deus.BaseObject")
-    Output = RemoteFunction:Load("Deus.Output")
+function RemoteFunction:start()
+    BaseObject = self:Load("Deus.BaseObject")
+    Output = self:Load("Deus.Output")
 
     return BaseObject.new(RemoteFunctionObjData)
 end
 
-function RemoteFunction.init()
+function RemoteFunction:init()
     if RunService:IsServer() then
-        RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionServer, true, true)
+        RemoteFunctionObjData.Methods = self:WrapModule(script.RemoteFunctionServer, true, true)
 
         RemoteFunctionObjData.Deconstructor = function(self)
             self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
         end
     else
-        RemoteFunctionObjData.Methods = RemoteFunction:WrapModule(script.RemoteFunctionClient, true, true)
+        RemoteFunctionObjData.Methods = self:WrapModule(script.RemoteFunctionClient, true, true)
     end
 end
 

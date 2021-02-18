@@ -330,19 +330,19 @@ function BaseObject.getClassList()
     return TableUtils.shallowCopy(ClassList)
 end
 
-function BaseObject.start()
-    Output = BaseObject:Load("Deus.Output")
-    Symbol = BaseObject:Load("Deus.Symbol")
-    TableProxy = BaseObject:Load("Deus.TableProxy")
-    TableUtils = BaseObject:Load("Deus.TableUtils")
-    InstanceUtils = BaseObject:Load("Deus.InstanceUtils")
-    BindableEvent = BaseObject:Load("Deus.BindableEvent")
-    ObjectService = BaseObject:Load("Deus.ObjectService")
+function BaseObject:start()
+    Output = self:Load("Deus.Output")
+    Symbol = self:Load("Deus.Symbol")
+    TableProxy = self:Load("Deus.TableProxy")
+    TableUtils = self:Load("Deus.TableUtils")
+    InstanceUtils = self:Load("Deus.InstanceUtils")
+    BindableEvent = self:Load("Deus.BindableEvent")
+    ObjectService = self:Load("Deus.ObjectService")
 end
 
-function BaseObject.init()
-    BlueprintSuperclass = BaseObject:WrapModule(script.Blueprint)
-    BaseObjectSuperclass = BaseObject:WrapModule(script.Object)
+function BaseObject:init()
+    BlueprintSuperclass = self:WrapModule(script.Blueprint)
+    BaseObjectSuperclass = self:WrapModule(script.Object)
 end
 
 return BaseObject

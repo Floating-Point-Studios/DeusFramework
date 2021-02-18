@@ -60,9 +60,9 @@ local BindableEventObjData = {
 
 local BindableEvent = {}
 
-function BindableEvent.start()
-    BaseObject = BindableEvent:Load("Deus.BaseObject")
-    Output = BindableEvent:Load("Deus.Output")
+function BindableEvent:start()
+    BaseObject = self:Load("Deus.BaseObject")
+    Output = self:Load("Deus.Output")
 
     return BaseObject.new(BindableEventObjData)
 end

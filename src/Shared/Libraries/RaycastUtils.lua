@@ -41,8 +41,8 @@ function RaycastUtils.castCollideOnly(origin, dir, params)
     until not result
 end
 
-function RaycastUtils.start()
-    TableUtils = RaycastUtils:Load("Deus.TableUtils")
+function RaycastUtils:start()
+    TableUtils = self:Load("Deus.TableUtils")
 end
 
 return RaycastUtils

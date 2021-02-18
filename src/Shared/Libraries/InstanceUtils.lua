@@ -133,8 +133,8 @@ function InstanceUtils.make(objData, ...)
     return unpack(objs)
 end
 
-function InstanceUtils.start()
-    Output = InstanceUtils:Load("Deus.Output")
+function InstanceUtils:start()
+    Output = self:Load("Deus.Output")
 end
 
 return InstanceUtils

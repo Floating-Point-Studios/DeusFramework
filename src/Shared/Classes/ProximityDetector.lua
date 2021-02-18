@@ -41,8 +41,8 @@ function ProximityDetector:Deconstructor()
     self.PublicReadOnlyProperties.Detector:Destroy()
 end
 
-function ProximityDetector.start()
-    return ProximityDetector:Load("Deus.BaseObject").new(ProximityDetector)
+function ProximityDetector:start()
+    return self:Load("Deus.BaseObject").new(ProximityDetector)
 end
 
 return ProximityDetector

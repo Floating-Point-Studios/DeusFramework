@@ -42,9 +42,9 @@ function Enumeration.waitForEnum(enumName)
     return enum
 end
 
-function Enumeration.start()
-    Output = Enumeration:Load("Deus.Output")
-    TableUtils = Enumeration:Load("Deus.TableUtils")
+function Enumeration:start()
+    Output = self:Load("Deus.Output")
+    TableUtils = self:Load("Deus.TableUtils")
 end
 
 return setmetatable(Enumeration, Enumeration)

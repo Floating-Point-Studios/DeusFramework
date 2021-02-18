@@ -38,9 +38,9 @@ function LockedTable.new(tab)
     return proxy
 end
 
-function LockedTable.start()
-    Output = LockedTable:Load("Deus.Output")
-    TableUtils = LockedTable:Load("Deus.TableUtils")
+function LockedTable:start()
+    Output = self:Load("Deus.Output")
+    TableUtils = self:Load("Deus.TableUtils")
 end
 
 return LockedTable

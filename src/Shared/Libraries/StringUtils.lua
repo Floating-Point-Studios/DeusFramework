@@ -63,8 +63,8 @@ function StringUtils.sub(str, subStart, subEnd)
     return str:sub(str, subStart, subEnd)
 end
 
-function StringUtils.start()
-    TableUtils = StringUtils:Load("Deus.TableUtils")
+function StringUtils:start()
+    TableUtils = self:Load("Deus.TableUtils")
 end
 
 return StringUtils

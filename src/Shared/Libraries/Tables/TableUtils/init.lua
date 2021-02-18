@@ -135,10 +135,12 @@ function TableUtils.instanceAsNewIndex(obj)
     end
 end
 
-function TableUtils.start()
-    TableUtils.lock = TableUtils:WrapModule(script.LockedTable).new
+function TableUtils:start()
+    Output = self:Load("Deus.Output")
+end
 
-    Output = TableUtils:Load("Deus.Output")
+function TableUtils:init()
+    TableUtils.lock = self:WrapModule(script.LockedTable).new
 end
 
 return TableUtils
