@@ -50,11 +50,11 @@ function LoaderMeta:Load(path)
     end
 
     if module.init then
-        module.init(module)
+        module:init()
     end
 
     if module.start then
-        local substituteModule = module.start(module)
+        local substituteModule = module:start()
 
         if substituteModule then
             module = substituteModule
@@ -75,12 +75,12 @@ function LoaderMeta:WrapModule(module, init, start)
 
     if module.init then
         if init then
-            module.init()
+            module:init()
             module.init = nil
         else
             local moduleInit = module.init
             module.init = function()
-                moduleInit()
+                moduleInit(module)
                 module.init = nil
             end
         end
@@ -88,7 +88,7 @@ function LoaderMeta:WrapModule(module, init, start)
 
     if module.start then
         if start then
-            local substituteModule = module.start()
+            local substituteModule = module:start()
 
             if substituteModule then
                 return substituteModule
@@ -100,7 +100,7 @@ function LoaderMeta:WrapModule(module, init, start)
 
             module.start = function()
                 module.start = nil
-                return moduleStart()
+                return moduleStart(module)
             end
         end
     end
