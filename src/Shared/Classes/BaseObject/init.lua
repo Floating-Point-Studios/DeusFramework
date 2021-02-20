@@ -193,6 +193,8 @@ function BaseObject.new(objData)
 
             Metadata                        = Metadata,
 
+            ClassName                       = objData.ClassName,
+
             Methods                         = objData.Methods or {},
 
             PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},

@@ -11,6 +11,29 @@ local InstanceUtils
 
 local Object = {}
 
+function Object:IsA(className)
+    local object = self
+
+    if className == "BaseObject" then
+        return true
+    end
+
+    repeat
+        if object.ClassName == className then
+            return true
+        end
+
+        -- First 'object' will be an object, every 'object' afterwards is a ClassData
+        if object.Superclass then
+            object = object.Superclass
+        else
+            object = object.Metadata.Superclass
+        end
+    until object == "BaseObject"
+
+    return false
+end
+
 -- Runs constructor again to reset the object, useful for re-using instead of destroying objects
 function Object:Reconstruct(...)
     Output.assert(self:IsInternalAccess(), "Object can only be reconstructed with internal access")
