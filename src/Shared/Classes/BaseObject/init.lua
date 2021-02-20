@@ -49,7 +49,6 @@ local InstanceUtils
 local BindableEvent
 -- local ObjectService
 
-local BlueprintSuperclass
 local BaseObjectSuperclass
 
 local ClassList = {}
@@ -187,121 +186,118 @@ function BaseObject.new(objData)
         Deconstructor               = objData.Deconstructor
     }
 
-    return setmetatable(
-        {
-            -- Constructor = objData.Constructor,
+    return {
+        -- Constructor = objData.Constructor,
 
-            Metadata                        = Metadata,
+        Metadata                        = Metadata,
 
-            ClassName                       = objData.ClassName,
+        ClassName                       = objData.ClassName,
 
-            Methods                         = objData.Methods or {},
+        Methods                         = objData.Methods or {},
 
-            PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
-            PublicReadOnlyProperties        = objData.PublicReadOnlyProperties or {},
-            PrivateProperties               = objData.PrivateProperties or {},
+        PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
+        PublicReadOnlyProperties        = objData.PublicReadOnlyProperties or {},
+        PrivateProperties               = objData.PrivateProperties or {},
 
-            Events                          = objData.Events or {},
+        Events                          = objData.Events or {},
 
-            new = function(...)
-                local obj = {
-                    __tostring  = __tostring,
-                    __index     = __index,
-                    __newindex  = __newindex,
+        new = function(...)
+            local obj = {
+                __tostring  = __tostring,
+                __index     = __index,
+                __newindex  = __newindex,
 
-                    Internal = {
-                        DEUSOBJECT_Properties = TableUtils.deepCopy(objData.PrivateProperties or {}),
-                        DEUSOBJECT_LockedTables = {
-                            Events = {},
-                        },
+                Internal = {
+                    DEUSOBJECT_Properties = TableUtils.deepCopy(objData.PrivateProperties or {}),
+                    DEUSOBJECT_LockedTables = {
+                        Events = {},
                     },
+                },
 
-                    ExternalReadOnly = {
-                        DEUSOBJECT_Methods                  = objData.Methods or {},
-                        DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
-                        DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
-                        DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
-                    }
+                ExternalReadOnly = {
+                    DEUSOBJECT_Methods                  = objData.Methods or {},
+                    DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
+                    DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
+                    DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
                 }
+            }
 
-                --[[
-                -- Wrap methods
-                for methodName, method in pairs(obj.ExternalReadOnly.DEUSOBJECT_Methods) do
-                    obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(self, ...)
-                        local internalAccess = false
-                        if obj == self then
-                            internalAccess = true
-                        end
-                        return method(obj, internalAccess, ...)
+            --[[
+            -- Wrap methods
+            for methodName, method in pairs(obj.ExternalReadOnly.DEUSOBJECT_Methods) do
+                obj.ExternalReadOnly.DEUSOBJECT_Methods[methodName] = function(self, ...)
+                    local internalAccess = false
+                    if obj == self then
+                        internalAccess = true
                     end
+                    return method(obj, internalAccess, ...)
                 end
-                ]]
-
-                --[[
-                -- Special exemption for objects that should not inherit base events
-                if objData.ClassName ~= "Deus.BindableEvent" then
-                    table.insert(obj.ExternalReadOnly.DEUSOBJECT_Events, "Changed")
-                end
-                ]]
-
-                -- Add events
-                for _,eventName in pairs(obj.ExternalReadOnly.DEUSOBJECT_Events) do
-                    local eventProxy, eventMeta = BindableEvent.new()
-                    obj.Internal.DEUSOBJECT_LockedTables.Events[eventName] = eventMeta
-                    obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
-                end
-
-                -- Read-only properties inherited by all objects
-                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
-                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
-                -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId             = HttpService:GenerateGUID(false)
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated          = tick()
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
-
-                -- Allows editing of properties locked externally
-                obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods
-                obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties                 = obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties
-                obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties             = obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties
-                obj.Internal.DEUSOBJECT_LockedTables.Events                             = obj.ExternalReadOnly.DEUSOBJECT_Events
-
-                -- Locks properties to be only readable externally
-                obj.ExternalReadOnly.DEUSOBJECT_Methods                                 = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Methods)
-                obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties                      = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties)
-                obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
-                obj.ExternalReadOnly.DEUSOBJECT_Events                                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Events)
-
-                -- Inherit class metadata
-                setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = Metadata})
-
-                obj = TableProxy.new(obj)
-
-                if objData.Constructor then
-                    objData.Constructor(obj, ...)
-                end
-
-                if obj.Changed then
-                    if RunService:IsServer() then
-                        obj.Changed:Connect(function(propertyName, newValue)
-                            if newValue == Symbol.new("None") then
-                                newValue = nil
-                            end
-
-                            local propertyReplicationTarget = obj.PropertyReplicationTarget
-                            if typeof(propertyReplicationTarget) == "Instance" and InstanceUtils.isTypeAttributeSupported(typeof(newValue)) then
-                                propertyReplicationTarget:SetAttribute("DEUS_".. propertyName, newValue)
-                            end
-                        end)
-                    end
-                end
-
-                -- ObjectService:TrackObject(obj)
-
-                return obj
             end
-        },
-        BlueprintSuperclass
-    )
+            ]]
+
+            --[[
+            -- Special exemption for objects that should not inherit base events
+            if objData.ClassName ~= "Deus.BindableEvent" then
+                table.insert(obj.ExternalReadOnly.DEUSOBJECT_Events, "Changed")
+            end
+            ]]
+
+            -- Add events
+            for _,eventName in pairs(obj.ExternalReadOnly.DEUSOBJECT_Events) do
+                local eventProxy, eventMeta = BindableEvent.new()
+                obj.Internal.DEUSOBJECT_LockedTables.Events[eventName] = eventMeta
+                obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
+            end
+
+            -- Read-only properties inherited by all objects
+            -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
+            -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
+            -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId             = HttpService:GenerateGUID(false)
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated          = tick()
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
+
+            -- Allows editing of properties locked externally
+            obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods
+            obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties                 = obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties
+            obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties             = obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties
+            obj.Internal.DEUSOBJECT_LockedTables.Events                             = obj.ExternalReadOnly.DEUSOBJECT_Events
+
+            -- Locks properties to be only readable externally
+            obj.ExternalReadOnly.DEUSOBJECT_Methods                                 = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Methods)
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties                      = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties)
+            obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
+            obj.ExternalReadOnly.DEUSOBJECT_Events                                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Events)
+
+            -- Inherit class metadata
+            setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = Metadata})
+
+            obj = TableProxy.new(obj)
+
+            if objData.Constructor then
+                objData.Constructor(obj, ...)
+            end
+
+            if obj.Changed then
+                if RunService:IsServer() then
+                    obj.Changed:Connect(function(propertyName, newValue)
+                        if newValue == Symbol.new("None") then
+                            newValue = nil
+                        end
+
+                        local propertyReplicationTarget = obj.PropertyReplicationTarget
+                        if typeof(propertyReplicationTarget) == "Instance" and InstanceUtils.isTypeAttributeSupported(typeof(newValue)) then
+                            propertyReplicationTarget:SetAttribute("DEUS_".. propertyName, newValue)
+                        end
+                    end)
+                end
+            end
+
+            -- ObjectService:TrackObject(obj)
+
+            return obj
+        end
+    }
 end
 
 -- Creates a class without events, methods are automatically setup, and all properties are set to Public Read & Write
@@ -345,7 +341,6 @@ function BaseObject:start()
 end
 
 function BaseObject:init()
-    BlueprintSuperclass = self:WrapModule(script.Blueprint, true, true)
     BaseObjectSuperclass = self:WrapModule(script.Object, true, true)
 end
 

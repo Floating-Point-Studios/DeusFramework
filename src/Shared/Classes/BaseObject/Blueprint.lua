@@ -1,3 +1,0 @@
-local Blueprint = {}
-
-return Blueprint
