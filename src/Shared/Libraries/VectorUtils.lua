@@ -35,4 +35,12 @@ function VectorUtils.llarToWorld(lat, lon, alt, rad)
     return Vector3.new(x, y, z)
 end
 
+function VectorUtils.abs(v)
+    return Vector3.new(math.abs(v.X), math.abs(v.Y), math.abs(v.Z))
+end
+
+function VectorUtils.angle(v1, v2)
+    return math.acos(v1:Dot(v2) / (v1.Magnitude * v2.Magnitude))
+end
+
 return VectorUtils

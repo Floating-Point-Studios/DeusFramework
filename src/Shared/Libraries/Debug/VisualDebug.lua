@@ -46,7 +46,7 @@ function VisualDebug.drawLine(pos1, pos2, color3)
 end
 
 function VisualDebug.drawPath(points, radius, color3)
-    radius = radius or 0.2
+    radius = radius or 0.05
     color3 = color3 or Color3.fromRGB(13, 105, 172)
 
     local path = Instance.new("Folder")
