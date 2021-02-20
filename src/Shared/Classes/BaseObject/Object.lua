@@ -11,10 +11,27 @@ local InstanceUtils
 
 local Object = {}
 
+-- Runs constructor again to reset the object, useful for re-using instead of destroying objects
+function Object:Reconstruct(...)
+    Output.assert(self:IsInternalAccess(), "Object can only be reconstructed with internal access")
+
+    local constructor = self.Constructor
+    if constructor then
+        constructor(self, ...)
+    else
+        Output.Output.error("Object class '%s' does not have any constructor parameters", self.ClassName)
+    end
+
+    return self
+end
+
 function Object:Destroy()
-    local deconstructor = self.Internal.Deconstructor
+    local deconstructor = self.Deconstructor
     if deconstructor then
-        deconstructor(self)
+        -- Deconstructor is allowed to return list of objects it wants destroyed
+        for _,v in pairs(deconstructor(self) or {}) do
+            Maid:GiveTask(v)
+        end
     end
 
     local destroyedEvent = self.Internal.DEUSOBJECT_LockedTables.Events["Destroyed"]
@@ -31,6 +48,8 @@ function Object:FireEvent(eventName, ...)
     Output.assert(self:IsInternalAccess(), "Object events can only be fired with internal access")
     Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
     self.Internal.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
+
+    return self
 end
 
 -- Returns a ScriptSignalConnection for a specific property
@@ -56,6 +75,7 @@ function Object:GetMethods()
     return self.Internal.DEUSOBJECT_LockedTables.Methods:GetKeys()
 end
 
+-- TODO: Check if this allows external access to fire events
 function Object:GetEvents()
     return self.Internal.DEUSOBJECT_LockedTables.Events:GetKeys()
 end
@@ -162,6 +182,8 @@ function Object:ReplicateProperties(obj)
     else
         cleanupPropertyReplication(self)
     end
+
+    return self
 end
 
 function Object:IsInternalAccess()

@@ -1,3 +1,5 @@
+-- TODO: Add way to detect when new object is created
+
 --[[
     Objects that require permissions, object inheritance, events, replication across the client-server boundary, or attaching to Roblox instances via attributes
     are inherited from BaseObject. Objects that do not require any of this should be constructed from a basic metatable.
@@ -45,7 +47,7 @@ local TableProxy
 local TableUtils
 local InstanceUtils
 local BindableEvent
-local ObjectService
+-- local ObjectService
 
 local BlueprintSuperclass
 local BaseObjectSuperclass
@@ -180,6 +182,9 @@ function BaseObject.new(objData)
         Extendable                  = objData.Extendable or true,
         Replicable                  = objData.Replicable or true,
         Superclass                  = objData.Superclass or "BaseObject",
+
+        Constructor                 = objData.Constructor,
+        Deconstructor               = objData.Deconstructor
     }
 
     return setmetatable(
@@ -244,9 +249,6 @@ function BaseObject.new(objData)
                     obj.ExternalReadOnly.DEUSOBJECT_Events[eventName] = eventProxy
                 end
 
-                -- Internal properties inherited by all objects
-                obj.Internal.Deconstructor = objData.Deconstructor
-
                 -- Read-only properties inherited by all objects
                 -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
                 -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
@@ -291,7 +293,7 @@ function BaseObject.new(objData)
                     end
                 end
 
-                ObjectService:TrackObject(obj)
+                -- ObjectService:TrackObject(obj)
 
                 return obj
             end
@@ -337,12 +339,12 @@ function BaseObject:start()
     TableUtils = self:Load("Deus.TableUtils")
     InstanceUtils = self:Load("Deus.InstanceUtils")
     BindableEvent = self:Load("Deus.BindableEvent")
-    ObjectService = self:Load("Deus.ObjectService")
+    -- ObjectService = self:Load("Deus.ObjectService")
 end
 
 function BaseObject:init()
-    BlueprintSuperclass = self:WrapModule(script.Blueprint)
-    BaseObjectSuperclass = self:WrapModule(script.Object)
+    BlueprintSuperclass = self:WrapModule(script.Blueprint, true, true)
+    BaseObjectSuperclass = self:WrapModule(script.Object, true, true)
 end
 
 return BaseObject
