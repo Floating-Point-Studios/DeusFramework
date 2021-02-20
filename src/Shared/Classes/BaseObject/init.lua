@@ -1,41 +1,8 @@
 -- TODO: Add way to detect when new object is created
 
 --[[
-    Objects that require permissions, object inheritance, events, replication across the client-server boundary, or attaching to Roblox instances via attributes
-    are inherited from BaseObject. Objects that do not require any of this should be constructed from a basic metatable.
-
-    Object properties can be referenced by their direct path when internally accessed. This is faster but not guaranteed to be supported in the case BaseObject
-    or TableProxy are updated. Note the Changed event will not fire if edits are applied directly through this method.
-
-    BaseObject = {
-        ClassName = "",
-            Direct: self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties.ClassName
-
-        Extendable = true,
-            Direct: self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties.Extendable
-
-        Replicable = true,
-            Direct: self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties.Replicable
-
-        Constructor = function(self)
-
-        end,
-
-        Methods = {},
-            Direct: self.Internal.DEUSOBJECT_LockedTables.Methods
-
-        Events = {},
-            Direct: self.Internal.DEUSOBJECT_LockedTables.Events
-
-        PrivateProperties = {},
-            Direct: self.Internal.DEUSOBJECT_Properties
-
-        PublicReadOnlyProperties = {},
-            Direct: self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
-
-        PublicReadAndWriteProperties = {},
-            Direct: self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
-    }
+    For documentation refer to here:
+    https://floating-point-studios.github.io/CardinalEngine/DeusFramework/Classes/baseObject/
 ]]
 
 local RunService = game:GetService("RunService")

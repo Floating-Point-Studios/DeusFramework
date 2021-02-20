@@ -114,7 +114,7 @@ function Object:GetWritableProperties()
 end
 
 -- Attempts to serialize the object
-function Object:Serialize()
+function Object:SerializeProperties()
     return JSON.serialize(
         {
             ClassName = self.ClassName,
@@ -126,7 +126,7 @@ function Object:Serialize()
 end
 
 function Object:Hash()
-    return StringUtils.hash(self:Serialize())
+    return StringUtils.hash(self:SerializeProperties())
 end
 
 local function cleanupPropertyReplication(self)

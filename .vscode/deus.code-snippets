@@ -52,7 +52,7 @@
 			"\t",
 			"end",
 			"",
-			"function $1.start()",
+			"function $1:start()",
 			"\treturn self:Load(\"Deus.BaseObject\").newSimple(self)",
 			"end",
 			"",
@@ -86,6 +86,25 @@
 			"",
 			"function $1:init()",
 			"\t",
+			"end",
+			"",
+			"return $1"
+		],
+		"description": "Creates a module"
+	},
+
+	"New enum": {
+		"prefix": "@enum",
+		"body": [
+			"local ${1:${TM_FILENAME/[.].+/$1/}} = {}",
+			"",
+			"function $1:start()",
+			"\treturn self:Load(\"Deus.Enumeration\").addEnum(",
+			"\t\"\",",
+			"\t\t{",
+			"\t\t",
+			"\t\t}",
+			"\t)",
 			"end",
 			"",
 			"return $1"
