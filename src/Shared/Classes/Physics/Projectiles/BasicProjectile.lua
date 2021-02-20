@@ -114,9 +114,13 @@ function BasicProjectile.Methods:SetTick(tick)
 end
 
 function BasicProjectile:Constructor(origin, velocity, gravity)
-    self.Origin = origin
-    self.Velocity = velocity
-    self.Gravity = gravity or workspace.Gravity
+    origin      = origin    or self.Origin
+    velocity    = velocity  or self.Velocity
+    gravity     = gravity   or workspace.Gravity
+
+    self.Origin     = origin
+    self.Velocity   = velocity
+    self.Gravity    = gravity
 
     local dir = velocity.Unit
     local a = VectorUtils.angle(dir, Vector3.new(dir.X, 0, dir.Z).Unit)
