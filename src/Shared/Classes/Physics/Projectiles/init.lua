@@ -12,7 +12,7 @@ function Projectiles.newDragProjectile(...)
     return DragProjectile.new(...)
 end
 
-function Projectiles.newLaser(...)
+function Projectiles.newLaserProjectile(...)
     return LaserProjectile.new(...)
 end
 
