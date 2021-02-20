@@ -10,6 +10,15 @@ Pool.Methods = {}
 
 Pool.Events = {}
 
+-- Gets all the items from the pool and set itself to empty
+function Pool.Methods:GetAll()
+    local items = self.Items
+
+    self.Items = {}
+
+    return items
+end
+
 -- Gets an item from the pool, if one is not available runs the newItemFunc function provided in constructor
 function Pool.Methods:Get()
     local item = self.Items[1]
