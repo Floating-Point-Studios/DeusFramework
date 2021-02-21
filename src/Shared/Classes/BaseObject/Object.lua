@@ -23,12 +23,7 @@ function Object:IsA(className)
             return true
         end
 
-        -- First 'object' will be an object, every 'object' afterwards is a ClassData
-        if object.Superclass then
-            object = object.Superclass
-        else
-            object = object.Metadata.Superclass
-        end
+        object = object.Superclass
     until object == "BaseObject"
 
     return false

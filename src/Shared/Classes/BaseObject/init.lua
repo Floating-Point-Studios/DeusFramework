@@ -16,6 +16,8 @@ local InstanceUtils
 local BindableEvent
 -- local ObjectService
 
+local NewClassEvent
+local NewObjectEvent
 local BaseObjectSuperclass
 
 local ClassList = {}
@@ -143,7 +145,7 @@ function BaseObject.new(objData)
 
     local superclass = objData.Superclass
     if superclass then
-        Output.assert(superclass.Metadata.Extendable, "Superclass '%s' is not extendable", superclass.Metadata.ClassName)
+        Output.assert(superclass.Extendable, "Superclass '%s' is not extendable", superclass.ClassName)
         setmetatable(objData.Methods, {__index = superclass.Methods})
     else
         setmetatable(objData.Methods, {__index = BaseObjectSuperclass})
@@ -164,10 +166,10 @@ function BaseObject.new(objData)
         Deconstructor               = objData.Deconstructor
     }
 
-    return {
+    local ClassData = {
         -- Constructor = objData.Constructor,
 
-        Metadata                        = Metadata,
+        -- Metadata                        = Metadata,
 
         PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
         PublicReadOnlyProperties        = objData.PublicReadOnlyProperties or {},
@@ -269,9 +271,24 @@ function BaseObject.new(objData)
 
             -- ObjectService:TrackObject(obj)
 
+            -- Due to ObjectService being moved to Cardinal this event is now how Cardinal detects when a new object is created (we cannot fire for BaseObject's own BindableEvents)
+            if NewObjectEvent then
+                NewObjectEvent:Fire(obj.Proxy)
+            end
+
             return obj
         end
     }
+
+    -- Set ClassData metatable
+    ClassData = setmetatable(ClassData, {__index = Metadata})
+
+    -- Fire NewClass event (we cannot fire for the first class which is BindableEvent)
+    if NewClassEvent then
+        NewClassEvent:Fire(TableUtils.lock(ClassData))
+    end
+
+    return ClassData
 end
 
 -- Creates a class without events, methods are automatically setup, and all properties are set to Public Read & Write
@@ -312,6 +329,12 @@ function BaseObject:start()
     InstanceUtils = self:Load("Deus.InstanceUtils")
     BindableEvent = self:Load("Deus.BindableEvent")
     -- ObjectService = self:Load("Deus.ObjectService")
+
+    NewClassEvent = BindableEvent.new()
+    NewObjectEvent = BindableEvent.new()
+
+    self.NewClass = NewClassEvent.Proxy
+    self.NewObject = NewObjectEvent.Proxy
 end
 
 function BaseObject:init()

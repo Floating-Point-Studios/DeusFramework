@@ -1,8 +1,10 @@
+-- TODO: Refactor to new class convention
+
 local HttpService = game:GetService("HttpService")
 
-local BaseObject
 local Output
 
+local BindableEvents = setmetatable({}, {__mode = "v"})
 -- BindableEvents do not support userdata types made from newproxy() so instead we cache the payload and send a Uuid to retrieve the payload
 local Cache = {}
 
@@ -15,56 +17,73 @@ function clearCache()
     end
 end
 
-local BindableEventObjData = {
-    ClassName = "Deus.BindableEvent",
-
-    Methods = {
-        Fire = function(self, ...)
-            Output.assert(self:IsInternalAccess(), "Attempt to fire remote from externally")
-            self.LastFiredTick = tick()
-
-            spawn(clearCache)
-
-            local Uuid = HttpService:GenerateGUID(false)
-            Cache[Uuid] = {...}
-
-            self.Internal.DEUSOBJECT_Properties.RBXEvent:Fire(Uuid)
-        end,
-
-        Connect = function(self, _, func)
-            return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Connect(function(Uuid)
-                local payload = Cache[Uuid]
-                payload.LastAccessed = tick()
-
-                func(unpack(payload))
-            end)
-        end,
-
-        Wait = function(self)
-            return self.Internal.DEUSOBJECT_Properties.RBXEvent.Event:Wait()
-        end
-    },
-
-    PublicReadOnlyProperties = {
-        LastFiredTick = 0,
-    },
-
-    Constructor = function(self)
-        self.Internal.DEUSOBJECT_Properties.RBXEvent = Instance.new("BindableEvent")
-    end,
-
-    Deconstructor = function(self)
-        self.Internal.DEUSOBJECT_Properties.RBXEvent:Destroy()
-    end
-}
-
 local BindableEvent = {}
 
+BindableEvent.ClassName = "Deus.BindableEvent"
+
+BindableEvent.Extendable = true
+
+BindableEvent.Replicable = true
+
+BindableEvent.Methods = {}
+
+BindableEvent.Events = {}
+
+function BindableEvent.Methods:Fire(...)
+    Output.assert(self:IsInternalAccess(), "Attempt to fire remote from externally")
+    self.LastFiredTick = tick()
+
+    spawn(clearCache)
+
+    local Uuid = HttpService:GenerateGUID(false)
+    Cache[Uuid] = {...}
+
+    self.RBXEvent:Fire(Uuid)
+end
+
+function BindableEvent.Methods:Connect(func)
+    if not self:IsInternalAccess() then
+        self = BindableEvents[self]
+    end
+
+    return self.RBXEvent.Event:Connect(function(Uuid)
+        local payload = Cache[Uuid]
+        payload.LastAccessed = tick()
+
+        func(unpack(payload))
+    end)
+end
+
+function BindableEvent.Methods:Wait()
+    if not self:IsInternalAccess() then
+        self = BindableEvents[self]
+    end
+
+    return self.RBXEvent.Event:Wait()
+end
+
+function BindableEvent:Constructor()
+    BindableEvents[self.Proxy] = self
+    self.RBXEvent = Instance.new("BindableEvent")
+end
+
+function BindableEvent:Deconstructor()
+    BindableEvents[self.Proxy] = nil
+    self.RBXEvent:Destroy()
+end
+
 function BindableEvent:start()
-    BaseObject = self:Load("Deus.BaseObject")
     Output = self:Load("Deus.Output")
 
-    return BaseObject.new(BindableEventObjData)
+    self.PrivateProperties = {
+        RBXEvent = self:Load("Deus.Symbol").new("None")
+    }
+
+    self.PublicReadOnlyProperties = {}
+
+    self.PublicReadAndWriteProperties = {}
+
+    return self:Load("Deus.BaseObject").new(self)
 end
 
 return BindableEvent
