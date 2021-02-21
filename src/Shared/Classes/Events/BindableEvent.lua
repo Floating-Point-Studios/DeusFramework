@@ -1,4 +1,4 @@
--- TODO: Refactor to new class convention
+-- TODO: Fix bug where BindableEvents cannot be created before BaseObject is loaded
 
 local HttpService = game:GetService("HttpService")
 

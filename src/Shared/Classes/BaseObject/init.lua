@@ -232,6 +232,7 @@ function BaseObject.new(objData)
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId                     = HttpService:GenerateGUID(false):sub(1, 8) -- Only use first 8 characters to save memory
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated                  = tick()
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.IsDead                       = false
 
             -- Allows editing of properties locked externally
             -- obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods

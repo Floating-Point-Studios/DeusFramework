@@ -44,21 +44,34 @@ function Object:Reconstruct(...)
 end
 
 function Object:Destroy()
-    local deconstructor = self.Deconstructor
-    if deconstructor then
-        -- Deconstructor is allowed to return list of objects it wants destroyed
-        for _,v in pairs(deconstructor(self) or {}) do
-            Maid:GiveTask(v)
+    if not self.IsDead then
+        self.IsDead = true
+
+        local deconstructor = self.Deconstructor
+        if deconstructor then
+            -- Deconstructor is allowed to return list of objects it wants destroyed
+            for _,v in pairs(deconstructor(self) or {}) do
+                Maid:GiveTask(v)
+            end
+        end
+
+        local destroyedEvent = self.Destroyed
+        if destroyedEvent then
+            destroyedEvent:Fire()
+        end
+
+        Maid:GiveTask(self)
+        Maid:DoCleaning()
+
+        -- Clean up anything the maid missed
+        for i,v in pairs(self) do
+            if type(v) == "table" then
+                setmetatable(v, {__mode = "kv"})
+            end
+
+            self[i] = nil
         end
     end
-
-    local destroyedEvent = self.Internal.DEUSOBJECT_LockedTables.Events["Destroyed"]
-    if destroyedEvent then
-        destroyedEvent:Fire()
-    end
-
-    Maid:GiveTask(self)
-    Maid:DoCleaning()
 end
 
 -- Fires an event of the object
@@ -209,7 +222,7 @@ function Object:IsInternalAccess()
 end
 
 function Object:start()
-    Maid = self:Load("Deus.Maid")
+    Maid = self:Load("Deus.Maid").new()
     JSON = self:Load("Deus.JSON")
     Output = self:Load("Deus.Output")
     Symbol = self:Load("Deus.Symbol")
