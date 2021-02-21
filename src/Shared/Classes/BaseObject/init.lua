@@ -27,12 +27,14 @@ end
 function __index(self, i, internalAccess)
     local v
 
-    local Internal = rawget(self, "Internal")
-    local Methods = Internal.DEUSOBJECT_LockedTables.Methods
+    local Internal = self.Internal
+    -- local Methods = Internal.DEUSOBJECT_LockedTables.Methods
     local Events = Internal.DEUSOBJECT_LockedTables.Events
     local InternalProperties = Internal.DEUSOBJECT_Properties
     local ExternalReadOnlyProperties = Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
     local ExternalReadAndWriteProperties = Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
+
+    local Methods = self.ExternalReadOnly.DEUSOBJECT_Methods
 
     v = Methods[i]
     if v ~= nil then
@@ -73,12 +75,15 @@ function __newindex(self, i, v, internalAccess)
         v = Symbol.new("None") 
     end
 
-    local Internal = rawget(self, "Internal")
-    local Methods = Internal.DEUSOBJECT_LockedTables.Methods
+    local Internal = self.Internal
+    -- local Methods = Internal.DEUSOBJECT_LockedTables.Methods
     local Events = Internal.DEUSOBJECT_LockedTables.Events
     local InternalProperties = Internal.DEUSOBJECT_Properties
     local ExternalReadOnlyProperties = Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties
     local ExternalReadAndWriteProperties = Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties
+
+    --[[
+    No more editing methods after object is created
 
     oldv = Methods[i]
     if oldv ~= nil then
@@ -89,6 +94,7 @@ function __newindex(self, i, v, internalAccess)
         end
         return true
     end
+    ]]
 
     if Events[i] ~= nil then
         Output.error("Events cannot be modified after object creation")
@@ -132,7 +138,8 @@ end
 local BaseObject = {}
 
 function BaseObject.new(objData)
-    objData.ClassName = objData.ClassName or ("Deus.UnnamedObject [%s]"):format(HttpService:GenerateGUID(false))
+    objData.ClassName   = objData.ClassName or ("Deus.UnnamedObject [%s]"):format(HttpService:GenerateGUID(false):sub(1, 8))
+    objData.Methods     = objData.Methods or {}
 
     if objData.Superclass then
         setmetatable(objData.Methods, {__index = objData.Superclass.Methods})
@@ -149,6 +156,8 @@ function BaseObject.new(objData)
         Replicable                  = objData.Replicable or true,
         Superclass                  = objData.Superclass or "BaseObject",
 
+        Methods                     = TableUtils.lock(objData.Methods), -- Methods table cannot be edited even with internal access
+
         Constructor                 = objData.Constructor,
         Deconstructor               = objData.Deconstructor
     }
@@ -157,10 +166,6 @@ function BaseObject.new(objData)
         -- Constructor = objData.Constructor,
 
         Metadata                        = Metadata,
-
-        ClassName                       = objData.ClassName,
-
-        Methods                         = objData.Methods or {},
 
         PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
         PublicReadOnlyProperties        = objData.PublicReadOnlyProperties or {},
@@ -182,7 +187,7 @@ function BaseObject.new(objData)
                 },
 
                 ExternalReadOnly = {
-                    DEUSOBJECT_Methods                  = objData.Methods or {},
+                    DEUSOBJECT_Methods                  = Metadata.Methods,
                     DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
                     DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
                     DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
@@ -220,18 +225,18 @@ function BaseObject.new(objData)
             -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ClassName            = objData.ClassName
             -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Extendable           = objData.Extendable or true
             -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
-            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId             = HttpService:GenerateGUID(false)
-            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated          = tick()
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId                     = HttpService:GenerateGUID(false):sub(1, 8) -- Only use first 8 characters to save memory
+            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated                  = tick()
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
 
             -- Allows editing of properties locked externally
-            obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods
+            -- obj.Internal.DEUSOBJECT_LockedTables.Methods                            = obj.ExternalReadOnly.DEUSOBJECT_Methods
             obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties                 = obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties
             obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties             = obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties
             obj.Internal.DEUSOBJECT_LockedTables.Events                             = obj.ExternalReadOnly.DEUSOBJECT_Events
 
             -- Locks properties to be only readable externally
-            obj.ExternalReadOnly.DEUSOBJECT_Methods                                 = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Methods)
+            -- obj.ExternalReadOnly.DEUSOBJECT_Methods                                 = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Methods)
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties                      = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties)
             obj.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
             obj.ExternalReadOnly.DEUSOBJECT_Events                                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Events)

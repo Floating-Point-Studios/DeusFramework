@@ -95,7 +95,7 @@ function Object:GetPropertyChangedSignal(eventName, func)
 end
 
 function Object:GetMethods()
-    return self.Internal.DEUSOBJECT_LockedTables.Methods:GetKeys()
+    return self.ExternalReadOnly.DEUSOBJECT_Methods:GetKeys()
 end
 
 -- TODO: Check if this allows external access to fire events

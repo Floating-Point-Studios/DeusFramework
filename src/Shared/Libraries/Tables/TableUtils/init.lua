@@ -137,10 +137,7 @@ end
 
 function TableUtils:start()
     Output = self:Load("Deus.Output")
-end
 
-function TableUtils:init()
-    TableUtils.lock = self:WrapModule(script.LockedTable).new
+    TableUtils.lock = self:WrapModule(script.LockedTable, true, true).new
 end
-
 return TableUtils
