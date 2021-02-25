@@ -69,9 +69,13 @@ end
 function LoaderMeta:WrapModule(module, init, start)
     module = require(module)
 
+    --[[
     module.Load = LoaderMeta.Load
     module.WrapModule = LoaderMeta.WrapModule
     module.Register = LoaderMeta.Register
+    ]]
+
+    setmetatable(module, {__index = LoaderMeta})
 
     if module.init then
         if init then
