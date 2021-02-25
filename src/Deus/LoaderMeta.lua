@@ -1,3 +1,4 @@
+local Packages = {}
 local Modules = {}
 
 function __newindex()
@@ -75,17 +76,27 @@ function LoaderMeta:WrapModule(module, init, start)
     module.Register = LoaderMeta.Register
     ]]
 
-    setmetatable(module, {__index = LoaderMeta})
+    -- Module metadata, uses underscore to try to avoid name collision
+    local moduleData = {}
+
+    -- If the MainModule is Deus itself then leave it nil
+    if self ~= LoaderMeta then
+        moduleData._MainModule = self
+    end
+
+    setmetatable(module, {__index = setmetatable(moduleData, {__index = LoaderMeta})})
 
     if module.init then
         if init then
             module:init()
             module.init = nil
+            moduleData._InitTick = tick()
         else
             local moduleInit = module.init
             module.init = function()
                 moduleInit(module)
                 module.init = nil
+                moduleData._InitTick = tick()
             end
         end
     end
@@ -99,11 +110,13 @@ function LoaderMeta:WrapModule(module, init, start)
             end
 
             module.start = nil
+            moduleData._StartTick = tick()
         else
             local moduleStart = module.start
 
             module.start = function()
                 module.start = nil
+                moduleData._StartTick = tick()
                 return moduleStart(module)
             end
         end
@@ -114,6 +127,10 @@ end
 
 function LoaderMeta:Register(instance, moduleName)
     moduleName = moduleName or instance.Name
+
+    if not table.find(Packages, moduleName) then
+        table.insert(Packages, moduleName)
+    end
 
     if instance:IsA("ModuleScript") then
         Modules[moduleName] = LoaderMeta:WrapModule(instance, true)
@@ -165,6 +182,38 @@ function LoaderMeta:Register(instance, moduleName)
             end
         end
     end
+end
+
+-- Checks if path is registered
+function LoaderMeta:IsRegistered(path)
+    local splitPath = string.split(path, ".")
+
+    if #splitPath == 1 then
+        if table.find(Packages, splitPath[1]) then
+            return true
+        end
+    else
+        if Modules[path] then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Returns the module which wrapped it, if the module is not a submodule it will return Deus
+function LoaderMeta:GetMainModule()
+    return self._MainModule
+end
+
+-- Returns when the module was initiated
+function LoaderMeta:GetInitTick()
+    return self._InitTick
+end
+
+-- Returns when the module was started
+function LoaderMeta:GetStartTick()
+    return self._StartTick
 end
 
 return LoaderMeta
