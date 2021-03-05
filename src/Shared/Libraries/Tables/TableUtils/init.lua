@@ -53,7 +53,7 @@ function TableUtils.unpack(...)
     local packedTab = {}
     for _,tab in pairs({...}) do
         for _,v in pairs(tab) do
-            table.insert(tab, v)
+            table.insert(packedTab, v)
         end
     end
     return unpack(packedTab)
