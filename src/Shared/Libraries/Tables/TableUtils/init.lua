@@ -155,9 +155,6 @@ function TableUtils.instanceAsNewIndex(obj)
     end
 end
 
-TableUtils.avg = TableUtils.average
-TableUtils.substitute = TableUtils.sub
-
 function TableUtils:start()
     Output = self:Load("Deus.Output")
 

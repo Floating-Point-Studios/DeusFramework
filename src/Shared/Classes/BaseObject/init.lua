@@ -1,4 +1,4 @@
--- TODO: Add way to detect when new object is created
+-- TODO: Refactor to use 'Proxy'
 
 --[[
     For documentation refer to here:
@@ -10,7 +10,7 @@ local HttpService = game:GetService("HttpService")
 
 local Output
 local Symbol
-local TableProxy
+local Proxy
 local TableUtils
 local InstanceUtils
 local BindableEvent
@@ -26,7 +26,8 @@ function __tostring(self)
     return ("[DeusObject] [%s] [%s]"):format(self.ClassName, self.ObjectId)
 end
 
-function __index(self, i, internalAccess)
+function __index(self, i)
+    local internalAccess = type(self) == "table"
     local v
 
     local Internal = self.Internal
@@ -71,7 +72,8 @@ function __index(self, i, internalAccess)
     return nil
 end
 
-function __newindex(self, i, v, internalAccess)
+function __newindex(self, i, v)
+    local internalAccess = type(self) == "table"
     local oldv
     if v == nil then
         v = Symbol.new("None") 
@@ -179,9 +181,11 @@ function BaseObject.new(objData)
 
         new = function(...)
             local obj = {
+                --[[
                 __tostring  = __tostring,
                 __index     = __index,
                 __newindex  = __newindex,
+                ]]
 
                 Internal = {
                     DEUSOBJECT_Properties = TableUtils.deepCopy(objData.PrivateProperties or {}),
@@ -249,7 +253,14 @@ function BaseObject.new(objData)
             -- Inherit class metadata
             setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = metadata})
 
-            obj = TableProxy.new(obj)
+            obj = Proxy.new(
+                obj,
+                {
+                    __index = __index,
+                    __newindex = __newindex,
+                    __tostring = __tostring
+                }
+            )
 
             if objData.Constructor then
                 objData.Constructor(obj, ...)
@@ -273,10 +284,7 @@ function BaseObject.new(objData)
             -- ObjectService:TrackObject(obj)
 
             -- Due to ObjectService being moved to Cardinal this event is now how Cardinal detects when a new object is created
-            -- TODO: Remove if-statement once events are refactored
-            if NewObjectEvent then
-                NewObjectEvent:Fire(obj.Proxy)
-            end
+            NewObjectEvent:Fire(obj.Proxy)
 
             return obj
         end
@@ -326,7 +334,7 @@ end
 function BaseObject:start()
     Output = self:Load("Deus.Output")
     Symbol = self:Load("Deus.Symbol")
-    TableProxy = self:Load("Deus.TableProxy")
+    Proxy = self:Load("Deus.Proxy")
     TableUtils = self:Load("Deus.TableUtils")
     InstanceUtils = self:Load("Deus.InstanceUtils")
     BindableEvent = self:Load("Deus.BindableEvent")

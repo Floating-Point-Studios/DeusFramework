@@ -1,89 +1,78 @@
--- TODO: Fix bug where BindableEvents cannot be created before BaseObject is loaded
-
 local HttpService = game:GetService("HttpService")
 
+local Proxy
 local Output
 
-local BindableEvents = setmetatable({}, {__mode = "v"})
--- BindableEvents do not support userdata types made from newproxy() so instead we cache the payload and send a Uuid to retrieve the payload
-local Cache = {}
+-- We use this BindableEvent to immediately spawn a new thread
+local RBXBindableEvent = Instance.new("BindableEvent")
+-- Roblox doesn't allow us to send proxies through events for some reason so we cache the arguments
+local RBXEventArgs = {}
 
-function clearCache()
-    local time = tick()
-    for i,v in pairs(Cache) do
-        if v.LastAccessed and time - v.LastAccessed > 0.5 then
-            Cache[i] = nil
+local BindableEvent = {}
+
+function BindableEvent.new()
+    return Proxy.new(
+        {
+            Connections = {},
+            LastFired = 0,
+        },
+        {
+            __index = BindableEvent
+        }
+    )
+end
+
+function BindableEvent:Connect(func)
+    local connections = self.Connections
+    local eventConnection = {
+        EventId = HttpService:GenerateGUID(false),
+        Connected = true
+    }
+
+    -- Simulate a connection signal
+    function eventConnection:Disconnect()
+        eventConnection.Connected = false
+        table.remove(connections, table.find(connections, func))
+    end
+
+    table.insert(connections, func)
+
+    return eventConnection
+end
+
+function BindableEvent:Wait()
+    while true do
+        local args = {RBXBindableEvent.Event:Wait()}
+        if args[1] == self.EventId then
+            return unpack(RBXEventArgs[args[3]])
         end
     end
 end
 
-local BindableEvent = {}
+-- Mimics a object without actually using one
+function BindableEvent:Fire(...)
+    Output.assert(typeof(self) == "table", "Attempt to fire event from externally")
 
-BindableEvent.ClassName = "Deus.BindableEvent"
+    local argsId = HttpService:GenerateGUID(false)
+    RBXEventArgs[argsId] = {...}
 
-BindableEvent.Extendable = true
-
-BindableEvent.Replicable = true
-
-BindableEvent.Methods = {}
-
-BindableEvent.Events = {}
-
-function BindableEvent.Methods:Fire(...)
-    Output.assert(self:IsInternalAccess(), "Attempt to fire remote from externally")
-    self.LastFiredTick = tick()
-
-    spawn(clearCache)
-
-    local Uuid = HttpService:GenerateGUID(false)
-    Cache[Uuid] = {...}
-
-    self.RBXEvent:Fire(Uuid)
-end
-
-function BindableEvent.Methods:Connect(func)
-    if not self:IsInternalAccess() then
-        self = BindableEvents[self]
+    for _,v in pairs(self.Connections) do
+        RBXBindableEvent:Fire(self.EventId, v, argsId)
     end
-
-    return self.RBXEvent.Event:Connect(function(Uuid)
-        local payload = Cache[Uuid]
-        payload.LastAccessed = tick()
-
-        func(unpack(payload))
-    end)
-end
-
-function BindableEvent.Methods:Wait()
-    if not self:IsInternalAccess() then
-        self = BindableEvents[self]
-    end
-
-    return self.RBXEvent.Event:Wait()
-end
-
-function BindableEvent:Constructor()
-    BindableEvents[self.Proxy] = self
-    self.RBXEvent = Instance.new("BindableEvent")
-end
-
-function BindableEvent:Deconstructor()
-    BindableEvents[self.Proxy] = nil
-    self.RBXEvent:Destroy()
+    self.LastFired = tick()
 end
 
 function BindableEvent:start()
+    Proxy = self:Load("Deus.Proxy")
     Output = self:Load("Deus.Output")
+end
 
-    self.PrivateProperties = {
-        RBXEvent = self:Load("Deus.Symbol").new("None")
-    }
-
-    self.PublicReadOnlyProperties = {}
-
-    self.PublicReadAndWriteProperties = {}
-
-    return self:Load("Deus.BaseObject").new(self)
+function BindableEvent:init()
+    RBXBindableEvent.Event:Connect(function(_, func, argsId)
+        local args = RBXEventArgs[argsId]
+        RBXEventArgs[argsId] = nil
+        func(unpack(args))
+    end)
 end
 
 return BindableEvent
