@@ -37,7 +37,7 @@ function Object:Reconstruct(...)
     if constructor then
         constructor(self, ...)
     else
-        Output.Output.error("Object class '%s' does not have any constructor parameters", self.ClassName)
+        Output.error("Object class '%s' does not have any constructor parameters", self.ClassName)
     end
 
     return self
@@ -108,17 +108,17 @@ end
 
 -- TODO: Check if this allows external access to fire events
 function Object:GetEvents()
-    return self.Internal.DEUSOBJECT_LockedTables.Events:GetKeys()
+    return TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.Events)
 end
 
 -- Returns all public properties
 function Object:GetReadableProperties()
-    return {TableUtils.unpack(self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties:GetKeys(), self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties:GetKeys())}
+    return {TableUtils.unpack(TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties), TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties))}
 end
 
 -- Returns all public properties that can be edited without internal access
 function Object:GetWritableProperties()
-    return self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties:GetKeys()
+    return TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
 end
 
 -- Attempts to serialize the object
@@ -134,7 +134,7 @@ function Object:SerializeProperties()
 end
 
 function Object:Hash()
-    return StringUtils.hash(self:SerializeProperties())
+    return tostring(StringUtils.hash(self:SerializeProperties()))
 end
 
 local function cleanupPropertyReplication(self)

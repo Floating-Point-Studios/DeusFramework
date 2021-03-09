@@ -114,3 +114,23 @@ script.Parent.Shared:Clone().Parent = Client
 
 Client.Parent = ReplicatedFirst
 DeusCore.Parent = ReplicatedStorage
+
+-- TestEZ Studio-Only Test
+if game:GetService("RunService"):IsStudio() then
+    local Specs = ReplicatedStorage:WaitForChild("deus-specs")
+    local TestEZ = ReplicatedStorage:WaitForChild("TestEZ")
+	if Specs and TestEZ then
+        TestEZ = require(TestEZ)
+
+        local extraOptions = {
+            showTimingInfo = true,
+            testNamePattern = nil,
+            extraEnvironment = {
+                Deus = Deus
+            }
+        }
+
+        TestEZ.TestBootstrap:run(Specs.Server:GetDescendants(), nil, extraOptions)
+        TestEZ.TestBootstrap:run(Specs.Shared:GetDescendants(), nil, extraOptions)
+    end
+end

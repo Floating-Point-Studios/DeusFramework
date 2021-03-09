@@ -25,6 +25,26 @@ if DeusSettings.AttachToShared then
     shared.Deus = Deus
 end
 
+-- TestEZ Studio-Only Test
+if game:GetService("RunService"):IsStudio() then
+    local Specs = ReplicatedStorage:WaitForChild("deus-specs")
+    local TestEZ = ReplicatedStorage:WaitForChild("TestEZ")
+	if Specs and TestEZ then
+        TestEZ = require(TestEZ)
+
+        local extraOptions = {
+            showTimingInfo = true,
+            testNamePattern = nil,
+            extraEnvironment = {
+                Deus = Deus
+            }
+        }
+
+        TestEZ.TestBootstrap:run(Specs.Client:GetDescendants(), nil, extraOptions)
+        TestEZ.TestBootstrap:run(Specs.Shared:GetDescendants(), nil, extraOptions)
+    end
+end
+
 --[[
 Outsourced to Cardinal
 

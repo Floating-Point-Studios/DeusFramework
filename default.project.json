@@ -3,6 +3,18 @@
   "tree": {
     "$className": "DataModel",
 
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+
+      "deus-specs": {
+        "$path": "specs"
+      },
+
+      "TestEZ": {
+        "$path": "TestEZ"
+      }
+    },
+
     "ServerScriptService": {
       "$className": "ServerScriptService",
 

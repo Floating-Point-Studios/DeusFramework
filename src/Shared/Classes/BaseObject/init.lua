@@ -69,6 +69,11 @@ function __index(self, i)
         return v
     end
 
+    v = rawget(self, i)
+    if internalAccess then
+        return v
+    end
+
     return nil
 end
 
