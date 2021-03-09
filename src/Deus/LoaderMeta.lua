@@ -201,11 +201,6 @@ function LoaderMeta:IsRegistered(path)
     return false
 end
 
--- Returns Loader once finished loading
-function LoaderMeta:Wait()
-    return LoaderMeta
-end
-
 -- Returns the module which wrapped it, if the module is not a submodule it will return Deus
 function LoaderMeta:GetMainModule()
     return self._MainModule

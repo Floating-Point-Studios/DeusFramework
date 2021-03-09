@@ -273,7 +273,10 @@ function BaseObject.new(objData)
             -- ObjectService:TrackObject(obj)
 
             -- Due to ObjectService being moved to Cardinal this event is now how Cardinal detects when a new object is created
-            NewObjectEvent:Fire(obj.Proxy)
+            -- TODO: Remove if-statement once events are refactored
+            if NewObjectEvent then
+                NewObjectEvent:Fire(obj.Proxy)
+            end
 
             return obj
         end
