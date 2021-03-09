@@ -153,7 +153,7 @@ function BaseObject.new(objData)
 
     table.insert(ClassList, objData.ClassName)
 
-    local Metadata = {
+    local metadata = {
         ClassName                   = objData.ClassName,
 
         Extendable                  = objData.Extendable or true,
@@ -166,10 +166,10 @@ function BaseObject.new(objData)
         Deconstructor               = objData.Deconstructor
     }
 
-    local ClassData = {
+    local classData = {
         -- Constructor = objData.Constructor,
 
-        -- Metadata                        = Metadata,
+        -- metadata                        = metadata,
 
         PublicReadAndWriteProperties    = objData.PublicReadAndWriteProperties or {},
         PublicReadOnlyProperties        = objData.PublicReadOnlyProperties or {},
@@ -191,7 +191,7 @@ function BaseObject.new(objData)
                 },
 
                 ExternalReadOnly = {
-                    DEUSOBJECT_Methods                  = Metadata.Methods,
+                    DEUSOBJECT_Methods                  = metadata.Methods,
                     DEUSOBJECT_ReadOnlyProperties       = TableUtils.deepCopy(objData.PublicReadOnlyProperties or {}),
                     DEUSOBJECT_ReadAndWriteProperties   = TableUtils.deepCopy(objData.PublicReadAndWriteProperties or {}),
                     DEUSOBJECT_Events                   = TableUtils.shallowCopy(objData.Events or {}),
@@ -247,7 +247,7 @@ function BaseObject.new(objData)
             obj.ExternalReadOnly.DEUSOBJECT_Events                                  = TableUtils.lock(obj.Internal.DEUSOBJECT_LockedTables.Events)
 
             -- Inherit class metadata
-            setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = Metadata})
+            setmetatable(obj.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties, {__index = metadata})
 
             obj = TableProxy.new(obj)
 
@@ -272,24 +272,22 @@ function BaseObject.new(objData)
 
             -- ObjectService:TrackObject(obj)
 
-            -- Due to ObjectService being moved to Cardinal this event is now how Cardinal detects when a new object is created (we cannot fire for BaseObject's own BindableEvents)
-            if NewObjectEvent then
-                NewObjectEvent:Fire(obj.Proxy)
-            end
+            -- Due to ObjectService being moved to Cardinal this event is now how Cardinal detects when a new object is created
+            NewObjectEvent:Fire(obj.Proxy)
 
             return obj
         end
     }
 
-    -- Set ClassData metatable
-    ClassData = setmetatable(ClassData, {__index = Metadata})
+    -- Set classData metatable
+    classData = setmetatable(classData, {__index = metadata})
 
     -- Fire NewClass event (we cannot fire for the first class which is BindableEvent)
     if NewClassEvent then
-        NewClassEvent:Fire(TableUtils.lock(ClassData))
+        NewClassEvent:Fire(TableUtils.lock(classData))
     end
 
-    return ClassData
+    return classData
 end
 
 -- Creates a class without events, methods are automatically setup, and all properties are set to Public Read & Write

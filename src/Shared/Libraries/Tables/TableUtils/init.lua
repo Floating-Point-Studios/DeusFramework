@@ -37,6 +37,26 @@ function TableUtils.getValues(tab)
     return values
 end
 
+function TableUtils.isEmpty(tab)
+    for _ in pairs(tab) do
+        return false
+    end
+    return true
+end
+
+-- Behaves differently from table.create(), if the value is a empty table then the tables will not share the same memory address
+function TableUtils.create(count, value)
+    if type(value) == "table" and TableUtils.isEmpty(value) then
+        local tab = {}
+        for _ = 1, count do
+            table.insert(tab, {})
+        end
+        return tab
+    else
+        return table.create(count, value)
+    end
+end
+
 -- Merges dictionaries together, for merging arrays use {TableUtils.unpack(...)}
 function TableUtils.merge(...)
     local mergedTab = {}
@@ -134,6 +154,9 @@ function TableUtils.instanceAsNewIndex(obj)
         end
     end
 end
+
+TableUtils.avg = TableUtils.average
+TableUtils.substitute = TableUtils.sub
 
 function TableUtils:start()
     Output = self:Load("Deus.Output")

@@ -1,4 +1,3 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local DeusSettingsModule = ReplicatedStorage:WaitForChild("DeusSettings")
