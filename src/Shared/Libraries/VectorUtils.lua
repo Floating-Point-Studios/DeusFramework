@@ -43,4 +43,6 @@ function VectorUtils.angle(v1, v2)
     return math.acos(v1:Dot(v2) / (v1.Magnitude * v2.Magnitude))
 end
 
+VectorUtils.clamp = VectorUtils.clampVector
+
 return VectorUtils

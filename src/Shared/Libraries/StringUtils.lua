@@ -60,8 +60,10 @@ function StringUtils.sub(str, subStart, subEnd)
         subEnd %= strLength
     end
 
-    return str:sub(str, subStart, subEnd)
+    return str:sub(subStart, subEnd)
 end
+
+StringUtils.replace = StringUtils.replaceAt
 
 function StringUtils:start()
     TableUtils = self:Load("Deus.TableUtils")

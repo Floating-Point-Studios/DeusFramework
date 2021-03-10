@@ -1,5 +1,7 @@
 -- Based on https://github.com/Roblox/roact/blob/master/src/Symbol.lua
 
+-- TODO: Allow symbols from Deus to work with symbols from other popular projects
+
 local Symbols = {}
 
 function __tostring(self)
@@ -21,7 +23,7 @@ function Symbol.new(name)
     metatable.__metatable = "[Symbol] Locked metatable"
     metatable.__type = name
 
-    Symbols[name] = symbol
+    Symbols[name] = self
     Symbols[self] = metatable
 
     return self
