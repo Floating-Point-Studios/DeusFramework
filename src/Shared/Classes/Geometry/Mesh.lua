@@ -140,6 +140,8 @@ end
 
 -- Creates a new vertex and returns the VertexId
 function Mesh.Methods:AddVertex(pos)
+    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos)
+
     local vertexId = self.VerticesVec3[pos]
     if vertexId then
         return vertexId
@@ -205,6 +207,7 @@ function Mesh.Methods:SetVertexPosition(vertexId, pos)
     local vertex = self.Vertices[vertexId]
 
     Output.assert(vertex, "VertexId '%s' is not a vertex", vertexId)
+    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos)
 
     vertex.Position = pos
 end
@@ -241,6 +244,9 @@ end
 
 -- Returns vertices within the radius of the given position
 function Mesh.Methods:GetVerticesInRadius(pos, radius)
+    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos)
+    Output.assert(type(radius) == "number", "'%s' is not a number", radius)
+
     local vertices = {}
 
     for _,vertex in pairs(self.Vertices) do
@@ -254,6 +260,8 @@ end
 
 -- Returns vertices in order of distance of the given position
 function Mesh.Methods:GetVerticesByDistance(pos)
+    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos)
+
     local vertices = TableUtils.getValues(self.Vertices)
 
     table.sort(vertices, function(a, b)
@@ -309,15 +317,23 @@ function Mesh.Methods:Translate(vec3)
         vec3 = Vector3.new(vec3, vec3, vec3)
     end
 
+    Output.assert(typeof(vec3) == "Vector3", "'%s' is not a Vector3", vec3)
+
     for _,vertex in pairs(self.Vertices) do
         self:SetVertexPosition(vertex.VertexId, vertex.Position + vec3)
     end
+
+    return self
 end
 
 function Mesh.Methods:Scale(vec3)
+    Output.assert(typeof(vec3) == "Vector3" or type(vec3) == "number", "'%s' is not a Vector3 or number", vec3)
+
     for _,vertex in pairs(self.Vertices) do
         self:SetVertexPosition(vertex.VertexId, vertex.Position * vec3)
     end
+
+    return self
 end
 
 function Mesh:start()

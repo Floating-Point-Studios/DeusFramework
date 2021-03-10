@@ -5,7 +5,14 @@ local Output
 local InstanceUtils = {}
 
 function InstanceUtils.anchor(obj, state)
-    Output.assert(state ~= nil and type(state) == "boolean", "Expected boolean as 2nd argument")
+    if state == nil then
+        state = true
+    end
+
+    if obj:IsA("BasePart") then
+        obj.Anchored = true
+    end
+
     for _,part in pairs(obj:GetDescendants()) do
         if part:IsA("BasePart") then
             part.Anchored = state

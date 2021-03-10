@@ -1,3 +1,5 @@
+-- TODO: Make DataType's into their own thing separate from BaseObject
+
 local Output
 
 local None

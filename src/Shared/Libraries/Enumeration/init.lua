@@ -18,17 +18,24 @@ Enumeration.__index = function(_, i)
 end
 
 function Enumeration.addEnumItem(enumName, enumItemName, value)
-    Enums[enumName][enumItemName] = CustomEnum.new(enumItemName, enumName, value)
+    Output.assert(not Enums[enumName][enumItemName], "EnumItem name '%s' already in use", enumName)
+
+    local enum = CustomEnum.new(enumItemName, enumName, value)
+    Enums[enumName][enumItemName] = enum
+    return enum
 end
 
 function Enumeration.addEnum(enumName, list)
     Output.assert(not Enums[enumName], "Enum name '%s' already in use", enumName)
+    Output.assert(not Enumeration[enumName], "Enum name '%s' is reserved", enumName)
 
     Enums[enumName] = {}
 
     for i,v in pairs(list) do
         Enumeration.addEnumItem(enumName, i, v)
     end
+
+    Enumeration[enumName] = TableUtils.lock(Enums[enumName])
 
     return Enums[enumName]
 end
@@ -41,6 +48,10 @@ function Enumeration.waitForEnum(enumName)
     Output.assert(enum, "Enum name '%s' could not be found", enumName)
     return enum
 end
+
+Enumeration.add     = Enumeration.addEnum
+Enumeration.addItem = Enumeration.addItem
+Enumeration.wait    = Enumeration.waitForEnum
 
 function Enumeration:start()
     Output = self:Load("Deus.Output")

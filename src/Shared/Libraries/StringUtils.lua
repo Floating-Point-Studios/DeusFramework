@@ -37,7 +37,7 @@ end
 
 function StringUtils.hash(str)
     local bytes = TableUtils.sum({string.byte(str, 1, #str)})
-    return Random.new(bytes):NextInteger(10000000, 99999999)
+    return tostring(Random.new(bytes):NextInteger(10000000, 99999999))
 end
 
 function StringUtils.reverseSub(str, subStart, subEnd)
