@@ -1,27 +1,6 @@
 {
-  "name": "DeusFramework",
-  "tree": {
-    "$className": "DataModel",
-
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-
-      "deus-specs": {
-        "$path": "specs"
-      },
-
-      "TestEZ": {
-        "$path": "TestEZ"
-      }
-    },
-
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-
-      "deus-framework": {
+    "name": "DeusFramework",
+    "tree": {
         "$path": "src"
-      }
     }
-
-  }
 }
