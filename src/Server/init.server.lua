@@ -117,8 +117,8 @@ DeusCore.Parent = ReplicatedStorage
 
 -- TestEZ Studio-Only Test
 if game:GetService("RunService"):IsStudio() then
-    local Specs = ReplicatedStorage:WaitForChild("deus-specs")
-    local TestEZ = ReplicatedStorage:WaitForChild("TestEZ")
+    local Specs = ReplicatedStorage:FindFirstChild("deus-specs")
+    local TestEZ = ReplicatedStorage:FindFirstChild("TestEZ")
 	if Specs and TestEZ then
         TestEZ = require(TestEZ)
 
