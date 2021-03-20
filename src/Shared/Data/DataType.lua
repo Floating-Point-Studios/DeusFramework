@@ -85,6 +85,10 @@ local function __newindex(self, i, newValue)
     Output.error("%s is not a valid member of %s", {i, self.__type}, 1)
 end
 
+local function __tostring(self)
+    return "[DataType] ".. self.__type
+end
+
 local DataType = {}
 
 function DataType.new(typeData)
@@ -106,6 +110,7 @@ function DataType.new(typeData)
 
     typeData.Metamethods.__index        = __index
     typeData.Metamethods.__newindex     = __newindex
+    typeData.Metamethods.__tostring     = typeData.Metamethods.__tostring or __tostring
 
     local dataTypeData = {
         new = function(...)
