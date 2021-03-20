@@ -55,7 +55,7 @@ function __index(self, i)
 
     v = InternalProperties[i]
     if v ~= nil then
-        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to read internal property", ExternalReadOnlyProperties.ClassName)
+        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to read internal property", ExternalReadOnlyProperties.ClassName, 1)
         return v
     end
 
@@ -106,13 +106,13 @@ function __newindex(self, i, v)
     ]]
 
     if Events[i] ~= nil then
-        Output.error("Events cannot be modified after object creation")
+        Output.error("Events cannot be modified after object creation", nil, 1)
         return false
     end
 
     oldv = InternalProperties[i]
     if oldv ~= nil then
-        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName)
+        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify internal property", ExternalReadOnlyProperties.ClassName, 1)
         InternalProperties[i] = v
         --[[
         if Events.Changed then
@@ -124,7 +124,7 @@ function __newindex(self, i, v)
 
     oldv = ExternalReadOnlyProperties[i]
     if oldv ~= nil then
-        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify read-only property", ExternalReadOnlyProperties.ClassName)
+        Output.assert(internalAccess, "[DeusObject] [%s] Attempt to modify read-only property", ExternalReadOnlyProperties.ClassName, 1)
         ExternalReadOnlyProperties[i] = v
         if Events.Changed then
             Events.Changed:Fire(i, v, oldv)
@@ -152,7 +152,7 @@ function BaseObject.new(objData)
 
     local superclass = objData.Superclass
     if superclass then
-        Output.assert(superclass.Extendable, "Superclass '%s' is not extendable", superclass.ClassName)
+        Output.assert(superclass.Extendable, "Superclass '%s' is not extendable", superclass.ClassName, 1)
         setmetatable(objData.Methods, {__index = superclass.Methods})
     else
         setmetatable(objData.Methods, {__index = BaseObjectSuperclass})

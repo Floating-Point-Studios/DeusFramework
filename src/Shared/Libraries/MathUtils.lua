@@ -42,7 +42,7 @@ end
 
 function MathUtils.lerp(a, b, c)
     local typeA, typeB = typeof(a), typeof(b)
-    Output.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", typeA, typeB)
+    Output.assert(typeA == typeB, "Type mismatch between %s and %s, same type expected", {typeA, typeB}, 1)
 
     if typeA == "CFrame" then
         return a:Lerp(b, c)

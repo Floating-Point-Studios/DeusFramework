@@ -74,7 +74,7 @@ end
 
 function Wireframe.Methods:Update()
     local mesh = self.Mesh
-    Output.assert(mesh ~= None, "Mesh has not been set to Wireframe")
+    Output.assert(mesh ~= None, "Mesh has not been set to Wireframe", nil, 1)
 
     if self.ShowVertices then
         local i = 1

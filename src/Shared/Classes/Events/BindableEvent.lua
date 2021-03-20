@@ -51,7 +51,7 @@ end
 
 -- Mimics a object without actually using one
 function BindableEvent:Fire(...)
-    Output.assert(typeof(self) == "table", "Attempt to fire event from externally")
+    Output.assert(typeof(self) == "table", "Attempt to fire event from externally", nil, 1)
 
     local argsId = HttpService:GenerateGUID(false)
     RBXEventArgs[argsId] = {...}

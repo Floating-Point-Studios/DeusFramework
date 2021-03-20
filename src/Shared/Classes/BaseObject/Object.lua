@@ -31,13 +31,13 @@ end
 
 -- Runs constructor again to reset the object, useful for re-using instead of destroying objects
 function Object:Reconstruct(...)
-    Output.assert(self:IsInternalAccess(), "Object can only be reconstructed with internal access")
+    Output.assert(self:IsInternalAccess(), "Object can only be reconstructed with internal access", nil, 1)
 
     local constructor = self.Constructor
     if constructor then
         constructor(self, ...)
     else
-        Output.error("Object class '%s' does not have any constructor parameters", self.ClassName)
+        Output.error("Object class '%s' does not have any constructor parameters", self.ClassName, 1)
     end
 
     return self
@@ -76,8 +76,8 @@ end
 
 -- Fires an event of the object
 function Object:FireEvent(eventName, ...)
-    Output.assert(self:IsInternalAccess(), "Object events can only be fired with internal access")
-    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
+    Output.assert(self:IsInternalAccess(), "Object events can only be fired with internal access", nil, 1)
+    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName}, 1)
     self.Internal.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
 
     return self
@@ -85,7 +85,7 @@ end
 
 -- Returns a ScriptSignalConnection for a specific property
 function Object:GetPropertyChangedSignal(eventName, func)
-    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName})
+    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event '%s' is not a valid member of '%s'", {eventName, self.ClassName}, 1)
     local event = Instance.new("BindableEvent")
     local proxySignal = event.Event:Connect(func)
     local mainSignal
@@ -149,6 +149,7 @@ local function cleanupPropertyReplication(self)
     end
 end
 
+--[[
 function Object:ReplicateProperties(obj)
     Output.assert(self:IsInternalAccess(), "Object replication can only be set internally")
 
@@ -216,6 +217,7 @@ function Object:ReplicateProperties(obj)
 
     return self
 end
+]]
 
 function Object:IsInternalAccess()
     return typeof(self) ~= "userdata"
