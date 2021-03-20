@@ -21,10 +21,10 @@ function Array2D:Constructor(x, y)
 end
 
 function Array2D.Methods:Multiset(x0, y0, x1, y1, v)
-    Output.assert(x0 >= 1 and x0 <= self.Size.X, "Argument #1 is out of bounds")
-    Output.assert(y0 >= 1 and y0 <= self.Size.Y, "Argument #2 is out of bounds")
-    Output.assert(x1 >= 1 and x1 <= self.Size.X, "Argument #3 is out of bounds")
-    Output.assert(y1 >= 1 and y1 <= self.Size.Y, "Argument #4 is out of bounds")
+    Output.assert(x0 >= 1 and x0 <= self.Size.X, "Argument #1 is out of bounds", nil, 1)
+    Output.assert(y0 >= 1 and y0 <= self.Size.Y, "Argument #2 is out of bounds", nil, 1)
+    Output.assert(x1 >= 1 and x1 <= self.Size.X, "Argument #3 is out of bounds", nil, 1)
+    Output.assert(y1 >= 1 and y1 <= self.Size.Y, "Argument #4 is out of bounds", nil, 1)
 
     for x = x0, x1 do
         for y = y0, y1 do

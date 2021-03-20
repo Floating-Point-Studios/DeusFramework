@@ -10,7 +10,13 @@ local None
 local NewDataTypeEvent
 
 local function __index(self, i)
-    local v = self.__publicValues[i]
+    local publicValues      = rawget(self, "__publicValues")
+    local readOnlyValues    = rawget(self, "__readOnlyValues")
+    local methods           = rawget(self, "__methods")
+    local index             = rawget(self, "__userindex")
+    local type              = rawget(self, "__type")
+
+    local v = publicValues[i]
     if v == None then
         return nil
     elseif v ~= nil then
@@ -18,7 +24,7 @@ local function __index(self, i)
     end
 
     -- Doing this instead of an 'or' in case publicValues[i] is false
-    v = self.__readOnlyValues[i]
+    v = readOnlyValues[i]
     if v == None then
         return nil
     elseif v ~= nil then
@@ -26,13 +32,14 @@ local function __index(self, i)
     end
 
     -- TODO: Remove this once methods are stored as a metatable
-    v = self.__methods[i]
+    v = methods[i]
     if v then
         return v
     end
 
-    if self.__userindex then
-        v = self.__userindex(self, i)
+    local userindex = index
+    if userindex then
+        v = userindex(self, i)
         if v then
             return v
         end
@@ -40,12 +47,19 @@ local function __index(self, i)
 
     -- Don't error when we try to index these values that might not exist
     if not (i == "__userindex" or i == "__usernewindex" or i == "__change") then
-        Output.error("%s is not a valid member of %s", {i, self.__type}, 1)
+        Output.error("%s is not a valid member of %s", {i, type}, 1)
     end
 end
 
 local function __newindex(self, i, newValue)
-    local curValue = self.__publicValues[i]
+    local publicValues      = rawget(self, "__publicValues")
+    local readOnlyValues    = rawget(self, "__readOnlyValues")
+    local methods           = rawget(self, "__methods")
+    local newindex          = rawget(self, "__usernewindex")
+    local change            = rawget(self, "__change")
+    local type              = rawget(self, "__type")
+
+    local curValue = publicValues[i]
 
     if newValue == nil then
         newValue = None
@@ -53,36 +67,37 @@ local function __newindex(self, i, newValue)
 
     if curValue ~= nil then
         if curValue ~= newValue then
-            self.__publicValues[i] = newValue
+            publicValues[i] = newValue
 
-            if self.__change then
-                self.__change(self.__publicValues, i, newValue, curValue)
+            if change then
+                change(publicValues, i, newValue, curValue)
             end
 
             return true
         end
     end
 
-    curValue = self.__readOnlyValues[i]
+    curValue = readOnlyValues[i]
     if curValue ~= nil then
         if curValue ~= newValue then
-            self.__readOnlyValues[i] = newValue
+            readOnlyValues[i] = newValue
 
-            if self.__change then
-                self.__change(self.__readOnlyValues, i, newValue, curValue)
+            if change then
+                change(readOnlyValues, i, newValue, curValue)
             end
 
             return true
         end
     end
 
-    if self.__usernewindex and self.__usernewindex(self, i, newValue) then
+    local usernewindex = newindex
+    if usernewindex and usernewindex(self, i, newValue) then
         return true
     end
 
-    Output.assert(self.__readOnlyValues[i] == nil, "%s cannot be assigned to", i, 1)
-    Output.assert(self.__methods[i] == nil, "%s cannot be assigned to", i, 1)
-    Output.error("%s is not a valid member of %s", {i, self.__type}, 1)
+    Output.assert(readOnlyValues[i] == nil, "%s cannot be assigned to", i, 1)
+    Output.assert(methods[i] == nil, "%s cannot be assigned to", i, 1)
+    Output.error("%s is not a valid member of %s", {i, type}, 1)
 end
 
 local function __tostring(self)
