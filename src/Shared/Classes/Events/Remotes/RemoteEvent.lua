@@ -11,14 +11,22 @@ local RemoteEvent = {
     Events = {}
 }
 
-function RemoteEvent:Constructor(name, parent)
-    name = name or HttpService:GenerateGUID(false)
+function RemoteEvent:Constructor(...)
+    local args = {...}
+    if RunService:IsServer() then
+        -- args[1] = name
+        -- args[2] = parent
+        local name = args[1] or HttpService:GenerateGUID(false)
 
-    local rbxevent = Instance.new("RemoteEvent")
-    rbxevent.Name = name
-    rbxevent.Parent = parent
+        local rbxevent = Instance.new("RemoteEvent")
+        rbxevent.Name = name
+        rbxevent.Parent = args[2]
 
-    self.RBXEvent = rbxevent
+        self.RBXEvent = rbxevent
+    else
+        -- args[1] = RemoteEvent
+        self.RBXEvent = args[1]
+    end
 end
 
 function RemoteEvent:Deconstructor()
