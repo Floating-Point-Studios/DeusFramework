@@ -74,6 +74,8 @@ local function __newindex(self, i, newValue)
             end
 
             return true
+        else
+            return false
         end
     end
 
@@ -87,6 +89,8 @@ local function __newindex(self, i, newValue)
             end
 
             return true
+        else
+            return false
         end
     end
 

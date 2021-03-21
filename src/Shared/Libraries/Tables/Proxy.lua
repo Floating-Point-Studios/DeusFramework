@@ -61,9 +61,13 @@ function Proxy.new(values, metamethods)
     meta.__div          = metamethods.__div
     meta.__mod          = metamethods.__mod
     meta.__pow          = metamethods.__pow
+    --[[
+    These metamethods don't work with userdatas
+
     meta.__eq           = metamethods.__eq
     meta.__lt           = metamethods.__lt
     meta.__le           = metamethods.__le
+    ]]
     meta.__len          = metamethods.__len
 
     meta.Index          = metamethods.__index

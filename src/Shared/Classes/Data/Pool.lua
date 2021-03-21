@@ -1,3 +1,5 @@
+-- TODO: Convert this to a DataType
+
 local Pool = {}
 
 Pool.ClassName = "Deus.Pool"
