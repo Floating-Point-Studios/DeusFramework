@@ -276,4 +276,9 @@ function LoaderMeta:GetStartTick()
     return self._StartTick
 end
 
+-- Only reliable way I've found of checking if the script is a plugin so far is a hard-coded value
+function LoaderMeta:IsPluginFramework()
+    return false
+end
+
 return LoaderMeta
