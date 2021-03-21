@@ -27,9 +27,11 @@ end
 
 -- @param color: Color3 to multiply
 -- @param x: factor to multiply by
+-- [[
 function MathUtils.multiplyColor3(color, x)
     return Color3.new(color.R * x, color.G * x, color.B * x)
 end
+]]
 
 -- Not reccomended to use this if hard-coded values are possible
 function MathUtils.factorial(x)
@@ -101,6 +103,8 @@ function MathUtils.snap(x, numbers, snapUp)
 end
 
 MathUtils.factors = MathUtils.getFactors
+MathUtils.ceil = MathUtils.roundCeil
+MathUtils.floor = MathUtils.roundFloor
 
 function MathUtils:start()
     Output = self:Load("Deus.Output")
