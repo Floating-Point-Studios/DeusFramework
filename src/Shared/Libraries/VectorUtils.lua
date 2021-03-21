@@ -25,6 +25,7 @@ end
 function VectorUtils.llarToWorld(lat, lon, alt, rad)
     -- https://stackoverflow.com/questions/10473852/convert-latitude-and-longitude-to-point-in-3d-space
     alt = alt or 0
+    rad = rad or 1
 
     local ls = math.atan(math.tan(lat))
 
