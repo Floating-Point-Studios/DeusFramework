@@ -12,7 +12,7 @@ return function ()
 
     describe("mesh", function()
         it("IsA() should be a Mesh", function()
-            expect(object:IsA("Deus.Mesh")).to.be.equal(true)
+            expect(object:IsA("Mesh")).to.be.equal(true)
         end)
 
         it("AddVertex() should throw", function()

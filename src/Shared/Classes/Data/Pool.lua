@@ -2,7 +2,7 @@
 
 local Pool = {}
 
-Pool.ClassName = "Deus.Pool"
+Pool.ClassName = "Pool"
 
 Pool.Extendable = true
 

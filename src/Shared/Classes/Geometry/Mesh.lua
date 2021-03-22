@@ -3,7 +3,7 @@ local Output
 
 local Mesh = {}
 
-Mesh.ClassName = "Deus.Mesh"
+Mesh.ClassName = "Mesh"
 
 Mesh.Extendable = true
 

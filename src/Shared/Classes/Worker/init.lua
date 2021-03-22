@@ -6,7 +6,7 @@ local WorkerClient = script.WorkerClient
 
 local Worker = {}
 
-Worker.ClassName = "Deus.Worker"
+Worker.ClassName = "Worker"
 
 Worker.Extendable = true
 

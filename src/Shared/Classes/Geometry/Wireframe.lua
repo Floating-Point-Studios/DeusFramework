@@ -48,7 +48,7 @@ end
 
 local Wireframe = {}
 
-Wireframe.ClassName = "Deus.Wireframe"
+Wireframe.ClassName = "Wireframe"
 
 Wireframe.Extendable = true
 
