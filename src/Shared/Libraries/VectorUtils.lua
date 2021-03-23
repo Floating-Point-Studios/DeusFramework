@@ -41,7 +41,10 @@ function VectorUtils.abs(v)
 end
 
 function VectorUtils.angle(v1, v2)
-    return math.acos(v1:Dot(v2) / (v1.Magnitude * v2.Magnitude))
+    v1 = v1 or Vector3.new()
+    v2 = v2 or Vector3.new()
+
+    return math.acos(v1:Dot(v2) / math.max(v1.Magnitude * v2.Magnitude, 0.00001))
 end
 
 VectorUtils.clamp = VectorUtils.clampVector
