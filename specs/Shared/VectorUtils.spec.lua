@@ -43,11 +43,13 @@ return function()
     end)
 
     describe("angle()", function()
+        --[[
         it("should throw", function()
             expect(function()
                 module.angle()
             end).to.throw()
         end)
+        ]]
 
         it("should be a number", function()
             expect(typeof(module.angle(Vector3.new(), Vector3.new())) == "number").to.be.equal(true)
