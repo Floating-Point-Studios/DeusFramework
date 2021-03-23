@@ -4,17 +4,13 @@ local Workers
 local WorkerServer = script.WorkerServer
 local WorkerClient = script.WorkerClient
 
-local Worker = {}
-
-Worker.ClassName = "Worker"
-
-Worker.Extendable = true
-
-Worker.Replicable = true
-
-Worker.Methods = {}
-
-Worker.Events = {"JobAssigned", "JobFinished"}
+local Worker = {
+    ClassName = "Worker",
+    Extendable = true,
+    Replicable = true,
+    Methods = {},
+    Events = {"JobAssigned", "JobFinished"}
+}
 
 function Worker.Methods:RunJob(module, funcName, ...)
     if not self.Busy then
