@@ -6,6 +6,35 @@ local Output
 local KeyCodes = Enum.KeyCode
 local IsTextBoxFocused = false
 
+local function inputBegan(self)
+    return function(inputObject)
+        if inputObject.KeyCode == self.KeyCode and inputObject:IsModifierKeyDown(Enum.ModifierKey.Shift) == self.Shift then
+            if not self.DisableWhenTextBoxFocused or (self.DisableWhenTextBoxFocused and not IsTextBoxFocused) then
+                self.Active = true
+                self:FireEvent("Began", inputObject)
+            end
+        end
+    end
+end
+
+local function inputEnded(self)
+    return function(inputObject)
+        if self.Active and inputObject.KeyCode == self.KeyCode then
+            self.Active = false
+            self:FireEvent("Ended", inputObject)
+        end
+    end
+end
+
+local function onFocus(self)
+    return function()
+        if self.Active and self.DisableWhenTextBoxFocused then
+            self.Active = false
+            self:FireEvent("Ended")
+        end
+    end
+end
+
 local KeyboardInput = {
     ClassName = "KeyboardInput",
     Extendable = true,
@@ -15,7 +44,11 @@ local KeyboardInput = {
 }
 
 function KeyboardInput:Constructor(keyCode, shift)
-    Output.assert(typeof(keyCode) == "EnumItem", "Expected EnumItem as Argument #1, instead got ".. typeof(keyCode), nil, 1)
+    if type(keyCode) == "string" then
+        keyCode = KeyCodes[keyCode]
+    end
+
+    Output.assert(typeof(keyCode) == "EnumItem", "Expected EnumItem or string as Argument #1, instead got ".. typeof(keyCode), nil, 1)
     Output.assert(keyCode.EnumType == KeyCodes, "Expected KeyCode as Argument #1, instead got ".. tostring(keyCode.EnumType), nil, 1)
 
     if not UserInputService.KeyboardEnabled then
@@ -27,6 +60,7 @@ function KeyboardInput:Constructor(keyCode, shift)
     -- self.Ctrl = ctrl or false
     self.Shift = shift or false
 
+    --[[
     self.BeganConnection = UserInputService.InputBegan:Connect(function(inputObject)
         if inputObject.KeyCode == self.KeyCode and inputObject:IsModifierKeyDown(Enum.ModifierKey.Shift) and IsTextBoxFocused ~= self.DisableWhenTextBoxFocused then
             self.Active = true
@@ -41,13 +75,11 @@ function KeyboardInput:Constructor(keyCode, shift)
         end
     end)
 
-    --[[
     self.ChangedConnection = UserInputService.InputChanged:Connect(function(inputObject)
         if inputObject.KeyCode == self.KeyCode then
             self:FireEvent("Changed", inputObject)
         end
     end)
-    ]]
 
     self.FocusedConnection = UserInputService.TextBoxFocused:Connect(function()
         if self.Active and self.DisableWhenTextBoxFocused then
@@ -55,13 +87,30 @@ function KeyboardInput:Constructor(keyCode, shift)
             self:FireEvent("Ended")
         end
     end)
+    ]]
+
+    self:Enable()
 end
 
 function KeyboardInput:Deconstructor()
-   self.BeganConnection:Disconnect()
-   self.EndedConnection:Disconnect()
-   -- self.ChangedConnection:Disconnect()
-   self.FocusedConnection:Disconnect()
+   self:Disable()
+end
+
+function KeyboardInput.Methods:Enable()
+    Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
+    self.BeganConnection = UserInputService.InputBegan:Connect(inputBegan(self))
+    self.EndedConnection = UserInputService.InputEnded:Connect(inputEnded(self))
+    self.FocusedConnection = UserInputService.TextBoxFocused:Connect(onFocus(self))
+    return self
+end
+
+function KeyboardInput.Methods:Disable()
+    Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
+    self.BeganConnection:Disconnect()
+    self.EndedConnection:Disconnect()
+    -- self.ChangedConnection:Disconnect()
+    self.FocusedConnection:Disconnect()
+    return self
 end
 
 function KeyboardInput:start()
