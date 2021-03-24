@@ -10,11 +10,11 @@ local None
 local NewDataTypeEvent
 
 local function __index(self, i)
-    local publicValues      = rawget(self, "__publicValues")
-    local readOnlyValues    = rawget(self, "__readOnlyValues")
-    local methods           = rawget(self, "__methods")
-    local index             = rawget(self, "__userindex")
-    local type              = rawget(self, "__type")
+    local publicValues      = self.__publicValues
+    local readOnlyValues    = self.__readOnlyValues
+    local methods           = self.__methods
+    local index             = self.__userindex
+    local datatype          = self.__type
 
     local v = publicValues[i]
     if v == None then
@@ -38,7 +38,7 @@ local function __index(self, i)
     end
 
     local userindex = index
-    if userindex then
+    if userindex and type(userindex) == "function" then
         v = userindex(self, i)
         if v then
             return v
@@ -47,17 +47,17 @@ local function __index(self, i)
 
     -- Don't error when we try to index these values that might not exist
     if not (i == "__userindex" or i == "__usernewindex" or i == "__change") then
-        Output.error("%s is not a valid member of %s", {i, type}, 1)
+        Output.error("%s is not a valid member of %s", {i, datatype}, 1)
     end
 end
 
 local function __newindex(self, i, newValue)
-    local publicValues      = rawget(self, "__publicValues")
-    local readOnlyValues    = rawget(self, "__readOnlyValues")
-    local methods           = rawget(self, "__methods")
-    local newindex          = rawget(self, "__usernewindex")
-    local change            = rawget(self, "__change")
-    local type              = rawget(self, "__type")
+    local publicValues      = self.__publicValues
+    local readOnlyValues    = self.__readOnlyValues
+    local methods           = self.__methods
+    local newindex          = self.__usernewindex
+    local change            = self.__change
+    local datatype          = self.__type
 
     local curValue = publicValues[i]
 
@@ -95,13 +95,13 @@ local function __newindex(self, i, newValue)
     end
 
     local usernewindex = newindex
-    if usernewindex and usernewindex(self, i, newValue) then
+    if usernewindex and type(usernewindex) == "function" and usernewindex(self, i, newValue) then
         return true
     end
 
     Output.assert(readOnlyValues[i] == nil, "%s cannot be assigned to", i, 1)
     Output.assert(methods[i] == nil, "%s cannot be assigned to", i, 1)
-    Output.error("%s is not a valid member of %s", {i, type}, 1)
+    Output.error("%s is not a valid member of %s", {i, datatype}, 1)
 end
 
 local function __tostring(self)
@@ -138,8 +138,8 @@ function DataType.new(typeData)
                 {
                     __type              = typeData.Name,
 
-                    __userindex         = index,
-                    __usernewindex      = newindex,
+                    __userindex         = index or None,
+                    __usernewindex      = newindex or None,
                     __change            = typeData.Metamethods.__change,
 
                     __methods           = typeData.Methods,

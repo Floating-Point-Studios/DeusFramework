@@ -3,9 +3,10 @@ local Output
 local Metatables = setmetatable({}, {__mode = "v"})
 
 local function __index(self, i)
-    self = Metatables[self]
+    local original = self
+    self = Metatables[self] or self
 
-    local v = self[i]
+    local v = rawget(self, i)
     if v then
         return v
     end
@@ -14,7 +15,7 @@ local function __index(self, i)
     local customIndex = self.Index
     if customIndex then
         if type(customIndex) == "function" then
-            return self.Index(self, i)
+            return self.Index(original, i)
         else
             return customIndex[i]
         end
@@ -22,16 +23,17 @@ local function __index(self, i)
 end
 
 local function __newindex(self, i, v)
-    self = Metatables[self]
+    local original = self
+    self = Metatables[self] or self
 
-    if self[i] then
-        self[i] = v
+    if rawget(self, i) then
+        rawset(self, i, v)
         return true
     end
 
     -- Check if proxy has a custom __newindex set
     if self.NewIndex then
-        return self.NewIndex(self, i, v)
+        return self.NewIndex(original, i, v)
     end
 end
 

@@ -1,4 +1,6 @@
 return function()
+    local None = Deus:Load("Deus.Symbol").new("None")
+
     local baseObject = Deus:Load("Deus.BaseObject")
     local class
     local object
@@ -8,7 +10,11 @@ return function()
             {
                 ClassName = "foo",
                 Events = {"bar"},
-                Methods = {print = print}
+                Methods = {print = print},
+
+                PrivateProperties = {value1 = true},
+                PublicReadOnlyProperties = {value2 = None},
+                PublicReadAndWriteProperties = {value3 = 3}
             }
         )
         object = class.new()
@@ -101,6 +107,49 @@ return function()
 
         it("IsInternalAccess() should give false", function()
             expect(object.Proxy:IsInternalAccess()).to.be.equal(false)
+        end)
+
+        it("Proxy should be userdata", function()
+            expect(typeof(object.Proxy) == "userdata").to.be.equal(true)
+        end)
+
+        it("PrivateProperties should be readable", function()
+            expect(object.value1).to.be.equal(true)
+        end)
+
+        it("PrivateProperties should not be readable", function()
+            expect(function()
+                local a = object.Proxy.value1
+            end).to.throw()
+        end)
+
+        it("PrivateProperties should be writable", function()
+            object.value1 = false
+            expect(object.value1).to.be.equal(false)
+        end)
+
+        it("PublicReadOnlyProperties should be readable", function()
+            expect(object.value2).to.be.equal(nil)
+        end)
+
+        it("PublicReadOnlyProperties should be writable", function()
+            object.value2 = "testez"
+            expect(object.value2).to.be.equal("testez")
+        end)
+
+        it("PublicReadOnlyProperties should not be writable", function()
+            expect(function()
+                object.Proxy.value2 = "testez"
+            end).to.throw()
+        end)
+
+        it("PublicReadAndWriteProperties should be readable", function()
+            expect(object.value3).to.be.equal(3)
+        end)
+
+        it("PublicReadAndWriteProperties should be writable", function()
+            object.value3 = nil
+            expect(object.value3).to.be.equal(nil)
         end)
 
         --[[

@@ -9,12 +9,13 @@ local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
 local Output
-local Symbol
 local Proxy
 local TableUtils
 local InstanceUtils
 local BindableEvent
 -- local ObjectService
+
+local None
 
 local NewClassEvent
 local NewObjectEvent
@@ -56,17 +57,29 @@ function __index(self, i)
     v = InternalProperties[i]
     if v ~= nil then
         Output.assert(internalAccess, "[DeusObject] [%s] Attempt to read internal property", ExternalReadOnlyProperties.ClassName, 1)
-        return v
+        if v == None then
+            return nil
+        else
+            return v
+        end
     end
 
     v = ExternalReadOnlyProperties[i]
     if v ~= nil then
-        return v
+        if v == None then
+            return nil
+        else
+            return v
+        end
     end
 
     v = ExternalReadAndWriteProperties[i]
     if v ~= nil then
-        return v
+        if v == None then
+            return nil
+        else
+            return v
+        end
     end
 
     v = rawget(self, i)
@@ -81,7 +94,7 @@ function __newindex(self, i, v)
     local internalAccess = type(self) == "table"
     local oldv
     if v == nil then
-        v = Symbol.new("None") 
+        v = None
     end
 
     local Internal = self.Internal
@@ -240,7 +253,7 @@ function BaseObject.new(objData)
             -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.Replicable           = objData.Replicable or true
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.ObjectId                     = HttpService:GenerateGUID(false):sub(1, 8) -- Only use first 8 characters to save memory
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.TickCreated                  = tick()
-            obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = Symbol.new("None")
+            -- obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget    = None
             obj.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.IsDead                       = false
 
             -- Allows editing of properties locked externally
@@ -274,7 +287,7 @@ function BaseObject.new(objData)
             if obj.Changed then
                 if RunService:IsServer() then
                     obj.Changed:Connect(function(propertyName, newValue)
-                        if newValue == Symbol.new("None") then
+                        if newValue == None then
                             newValue = nil
                         end
 
@@ -338,12 +351,13 @@ end
 
 function BaseObject:start()
     Output = self:Load("Deus.Output")
-    Symbol = self:Load("Deus.Symbol")
     Proxy = self:Load("Deus.Proxy")
     TableUtils = self:Load("Deus.TableUtils")
     InstanceUtils = self:Load("Deus.InstanceUtils")
     BindableEvent = self:Load("Deus.BindableEvent")
     -- ObjectService = self:Load("Deus.ObjectService")
+
+    None = self:Load("Deus.Symbol").new("None")
 
     NewClassEvent = BindableEvent.new()
     NewObjectEvent = BindableEvent.new()
