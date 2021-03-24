@@ -38,7 +38,6 @@ end
 local KeyboardInput = {
     ClassName = "KeyboardInput",
     Extendable = true,
-    Replicable = true,
     Methods = {},
     Events = {"Began", "Ended", "Changed"}
 }

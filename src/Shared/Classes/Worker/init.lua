@@ -7,7 +7,6 @@ local WorkerClient = script.WorkerClient
 local Worker = {
     ClassName = "Worker",
     Extendable = true,
-    Replicable = true,
     Methods = {},
     Events = {"JobAssigned", "JobFinished"}
 }

@@ -46,17 +46,12 @@ local function disableSpheres(self, sphereIdStart, sphereIdEnd)
     end
 end
 
-local Wireframe = {}
-
-Wireframe.ClassName = "Wireframe"
-
-Wireframe.Extendable = true
-
-Wireframe.Replicable = true
-
-Wireframe.Methods = {}
-
-Wireframe.Events = {}
+local Wireframe = {
+    ClassName = "Wireframe",
+    Extendable = true,
+    Methods = {},
+    Events = {}
+}
 
 function Wireframe:Constructor(mesh, adornee)
     self.Adornee = adornee or None

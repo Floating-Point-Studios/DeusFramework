@@ -43,7 +43,6 @@ end
 local MouseInput = {
     ClassName = "MouseInput",
     Extendable = true,
-    Replicable = true,
     Methods = {},
     Events = {"Move", "Button1Down", "Button1Up", "Button2Up", "Button2Down", "Button3Up", "Button3Down", "WheelBackward", "WheelForward"}
 }

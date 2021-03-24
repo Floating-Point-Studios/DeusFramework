@@ -1,17 +1,12 @@
 local TableUtils
 local Output
 
-local Mesh = {}
-
-Mesh.ClassName = "Mesh"
-
-Mesh.Extendable = true
-
-Mesh.Replicable = true
-
-Mesh.Methods = {}
-
-Mesh.Events = {}
+local Mesh = {
+    ClassName = "Mesh",
+    Extendable = true,
+    Methods = {},
+    Events = {}
+}
 
 -- These do not actually count the number of faces, lines, or vertices, they are used internally for Id assignment, use #TableUtils.getKeys() for counting
 Mesh.PrivateProperties = {

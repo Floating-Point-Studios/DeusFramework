@@ -59,11 +59,12 @@ function BindableEvent:Fire(...)
     -- If there are no connections to the event but :Wait() is called it will infinitely yield, this is the way around that
     if #self.Connections == 0 then
         RBXBindableEvent:Fire(self.EventId, nil, argsId)
+    else
+        for _,v in pairs(self.Connections) do
+            RBXBindableEvent:Fire(self.EventId, v, argsId)
+        end
     end
 
-    for _,v in pairs(self.Connections) do
-        RBXBindableEvent:Fire(self.EventId, v, argsId)
-    end
     self.LastFired = tick()
 end
 

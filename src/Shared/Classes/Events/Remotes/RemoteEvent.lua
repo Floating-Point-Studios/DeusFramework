@@ -6,7 +6,6 @@ local Output
 local RemoteEvent = {
     ClassName = "Deus.RemoteEvent",
     Extendable = true,
-    Replicable = true,
     Methods = {},
     Events = {}
 }

@@ -177,7 +177,6 @@ function BaseObject.new(objData)
         ClassName                   = objData.ClassName,
 
         Extendable                  = objData.Extendable or true,
-        Replicable                  = objData.Replicable or true,
         Superclass                  = objData.Superclass or "BaseObject",
 
         Methods                     = TableUtils.lock(objData.Methods), -- Methods table cannot be edited even with internal access

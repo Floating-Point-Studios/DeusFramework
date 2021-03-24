@@ -1,16 +1,11 @@
 -- TODO: Convert this to a DataType
 
-local Pool = {}
-
-Pool.ClassName = "Pool"
-
-Pool.Extendable = true
-
-Pool.Replicable = true
-
-Pool.Methods = {}
-
-Pool.Events = {}
+local Pool = {
+    ClassName = "Pool",
+    Extendable = true,
+    Methods = {},
+    Events = {}
+}
 
 -- Gets all the items from the pool and set itself to empty
 function Pool.Methods:GetAll()
