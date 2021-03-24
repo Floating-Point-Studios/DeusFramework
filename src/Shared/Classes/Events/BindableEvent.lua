@@ -56,6 +56,11 @@ function BindableEvent:Fire(...)
     local argsId = HttpService:GenerateGUID(false)
     RBXEventArgs[argsId] = {...}
 
+    -- If there are no connections to the event but :Wait() is called it will infinitely yield, this is the way around that
+    if #self.Connections == 0 then
+        RBXBindableEvent:Fire(self.EventId, nil, argsId)
+    end
+
     for _,v in pairs(self.Connections) do
         RBXBindableEvent:Fire(self.EventId, v, argsId)
     end
@@ -69,9 +74,11 @@ end
 
 function BindableEvent:init()
     RBXBindableEvent.Event:Connect(function(_, func, argsId)
-        local args = RBXEventArgs[argsId]
-        RBXEventArgs[argsId] = nil
-        func(unpack(args))
+        if func then
+            local args = RBXEventArgs[argsId]
+            RBXEventArgs[argsId] = nil
+            func(unpack(args))
+        end
     end)
 end
 
