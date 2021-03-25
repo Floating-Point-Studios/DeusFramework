@@ -40,6 +40,7 @@ function StringUtils.hash(str)
     return tostring(Random.new(bytes):NextInteger(10000000, 99999999))
 end
 
+-- Reccomended to use StringUtils.sub() with negative position arguments instead
 function StringUtils.reverseSub(str, subStart, subEnd)
     local strLength = #str
     subStart = subStart or 1
@@ -63,7 +64,9 @@ function StringUtils.sub(str, subStart, subEnd)
     return str:sub(subStart, subEnd)
 end
 
+StringUtils.matches = StringUtils.matches
 StringUtils.replace = StringUtils.replaceAt
+StringUtils.collapse = StringUtils.collapseOccurances
 
 function StringUtils:start()
     TableUtils = self:Load("Deus.TableUtils")

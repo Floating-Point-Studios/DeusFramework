@@ -102,9 +102,9 @@ function MathUtils.snap(x, numbers, snapUp)
     return bestMatch
 end
 
-MathUtils.factors = MathUtils.getFactors
 MathUtils.ceil = MathUtils.roundCeil
 MathUtils.floor = MathUtils.roundFloor
+MathUtils.factors = MathUtils.getFactors
 
 function MathUtils:start()
     Output = self:Load("Deus.Output")

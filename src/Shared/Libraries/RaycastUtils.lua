@@ -4,13 +4,21 @@ local DefaultParams = RaycastParams.new()
 
 local RaycastUtils = {}
 
+function RaycastUtils.raycastParamsFrom(params)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances    = params.FilterDescendantsInstances
+    raycastParams.FilterType                    = params.FilterType
+    raycastParams.IgnoreWater                   = params.IgnoreWater
+    raycastParams.CollisionGroup                = params.CollisionGroup
+end
+
 -- Clones a new RaycastParams with the same properties
 function RaycastUtils.copyRaycastParams(raycastParams)
-    local copyRaycastParams = RaycastParams.new()
-    copyRaycastParams.FilterDescendantsInstances = TableUtils.shallowCopy(raycastParams.FilterDescendantsInstances)
-    copyRaycastParams.FilterType = raycastParams.FilterType
-    copyRaycastParams.IgnoreWater = raycastParams.IgnoreWater
-    copyRaycastParams.CollisionGroup = raycastParams.CollisionGroup
+    local copyRaycastParams                         = RaycastParams.new()
+    copyRaycastParams.FilterDescendantsInstances    = TableUtils.shallowCopy(raycastParams.FilterDescendantsInstances)
+    copyRaycastParams.FilterType                    = raycastParams.FilterType
+    copyRaycastParams.IgnoreWater                   = raycastParams.IgnoreWater
+    copyRaycastParams.CollisionGroup                = raycastParams.CollisionGroup
 
     return copyRaycastParams
 end
@@ -40,6 +48,9 @@ function RaycastUtils.castCollideOnly(origin, dir, params)
         end
     until not result
 end
+
+RaycastUtils.copy = RaycastUtils.copyRaycastParams
+RaycastUtils.from = RaycastUtils.from
 
 function RaycastUtils:start()
     TableUtils = self:Load("Deus.TableUtils")
