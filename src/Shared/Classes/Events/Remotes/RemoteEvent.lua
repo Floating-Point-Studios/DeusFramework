@@ -4,9 +4,7 @@ local HttpService = game:GetService("HttpService")
 local Output
 
 local RemoteEvent = {
-    ClassName = "Deus.RemoteEvent",
-    Extendable = true,
-    Methods = {},
+    ClassName = "RemoteEvent",
     Events = {}
 }
 
@@ -32,7 +30,7 @@ function RemoteEvent:Deconstructor()
     self.RBXEvent:Destroy()
 end
 
-function RemoteEvent.Methods:Connect(func)
+function RemoteEvent:Connect(func)
     if RunService:IsServer() then
         return self.RBXEvent.OnServerEvent:Connect(func)
     else
@@ -40,7 +38,7 @@ function RemoteEvent.Methods:Connect(func)
     end
 end
 
-function RemoteEvent.Methods:Fire(...)
+function RemoteEvent:Fire(...)
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
 
     if RunService:IsServer() then
@@ -50,14 +48,14 @@ function RemoteEvent.Methods:Fire(...)
     end
 end
 
-function RemoteEvent.Methods:FireAllClients(...)
+function RemoteEvent:FireAllClients(...)
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     Output.assert(RunService:IsServer(), "Attempt to use server-only method on client", nil, 1)
 
     self.RBXEvent:FireAllClients(...)
 end
 
-function RemoteEvent.Methods:FireWhitelistedClients(players, ...)
+function RemoteEvent:FireWhitelistedClients(players, ...)
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     Output.assert(RunService:IsServer(), "Attempt to use server-only method on client", nil, 1)
 

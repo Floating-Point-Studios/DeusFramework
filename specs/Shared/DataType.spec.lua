@@ -2,7 +2,6 @@ return function()
     local DataType = Deus:Load("Deus.DataType")
     local customType = {
         Name = "TestEZ DataType Test",
-        Methods = {},
         Metamethods = {},
         PublicValues = {Value = 0},
         ReadOnlyValues = {}
@@ -13,7 +12,7 @@ return function()
         self.Value = (x or 0)
     end
 
-    function customType.Methods:Foo()
+    function customType:Foo()
         return "Bar"
     end
 

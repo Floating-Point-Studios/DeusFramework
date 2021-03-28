@@ -48,8 +48,6 @@ end
 
 local Wireframe = {
     ClassName = "Wireframe",
-    Extendable = true,
-    Methods = {},
     Events = {}
 }
 
@@ -67,7 +65,7 @@ function Wireframe:Deconstructor()
    self.Wires:Destroy()
 end
 
-function Wireframe.Methods:Update()
+function Wireframe:Update()
     local mesh = self.Mesh
     Output.assert(mesh ~= None, "Mesh has not been set to Wireframe", nil, 1)
 

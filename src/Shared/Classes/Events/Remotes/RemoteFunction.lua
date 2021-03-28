@@ -4,9 +4,7 @@ local HttpService = game:GetService("HttpService")
 local Output
 
 local RemoteFunction = {
-    ClassName = "Deus.RemoteFunction",
-    Extendable = true,
-    Methods = {},
+    ClassName = "RemoteFunction",
     Events = {}
 }
 
@@ -32,7 +30,7 @@ function RemoteFunction:Deconstructor()
     self.RBXEvent:Destroy()
 end
 
-function RemoteFunction.Methods:OnInvoke(func)
+function RemoteFunction:OnInvoke(func)
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
 
     if RunService:IsServer() then
@@ -42,7 +40,7 @@ function RemoteFunction.Methods:OnInvoke(func)
     end
 end
 
-function RemoteFunction.Methods:Invoke(...)
+function RemoteFunction:Invoke(...)
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
 
     if RunService:IsServer() then

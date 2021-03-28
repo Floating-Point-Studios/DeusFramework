@@ -6,12 +6,10 @@ local WorkerClient = script.WorkerClient
 
 local Worker = {
     ClassName = "Worker",
-    Extendable = true,
-    Methods = {},
     Events = {"JobAssigned", "JobFinished"}
 }
 
-function Worker.Methods:RunJob(module, funcName, ...)
+function Worker:RunJob(module, funcName, ...)
     if not self.Busy then
         self.Busy = true
         self.JobAssigned:Fire()

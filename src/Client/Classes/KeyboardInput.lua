@@ -37,8 +37,6 @@ end
 
 local KeyboardInput = {
     ClassName = "KeyboardInput",
-    Extendable = true,
-    Methods = {},
     Events = {"Began", "Ended", "Changed"}
 }
 
@@ -95,7 +93,7 @@ function KeyboardInput:Deconstructor()
    self:Disable()
 end
 
-function KeyboardInput.Methods:Enable()
+function KeyboardInput:Enable()
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     self.BeganConnection = UserInputService.InputBegan:Connect(inputBegan(self))
     self.EndedConnection = UserInputService.InputEnded:Connect(inputEnded(self))
@@ -103,7 +101,7 @@ function KeyboardInput.Methods:Enable()
     return self
 end
 
-function KeyboardInput.Methods:Disable()
+function KeyboardInput:Disable()
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     self.BeganConnection:Disconnect()
     self.EndedConnection:Disconnect()

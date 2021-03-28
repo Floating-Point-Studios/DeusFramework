@@ -117,8 +117,18 @@ function DataType.new(typeData)
 
     -- If no name is given generate one
     typeData.Name                       = typeData.Name or ("[DataType] ".. HttpService:GenerateGUID(false))
-    typeData.Methods                    = typeData.Methods or {}
+    --typeData.Methods                    = typeData.Methods or {}
     typeData.Metamethods                = typeData.Metamethods or {}
+
+    if not typeData.Methods then
+        local methods = {}
+        for i,v in pairs(typeData) do
+            if type(v) == "function" and i ~= "Constructor" then
+                methods[i] = v
+            end
+            typeData.Methods = methods
+        end
+    end
 
     if typeData.Metamethods.__index then
         index = typeData.Metamethods.__index

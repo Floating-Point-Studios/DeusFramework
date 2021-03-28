@@ -42,8 +42,6 @@ end
 
 local MouseInput = {
     ClassName = "MouseInput",
-    Extendable = true,
-    Methods = {},
     Events = {"Move", "Button1Down", "Button1Up", "Button2Up", "Button2Down", "Button3Up", "Button3Down", "WheelBackward", "WheelForward"}
 }
 
@@ -59,7 +57,7 @@ function MouseInput:Deconstructor()
     self:Disable()
 end
 
-function MouseInput.Methods:Enable()
+function MouseInput:Enable()
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     self.BeganConnection = UserInputService.InputBegan:Connect(inputBegan(self))
     self.EndedConnection = UserInputService.InputEnded:Connect(inputEnded(self))
@@ -67,7 +65,7 @@ function MouseInput.Methods:Enable()
     return self
 end
 
-function MouseInput.Methods:Disable()
+function MouseInput:Disable()
     Output.assert(self:IsInternalAccess(), "Attempt to use internal method from externally", nil, 1)
     self.BeganConnection:Disconnect()
     self.EndedConnection:Disconnect()

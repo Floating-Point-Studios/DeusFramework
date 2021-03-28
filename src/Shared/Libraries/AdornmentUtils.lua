@@ -12,7 +12,7 @@ local ValidClasses = {
 local AdornmentUtils = {}
 
 function AdornmentUtils.make(className, parent, cframe, isWorldSpace, properties)
-    Output.assert(table.find(ValidClasses, className), "Class '%s' is not an adornment", className, 1)
+    Output.assert(table.find(ValidClasses, className), "Class %s is not an adornment", className, 1)
 
     local adornment = Instance.new(className)
 

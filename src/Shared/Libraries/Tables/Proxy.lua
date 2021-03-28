@@ -78,7 +78,7 @@ function Proxy.new(values, metamethods)
     meta.Proxy          = proxy
 
     for i,v in pairs(values) do
-        Output.assert(meta[i] == nil, "Index '%s' is reserved in Proxy", i, 1)
+        Output.assert(meta[i] == nil, "Index %s is reserved in Proxy", i, 1)
         meta[i] = v
     end
 

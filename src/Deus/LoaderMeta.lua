@@ -35,7 +35,7 @@ function LoaderMeta:Load(path)
     local module = Modules[path]
 
     if not module then
-        warn(("Could not find module '%s' beginning yield"):format(path))
+        warn(("Could not find module %s beginning yield"):format(path))
 
         local waitStart = tick()
         local waitEnd
@@ -46,7 +46,7 @@ function LoaderMeta:Load(path)
         until module or waitEnd - waitStart > 3
 
         if not module then
-            warn(("Could not find module '%s' after %s second yield, check load order"):format(path, waitEnd - waitStart))
+            warn(("Could not find module %s after %s second yield, check load order"):format(path, waitEnd - waitStart))
         end
     end
 

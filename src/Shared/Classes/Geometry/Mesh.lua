@@ -3,8 +3,6 @@ local Output
 
 local Mesh = {
     ClassName = "Mesh",
-    Extendable = true,
-    Methods = {},
     Events = {}
 }
 
@@ -26,7 +24,7 @@ Mesh.PublicReadAndWriteProperties = {}
 
 --[[
 -- Creates a face from VertexId's
-function Mesh.Methods:AddFace(...)
+function Mesh:AddFace(...)
     self.FacesCount += 1
 
     local faceId = tostring(self.FacesCount)
@@ -37,10 +35,10 @@ function Mesh.Methods:AddFace(...)
 end
 
 -- Deletes a face given the FaceId
-function Mesh.Methods:DeleteFace(faceId)
+function Mesh:DeleteFace(faceId)
     local face = self.Faces[faceId]
 
-    Output.assert(faceId, "FaceId '%s' is not a face", faceId)
+    Output.assert(faceId, "FaceId %s is not a face", faceId)
 
     for _,vertexId in pairs(face) do
         TableUtils.remove(self.Vertices[vertexId].Faces, faceId)
@@ -50,15 +48,15 @@ function Mesh.Methods:DeleteFace(faceId)
 end
 
 -- Adds vertices to a face
-function Mesh.Methods:AddVerticesToFace(faceId, ...)
+function Mesh:AddVerticesToFace(faceId, ...)
     local face = self.Faces[faceId]
 
-    Output.assert(faceId, "FaceId '%s' is not a face", faceId)
+    Output.assert(faceId, "FaceId %s is not a face", faceId)
 
     for _,vertexId in pairs(...) do
         local vertex = self.Vertices[vertexId]
 
-        Output.assert(vertex, "VertexId '%s' is not a vertex", vertexId)
+        Output.assert(vertex, "VertexId %s is not a vertex", vertexId)
 
         table.insert(face, vertexId)
         table.insert(vertex.Faces, faceId)
@@ -67,7 +65,7 @@ end
 ]]
 
 -- Creates a line from 2 VertexId's and returns the LineId
-function Mesh.Methods:AddLine(vertexId1, vertexId2)
+function Mesh:AddLine(vertexId1, vertexId2)
     local vertex1
     local vertex2
 
@@ -89,8 +87,8 @@ function Mesh.Methods:AddLine(vertexId1, vertexId2)
         vertex2 = self.VerticesVec3[vertexId2]
     end
 
-    Output.assert(vertex1, "VertexId '%s' is not a vertex", tostring(vertexId1), 1)
-    Output.assert(vertex2, "VertexId '%s' is not a vertex", tostring(vertexId2), 1)
+    Output.assert(vertex1, "VertexId %s is not a vertex", tostring(vertexId1), 1)
+    Output.assert(vertex2, "VertexId %s is not a vertex", tostring(vertexId2), 1)
 
     if vertexId1 == vertexId2 then
         -- Same vertices provided for both arguments
@@ -116,11 +114,11 @@ function Mesh.Methods:AddLine(vertexId1, vertexId2)
 end
 
 -- Deletes a line from LineId
-function Mesh.Methods:DeleteLine(lineId)
+function Mesh:DeleteLine(lineId)
     lineId = tostring(lineId)
     local line = self.Lines[lineId]
 
-    Output.assert(line, "LineId '%s' is not a line", lineId, 1)
+    Output.assert(line, "LineId %s is not a line", lineId, 1)
 
     local vertexId1 = line[1]
     local vertexId2 = line[2]
@@ -134,8 +132,8 @@ function Mesh.Methods:DeleteLine(lineId)
 end
 
 -- Creates a new vertex and returns the VertexId
-function Mesh.Methods:AddVertex(pos)
-    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos, 1)
+function Mesh:AddVertex(pos)
+    Output.assert(typeof(pos) == "Vector3", "%s is not a Vector3", pos, 1)
 
     local vertexId = self.VerticesVec3[pos]
     if vertexId then
@@ -158,11 +156,11 @@ function Mesh.Methods:AddVertex(pos)
 end
 
 -- Deletes a vertex from VertexId
-function Mesh.Methods:DeleteVertex(vertexId)
+function Mesh:DeleteVertex(vertexId)
     vertexId = tostring(vertexId)
     local vertex = self.Vertices[vertexId]
 
-    Output.assert(vertex, "VertexId '%s' is not a vertex", vertexId, 1)
+    Output.assert(vertex, "VertexId %s is not a vertex", vertexId, 1)
 
     for _,lineId in pairs(vertex.Lines) do
         self:DeleteLine(lineId)
@@ -178,15 +176,15 @@ function Mesh.Methods:DeleteVertex(vertexId)
 end
 
 -- Always merges vertex 2 into vertex 1
-function Mesh.Methods:MergeVertices(vertexId1, vertexId2)
+function Mesh:MergeVertices(vertexId1, vertexId2)
     vertexId1 = tostring(vertexId1)
     vertexId2 = tostring(vertexId2)
 
     local vertex1 = self.Vertices[vertexId1]
     local vertex2 = self.Vertices[vertexId2]
 
-    Output.assert(vertex1, "VertexId '%s' is not a vertex", vertexId1, 1)
-    Output.assert(vertex2, "VertexId '%s' is not a vertex", vertexId2, 1)
+    Output.assert(vertex1, "VertexId %s is not a vertex", vertexId1, 1)
+    Output.assert(vertex2, "VertexId %s is not a vertex", vertexId2, 1)
 
     for vertexId in pairs(vertex2.Lines) do
         self:AddLine(vertexId, vertexId1)
@@ -196,51 +194,51 @@ function Mesh.Methods:MergeVertices(vertexId1, vertexId2)
 end
 
 -- Sets the position of a vertex from the VertexId
-function Mesh.Methods:SetVertexPosition(vertexId, pos)
+function Mesh:SetVertexPosition(vertexId, pos)
     vertexId = tostring(vertexId)
 
     local vertex = self.Vertices[vertexId]
 
-    Output.assert(vertex, "VertexId '%s' is not a vertex", vertexId, 1)
-    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos, 1)
+    Output.assert(vertex, "VertexId %s is not a vertex", vertexId, 1)
+    Output.assert(typeof(pos) == "Vector3", "%s is not a Vector3", pos, 1)
 
     vertex.Position = pos
 end
 
 -- Deletes the line between 2 vertices given 2 VertexId's
-function Mesh.Methods:UnlinkVertices(vertexId1, vertexId2)
+function Mesh:UnlinkVertices(vertexId1, vertexId2)
     vertexId1 = tostring(vertexId1)
     vertexId2 = tostring(vertexId2)
 
     local vertex1 = self.Vertices[vertexId1]
 
-    Output.assert(vertex1, "VertexId '%s' is not a vertex", vertexId1, 1)
+    Output.assert(vertex1, "VertexId %s is not a vertex", vertexId1, 1)
 
     self:DeleteLine(vertex1.Lines[vertexId2])
 end
 
-function Mesh.Methods:GetLinkedVertices(vertexId)
+function Mesh:GetLinkedVertices(vertexId)
     vertexId = tostring(vertexId)
 
     local vertex = self.Vertices[vertexId]
 
-    Output.assert(vertex, "VertexId '%s' is not a vertex", vertexId, 1)
+    Output.assert(vertex, "VertexId %s is not a vertex", vertexId, 1)
 
     return TableUtils.getKeys(vertex.Lines)
 end
 
-function Mesh.Methods:GetVertices()
+function Mesh:GetVertices()
     return TableUtils.getValues(self.Vertices)
 end
 
-function Mesh.Methods:GetLines()
+function Mesh:GetLines()
     return TableUtils.getValues(self.Lines)
 end
 
 -- Returns vertices within the radius of the given position
-function Mesh.Methods:GetVerticesInRadius(pos, radius)
-    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos, 1)
-    Output.assert(type(radius) == "number", "'%s' is not a number", radius, 1)
+function Mesh:GetVerticesInRadius(pos, radius)
+    Output.assert(typeof(pos) == "Vector3", "%s is not a Vector3", pos, 1)
+    Output.assert(type(radius) == "number", "%s is not a number", radius, 1)
 
     local vertices = {}
 
@@ -254,8 +252,8 @@ function Mesh.Methods:GetVerticesInRadius(pos, radius)
 end
 
 -- Returns vertices in order of distance of the given position
-function Mesh.Methods:GetVerticesByDistance(pos)
-    Output.assert(typeof(pos) == "Vector3", "'%s' is not a Vector3", pos, 1)
+function Mesh:GetVerticesByDistance(pos)
+    Output.assert(typeof(pos) == "Vector3", "%s is not a Vector3", pos, 1)
 
     local vertices = TableUtils.getValues(self.Vertices)
 
@@ -267,7 +265,7 @@ function Mesh.Methods:GetVerticesByDistance(pos)
 end
 
 -- Returns all vertices in an array of Vector3's
-function Mesh.Methods:GetVerticesAsVector3()
+function Mesh:GetVerticesAsVector3()
     local vertices = {}
 
     for _,vertex in pairs(self.Vertices) do
@@ -278,7 +276,7 @@ function Mesh.Methods:GetVerticesAsVector3()
 end
 
 -- Returns all lines in an array of arrays containing the start and end of the line as a Vector3
-function Mesh.Methods:GetLinesAsVector3()
+function Mesh:GetLinesAsVector3()
     local lines = {}
 
     for _,line in pairs(self.Lines) do
@@ -291,7 +289,7 @@ function Mesh.Methods:GetLinesAsVector3()
     return lines
 end
 
-function Mesh.Methods:MergeVerticesByDistance(distance, mergeMode)
+function Mesh:MergeVerticesByDistance(distance, mergeMode)
     local merges = 0
     for _,vertex1 in pairs(self.Vertices) do
         local vertices = self:GetVerticesInRadius(vertex1.Position, distance)
@@ -307,12 +305,12 @@ function Mesh.Methods:MergeVerticesByDistance(distance, mergeMode)
     return merges
 end
 
-function Mesh.Methods:Translate(vec3)
+function Mesh:Translate(vec3)
     if type(vec3) == "number" then
         vec3 = Vector3.new(vec3, vec3, vec3)
     end
 
-    Output.assert(typeof(vec3) == "Vector3", "'%s' is not a Vector3", vec3, 1)
+    Output.assert(typeof(vec3) == "Vector3", "%s is not a Vector3", vec3, 1)
 
     for _,vertex in pairs(self.Vertices) do
         self:SetVertexPosition(vertex.VertexId, vertex.Position + vec3)
@@ -321,8 +319,8 @@ function Mesh.Methods:Translate(vec3)
     return self
 end
 
-function Mesh.Methods:Scale(vec3)
-    Output.assert(typeof(vec3) == "Vector3" or type(vec3) == "number", "'%s' is not a Vector3 or number", vec3, 1)
+function Mesh:Scale(vec3)
+    Output.assert(typeof(vec3) == "Vector3" or type(vec3) == "number", "%s is not a Vector3 or number", vec3, 1)
 
     for _,vertex in pairs(self.Vertices) do
         self:SetVertexPosition(vertex.VertexId, vertex.Position * vec3)

@@ -129,7 +129,7 @@ function TableUtils.instanceAsIndex(obj)
             if success then
                 return v
             else
-                Output.error("'%s' is not a valid member of %s", {i, obj}, 2)
+                Output.error("%s is not a valid member of %s", {i, obj}, 2)
             end
         end
     end
@@ -149,7 +149,7 @@ function TableUtils.instanceAsNewIndex(obj)
             if success then
                 return v
             else
-                Output.error("'%s' is not a valid member of %s", {i, obj}, 2)
+                Output.error("%s is not a valid member of %s", {i, obj}, 2)
             end
         end
     end

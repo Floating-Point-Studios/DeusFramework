@@ -40,7 +40,7 @@ end
 --                                it is destroyed.
 function Maid:__newindex(index, newTask)
 	if Maid[index] ~= nil then
-		error(("'%s' is reserved"):format(tostring(index)), 2)
+		error(("%s is reserved"):format(tostring(index)), 2)
 	end
 
 	local tasks = self._tasks

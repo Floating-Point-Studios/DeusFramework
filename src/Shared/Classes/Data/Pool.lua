@@ -2,13 +2,11 @@
 
 local Pool = {
     ClassName = "Pool",
-    Extendable = true,
-    Methods = {},
     Events = {}
 }
 
 -- Gets all the items from the pool and set itself to empty
-function Pool.Methods:GetAll()
+function Pool:GetAll()
     local items = self.Items
 
     self.Items = {}
@@ -17,7 +15,7 @@ function Pool.Methods:GetAll()
 end
 
 -- Gets an item from the pool, if one is not available runs the newItemFunc function provided in constructor
-function Pool.Methods:Get()
+function Pool:Get()
     local item = self.Items[1]
 
     if item then
@@ -29,7 +27,7 @@ function Pool.Methods:Get()
 end
 
 -- This should be run when done using the item to return it back to the pool
-function Pool.Methods:Add(item)
+function Pool:Add(item)
     table.insert(self.Items, item)
 end
 

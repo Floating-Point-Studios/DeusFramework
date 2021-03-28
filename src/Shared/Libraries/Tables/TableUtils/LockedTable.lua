@@ -7,12 +7,12 @@ local LockedTable = {}
 
 function __index(self, i)
     local v = LockedTables[self][i] or LockedTable[i]
-    -- Output.assert(v, "'%s' does not exist in read-only table", i)
+    -- Output.assert(v, "%s does not exist in read-only table", i)
     return v
 end
 
 function __newindex(_, i)
-    Output.error("Cannot modify '%s' in read-only table", i, 2)
+    Output.error("Cannot modify %s in read-only table", i, 2)
 end
 
 function LockedTable:Copy()

@@ -160,12 +160,23 @@ end
 local BaseObject = {}
 
 function BaseObject.new(objData)
-    objData.ClassName   = objData.ClassName or ("Deus.UnnamedObject [%s]"):format(HttpService:GenerateGUID(false):sub(1, 8))
-    objData.Methods     = objData.Methods or {}
+    objData.ClassName = objData.ClassName or ("Deus.UnnamedObject [%s]"):format(HttpService:GenerateGUID(false):sub(1, 8))
+
+    if not objData.Methods then
+        local methods = {}
+
+        for i, v in pairs(objData) do
+            if type(v) == "function" and i ~= "Constructor" and i ~= "Deconstructor" then
+                methods[i] = v
+            end
+        end
+
+        objData.Methods = methods
+    end
 
     local superclass = objData.Superclass
     if superclass then
-        Output.assert(superclass.Extendable, "Superclass '%s' is not extendable", superclass.ClassName, 1)
+        Output.assert(superclass.Extendable, "Superclass %s is not extendable", superclass.ClassName, 1)
         setmetatable(objData.Methods, {__index = superclass.Methods})
     else
         setmetatable(objData.Methods, {__index = BaseObjectSuperclass})
@@ -333,7 +344,7 @@ function BaseObject.newSimple(objData)
         -- Check the index isn't a object configuration
         if not parsedObjData[i] then
             -- Check if index is a method or property
-            if type(v) == "function" then
+            if type(v) == "function" and i ~= "Constructor" and i ~= "Deconstructor" then
                 parsedObjData.Methods[i] = v
             else
                 parsedObjData.PublicReadAndWriteProperties[i] = v

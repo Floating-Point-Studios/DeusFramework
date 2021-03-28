@@ -20,7 +20,7 @@ local function loadModule(module)
 end
 
 local function registerModule(module, path)
-    assert(not Modules[path], ("[Deus] Error on start, module path '%s' already exists"):format(path))
+    assert(not Modules[path], ("[Deus] Error on start, module path %s already exists"):format(path))
 
     if module.Name:lower():match("service") then
         Modules[path] = loadModule(module)
@@ -54,7 +54,7 @@ return function(deusSettings)
             local module = Modules[path]
 
             if not module then
-                warn(("[Deus] Error finding module '%s' beginning yield"):format(path))
+                warn(("[Deus] Error finding module %s beginning yield"):format(path))
                 local waitStart = tick()
                 repeat
                     module = Modules[path]

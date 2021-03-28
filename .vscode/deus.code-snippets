@@ -4,8 +4,6 @@
 		"body": [
 			"local ${1:${TM_FILENAME/[.].+/$1/}} = {",
 			"\tClassName = \"$1\",",
-			"\tExtendable = ${2:true},",
-			"\tMethods = {},",
 			"\tEvents = {}",
 			"}",
 			"",
@@ -112,7 +110,6 @@
 		"body": [
 			"local ${1:${TM_FILENAME/[.].+/$1/}} = {",
 			"\tName = \"$1\",",
-			"\tMethods = {},",
 			"\tMetamethods = {},",
 			"}",
 			"",
