@@ -1,6 +1,6 @@
 -- Based on https://github.com/Roblox/roact/blob/master/src/Symbol.lua
 
--- TODO: Allow symbols from Deus to work with symbols from other popular projects
+-- TODO: Allow symbols from Deus to work with symbols from other projects
 
 local Symbols = {}
 
@@ -10,23 +10,28 @@ end
 
 local Symbol = {}
 
-function Symbol.new(name)
+function Symbol.new(name, nonGlobal)
     local symbol = Symbols[name]
-    if symbol then
-        return symbol
+
+    if nonGlobal or not symbol then
+        symbol = newproxy(true)
+        local metatable = getmetatable(symbol)
+
+        metatable.__metatable = "[Symbol] Locked metatable"
+        metatable.__type = name
+
+        if nonGlobal then
+            metatable.__tostring = function()
+                return "[Symbol] ".. name
+            end
+        else
+            Symbols[name] = symbol
+            Symbols[symbol] = metatable
+            metatable.__tostring = __tostring
+        end
     end
 
-    local self = newproxy(true)
-    local metatable = getmetatable(self)
-
-    metatable.__tostring = __tostring
-    metatable.__metatable = "[Symbol] Locked metatable"
-    metatable.__type = name
-
-    Symbols[name] = self
-    Symbols[self] = metatable
-
-    return self
+    return symbol
 end
 
 return Symbol
