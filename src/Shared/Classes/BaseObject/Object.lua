@@ -1,13 +1,8 @@
-local CollectionService = game:GetService("CollectionService")
-local RunService = game:GetService("RunService")
-
 local Maid
 local JSON
 local Output
-local Symbol
 local TableUtils
 local StringUtils
-local InstanceUtils
 
 local Object = {}
 
@@ -77,20 +72,20 @@ end
 -- Fires an event of the object
 function Object:FireEvent(eventName, ...)
     Output.assert(self:IsInternalAccess(), "Object events can only be fired with internal access", nil, 1)
-    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event %s is not a valid member of %s", {eventName, self.ClassName}, 1)
-    self.Internal.DEUSOBJECT_LockedTables.Events[eventName]:Fire(...)
+    Output.assert(self[Object.SymbolEvents][eventName], "Event %s is not a valid member of %s", {eventName, self.ClassName}, 1)
+    self[self.SymbolEvents][eventName]:Fire(...)
 
     return self
 end
 
 -- Returns a ScriptSignalConnection for a specific property
 function Object:GetPropertyChangedSignal(eventName, func)
-    Output.assert(self.Internal.DEUSOBJECT_LockedTables.Events[eventName], "Event %s is not a valid member of %s", {eventName, self.ClassName}, 1)
+    Output.assert(self[Object.SymbolEvents][eventName], "Event %s is not a valid member of %s", {eventName, self.ClassName}, 1)
     local event = Instance.new("BindableEvent")
     local proxySignal = event.Event:Connect(func)
     local mainSignal
 
-    mainSignal = self.Internal.DEUSOBJECT_LockedTables.Events[eventName]:Connect(function(...)
+    mainSignal = self[Object.SymbolEvents][eventName]:Connect(function(...)
         if proxySignal.Connected then
             event:Fire(...)
         else
@@ -103,22 +98,22 @@ function Object:GetPropertyChangedSignal(eventName, func)
 end
 
 function Object:GetMethods()
-    return self.ExternalReadOnly.DEUSOBJECT_Methods:GetKeys()
+    return self[Object.SymbolMethods]:GetKeys()
 end
 
 -- TODO: Check if this allows external access to fire events
 function Object:GetEvents()
-    return TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.Events)
+    return TableUtils.getKeys(self[Object.SymbolEvents])
 end
 
 -- Returns all public properties
 function Object:GetReadableProperties()
-    return {TableUtils.unpack(TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadOnlyProperties), TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties))}
+    return {TableUtils.unpack(TableUtils.getKeys(self[Object.SymbolReadOnlyProperties]), TableUtils.getKeys(self[Object.SymbolReadAndWriteProperties]))}
 end
 
 -- Returns all public properties that can be edited without internal access
 function Object:GetWritableProperties()
-    return TableUtils.getKeys(self.Internal.DEUSOBJECT_LockedTables.ReadAndWriteProperties)
+    return TableUtils.getKeys(self[Object.SymbolReadAndWriteProperties])
 end
 
 -- Attempts to serialize the object
@@ -126,9 +121,9 @@ function Object:SerializeProperties()
     return JSON.serialize(
         {
             ClassName = self.ClassName,
-            PrivateProperties = self.Internal.DEUSOBJECT_Properties,
-            ReadOnlyProperties = self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties:Copy(),
-            ReadAndWriteProperties = self.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties:Copy()
+            PrivateProperties = self[Object.SymbolPrivateProperties],
+            ReadOnlyProperties = self[Object.SymbolReadOnlyProperties],
+            ReadAndWriteProperties = self[Object.SymbolReadAndWriteProperties]
         }
     )
 end
@@ -137,100 +132,16 @@ function Object:Hash()
     return tostring(StringUtils.hash(self:SerializeProperties()))
 end
 
-local function cleanupPropertyReplication(self)
-    local obj = self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget
-    CollectionService:RemoveTag(obj, "DeusObject")
-    self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget = nil
-
-    for i in pairs(obj:GetAttributes()) do
-        if i:sub(1, 5) == "DEUS_" then
-            obj:SetAttribute(i, nil)
-        end
-    end
-end
-
---[[
-function Object:ReplicateProperties(obj)
-    Output.assert(self:IsInternalAccess(), "Object replication can only be set internally")
-
-    if obj then
-        CollectionService:AddTag(obj, "DeusObject")
-        self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget = obj
-
-        if RunService:IsServer() then
-            obj:SetAttribute("DEUS_ClassName", self.ClassName)
-
-            for i,v in pairs(self.Internal.DEUSOBJECT_Properties) do
-                -- Objects store the symbol none due to not being able to store nil in a table, attributes cannot store symbols
-                if v == nil then
-                    v = Symbol.new("None")
-                end
-
-                if InstanceUtils.isTypeAttributeSupported(typeof(v)) then
-                    obj:SetAttribute("DEUS_".. i, v)
-                end
-            end
-
-            for i,v in pairs(self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties:Copy()) do
-                if v == nil then
-                    v = Symbol.new("None")
-                end
-
-                if InstanceUtils.isTypeAttributeSupported(typeof(v)) then
-                    obj:SetAttribute("DEUS_".. i, v)
-                end
-            end
-
-            for i,v in pairs(self.ExternalReadOnly.DEUSOBJECT_ReadAndWriteProperties:Copy()) do
-                if v == nil then
-                    v = Symbol.new("None")
-                end
-
-                if InstanceUtils.isTypeAttributeSupported(typeof(v)) then
-                    obj:SetAttribute("DEUS_".. i, v)
-                end
-            end
-        else
-            Output.assert(self.ClassName == obj:GetAttribute("DEUS_ClassName"), "Provided object is not a valid replication source")
-
-            for i,v in pairs(obj:GetAttributes()) do
-                if i:sub(1, 5) == "DEUS_" then
-                    self[i:sub(6)] = v
-                end
-            end
-
-            local scriptSignal
-            scriptSignal = obj.AttributeChanged():Connect(function(attributeName)
-                if self.ExternalReadOnly.DEUSOBJECT_ReadOnlyProperties.PropertyReplicationTarget == obj then
-                    if attributeName:sub(1, 5) == "DEUS_" then
-                        self[attributeName:sub(6)] = obj:GetAttribute(attributeName) or Symbol.new("None")
-                    end
-                else
-                    scriptSignal:Disconnect()
-                    cleanupPropertyReplication(self)
-                end
-            end)
-        end
-    else
-        cleanupPropertyReplication(self)
-    end
-
-    return self
-end
-]]
-
 function Object:IsInternalAccess()
     return typeof(self) ~= "userdata"
 end
 
 function Object:start()
-    Maid = self:Load("Deus.Maid").new()
-    JSON = self:Load("Deus.JSON")
-    Output = self:Load("Deus.Output")
-    Symbol = self:Load("Deus.Symbol")
-    TableUtils = self:Load("Deus.TableUtils")
-    StringUtils = self:Load("Deus.StringUtils")
-    InstanceUtils = self:Load("Deus.InstanceUtils")
+    Maid                            = self:Load("Deus.Maid").new()
+    JSON                            = self:Load("Deus.JSON")
+    Output                          = self:Load("Deus.Output")
+    TableUtils                      = self:Load("Deus.TableUtils")
+    StringUtils                     = self:Load("Deus.StringUtils")
 end
 
 return Object
