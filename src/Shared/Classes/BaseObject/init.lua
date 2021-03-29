@@ -269,12 +269,12 @@ function BaseObject:start()
     BindableEvent                                       = self:Load("Deus.BindableEvent")
 
     local Symbol                                        = self:Load("Deus.Symbol")
-    None                                                = Symbol.new("None")
-    SymbolPrivateProperties                             = Symbol.new("PrivateProperties", true)
-    SymbolReadOnlyProperties                            = Symbol.new("ReadOnlyProperties", true)
-    SymbolReadAndWriteProperties                        = Symbol.new("ReadAndWriteProperties", true)
-    SymbolEvents                                        = Symbol.new("Events", true)
-    SymbolMethods                                       = Symbol.new("Methods", true)
+    None                                                = Symbol.get("None")
+    SymbolPrivateProperties                             = Symbol.new("PrivateProperties")
+    SymbolReadOnlyProperties                            = Symbol.new("ReadOnlyProperties")
+    SymbolReadAndWriteProperties                        = Symbol.new("ReadAndWriteProperties")
+    SymbolEvents                                        = Symbol.new("Events")
+    SymbolMethods                                       = Symbol.new("Methods")
 
     BaseObjectSuperclass.SymbolPrivateProperties        = SymbolPrivateProperties
     BaseObjectSuperclass.SymbolReadOnlyProperties       = SymbolReadOnlyProperties

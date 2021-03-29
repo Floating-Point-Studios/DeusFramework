@@ -76,7 +76,7 @@ end
 function MouseInput:start()
     Output = self:Load("Deus.Output")
 
-    local None = self:Load("Deus.Symbol").new("None")
+    local None = self:Load("Deus.Symbol").get("None")
 
     self.PrivateProperties = {
         BeganConnection = None,

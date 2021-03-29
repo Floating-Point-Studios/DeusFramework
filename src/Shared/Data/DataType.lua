@@ -9,12 +9,21 @@ local TableUtils
 local None
 local NewDataTypeEvent
 
+-- Symbols
+local SymbolPublicValues
+local SymbolReadOnlyValues
+local SymbolMethods
+local SymbolIndex
+local SymbolNewIndex
+local SymbolChange
+local SymbolType
+
 local function __index(self, i)
-    local publicValues      = self.__publicValues
-    local readOnlyValues    = self.__readOnlyValues
-    local methods           = self.__methods
-    local index             = self.__userindex
-    local datatype          = self.__type
+    local publicValues      = self[SymbolPublicValues]
+    local readOnlyValues    = self[SymbolReadOnlyValues]
+    local methods           = self[SymbolMethods]
+    local index             = self[SymbolIndex]
+    local datatype          = self[SymbolType]
 
     local v = publicValues[i]
     if v == None then
@@ -46,18 +55,18 @@ local function __index(self, i)
     end
 
     -- Don't error when we try to index these values that might not exist
-    if not (i == "__userindex" or i == "__usernewindex" or i == "__change") then
+    if not (i == SymbolIndex or i == SymbolNewIndex or i == SymbolChange) then
         Output.error("%s is not a valid member of %s", {i, datatype}, 1)
     end
 end
 
 local function __newindex(self, i, newValue)
-    local publicValues      = self.__publicValues
-    local readOnlyValues    = self.__readOnlyValues
-    local methods           = self.__methods
-    local newindex          = self.__usernewindex
-    local change            = self.__change
-    local datatype          = self.__type
+    local publicValues      = self[SymbolPublicValues]
+    local readOnlyValues    = self[SymbolReadOnlyValues]
+    local methods           = self[SymbolMethods]
+    local newindex          = self[SymbolNewIndex]
+    local change            = self[SymbolChange]
+    local datatype          = self[SymbolType]
 
     local curValue = publicValues[i]
 
@@ -105,7 +114,7 @@ local function __newindex(self, i, newValue)
 end
 
 local function __tostring(self)
-    return "[DataType] ".. self.__type
+    return "[DataType] ".. self[SymbolType]
 end
 
 local DataType = {}
@@ -146,15 +155,15 @@ function DataType.new(typeData)
             -- TODO: Find better way of storing properties of DataTypes to reduce memory footprint
             local dataType = Proxy.new(
                 {
-                    __type              = typeData.Name,
+                    [SymbolType]            = typeData.Name,
 
-                    __userindex         = index or None,
-                    __usernewindex      = newindex or None,
-                    __change            = typeData.Metamethods.__change,
+                    [SymbolIndex]           = index or None,
+                    [SymbolNewIndex]        = newindex or None,
+                    [SymbolChange]          = typeData.Metamethods.__change,
 
-                    __methods           = typeData.Methods,
-                    __publicValues      = TableUtils.shallowCopy(typeData.PublicValues),
-                    __readOnlyValues    = TableUtils.shallowCopy(typeData.ReadOnlyValues)
+                    [SymbolMethods]         = typeData.Methods,
+                    [SymbolPublicValues]    = TableUtils.shallowCopy(typeData.PublicValues),
+                    [SymbolReadOnlyValues]  = TableUtils.shallowCopy(typeData.ReadOnlyValues)
                 },
                 typeData.Metamethods
             )
@@ -177,17 +186,25 @@ function DataType.new(typeData)
 end
 
 function DataType:start()
-    Proxy = self:Load("Deus.Proxy")
-    Output = self:Load("Deus.Output")
-    TableUtils = self:Load("Deus.TableUtils")
+    Proxy                   = self:Load("Deus.Proxy")
+    Output                  = self:Load("Deus.Output")
+    TableUtils              = self:Load("Deus.TableUtils")
 
-    None = self:Load("Deus.Symbol").new("None")
+    local Symbol            = self:Load("Deus.Symbol")
+    None                    = Symbol.get("None")
+    SymbolPublicValues      = Symbol.new("SymbolPublicValues")
+    SymbolReadOnlyValues    = Symbol.new("SymbolReadOnlyValues")
+    SymbolMethods           = Symbol.new("SymbolMethods")
+    SymbolIndex             = Symbol.new("SymbolIndex")
+    SymbolNewIndex          = Symbol.new("SymbolNewIndex")
+    SymbolChange            = Symbol.new("SymbolChange")
+    SymbolType              = Symbol.new("SymbolType")
 
-    local BindableEvent = self:Load("Deus.BindableEvent")
+    local BindableEvent     = self:Load("Deus.BindableEvent")
 
-    NewDataTypeEvent = BindableEvent.new()
+    NewDataTypeEvent        = BindableEvent.new()
 
-    self.NewDataType = NewDataTypeEvent.Proxy
+    self.NewDataType        = NewDataTypeEvent.Proxy
 end
 
 return DataType

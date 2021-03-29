@@ -55,7 +55,7 @@ function Worker:start()
     Workers.Parent = workspace
 
     self.PrivateProperties = {
-        Actor = self:Load("Deus.Symbol").new("None")
+        Actor = self:Load("Deus.Symbol").get("None")
     }
 
     self.PublicReadOnlyProperties = {

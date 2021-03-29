@@ -3,11 +3,11 @@ return function()
 
     describe("global symbols", function()
         it("should equal", function()
-            expect(module.new("foo")).to.be.equal(module.new("foo"))
+            expect(module.get("foo")).to.be.equal(module.get("foo"))
         end)
 
         it("should never equal", function()
-            expect(module.new("foo")).to.never.be.equal(module.new("bar"))
+            expect(module.get("foo")).to.never.be.equal(module.get("bar"))
         end)
     end)
 

@@ -42,7 +42,7 @@ end
 
 function Pool:start()
     self.PrivateProperties = {
-        NewItemFunc = self:Load("Deus.Symbol").new("None"),
+        NewItemFunc = self:Load("Deus.Symbol").get("None"),
         Items = {}
     }
 

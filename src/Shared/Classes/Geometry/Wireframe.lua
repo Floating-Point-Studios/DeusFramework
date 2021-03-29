@@ -125,7 +125,7 @@ function Wireframe:start()
     Output = self:Load("Deus.Output")
     Symbol = self:Load("Deus.Symbol")
 
-    None = Symbol.new("None")
+    None = Symbol.get("None")
 
     self.PrivateProperties = {
         LineAdornments = {},

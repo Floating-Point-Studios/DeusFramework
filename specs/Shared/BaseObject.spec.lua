@@ -1,5 +1,5 @@
 return function()
-    local None = Deus:Load("Deus.Symbol").new("None")
+    local None = Deus:Load("Deus.Symbol").get("None")
 
     local baseObject = Deus:Load("Deus.BaseObject")
     local class
