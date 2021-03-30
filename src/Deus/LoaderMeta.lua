@@ -15,20 +15,6 @@ function __tostring()
     return "[Deus] Locked metatable"
 end
 
---[[
-function newModuleProxy(module)
-    local proxy = newproxy(true)
-    local meta = getmetatable(proxy)
-
-    meta.__metatable = "[Deus] Locked metatable"
-    meta.__index = module
-    meta.__newindex = __newindex
-    meta.__tostring = __tostring
-
-    return proxy
-end
-]]
-
 local LoaderMeta = {}
 
 function LoaderMeta:Load(path)
@@ -74,61 +60,69 @@ function LoaderMeta:Load(path)
 end
 
 function LoaderMeta:WrapModule(module, init, start)
-    module = require(module)
+    local args = {require(module)}
 
-    --[[
-    module.Load = LoaderMeta.Load
-    module.WrapModule = LoaderMeta.WrapModule
-    module.Register = LoaderMeta.Register
-    ]]
+    if type(args[1]) == "table" then
+        module = args[1]
 
-    -- Module metadata, uses underscore to try to avoid name collision
-    local moduleData = {}
+        -- Module metadata, uses underscore to try to avoid name collision
+        local moduleData = {}
 
-    -- If the MainModule is Deus itself then leave it nil
-    if self ~= LoaderMeta then
-        moduleData._MainModule = self
-    end
+        -- If the MainModule is Deus itself then leave it nil
+        if self ~= LoaderMeta then
+            moduleData._MainModule = self
+        end
 
-    setmetatable(module, {__index = setmetatable(moduleData, {__index = LoaderMeta})})
+        setmetatable(module, {__index = setmetatable(moduleData, {__index = LoaderMeta})})
 
-    if module.init then
-        if init then
-            module:init()
-            module.init = nil
-            moduleData._InitTick = tick()
-        else
-            local moduleInit = module.init
-            module.init = function()
-                moduleInit(module)
+        if module.init then
+            if init then
+                module:init()
                 module.init = nil
                 moduleData._InitTick = tick()
+            else
+                local moduleInit = module.init
+                module.init = function()
+                    moduleInit(module)
+                    module.init = nil
+                    moduleData._InitTick = tick()
+                end
             end
         end
-    end
 
-    if module.start then
-        if start then
-            local substituteModule = module:start()
+        if module.start then
+            if start then
+                local substituteModule = module:start()
 
-            if substituteModule then
-                return substituteModule
-            end
+                if substituteModule then
+                    return substituteModule
+                end
 
-            module.start = nil
-            moduleData._StartTick = tick()
-        else
-            local moduleStart = module.start
-
-            module.start = function()
                 module.start = nil
                 moduleData._StartTick = tick()
-                return moduleStart(module)
+            else
+                local moduleStart = module.start
+
+                module.start = function()
+                    module.start = nil
+                    moduleData._StartTick = tick()
+                    return moduleStart(module)
+                end
             end
         end
-    end
 
-    return module
+        return module
+    elseif type(args[1]) == "function" then
+        local func = args[1]
+
+        return function(...)
+            func(LoaderMeta, ...)
+        end
+    end
+end
+
+function LoaderMeta:WrapFunction(callback, ...)
+    return callback(LoaderMeta, ...)
 end
 
 function LoaderMeta:Register(instance, moduleName)
