@@ -43,17 +43,6 @@ return function()
             expect(Deus:IsRegistered("KSDLAFJKSDFHGUIHJDSLFJKLDSHIOQIOJKLZXC")).to.be.equal(false)
         end)
 
-        it("SetContext() should never throw", function()
-            expect(function()
-                Deus:SetContext("TestEZ", "foo", "bar")
-            end).to.never.throw()
-        end)
-
-        it("SetContext() should give foo", function()
-            Deus:GetContext("TestEZ")
-            expect(foo).to.be.equal("bar")
-        end)
-
         -- Can't test GetMainModule(), GetInitTick(), GetStartTick() as this isn't a module loaded by Deus
     end)
 end
