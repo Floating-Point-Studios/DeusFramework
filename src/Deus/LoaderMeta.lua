@@ -50,7 +50,7 @@ function LoaderMeta:Load(path)
     end
 
     -- Return module anyway in event error can be circumvented
-    return module
+    return Modules[path]
 end
 
 function LoaderMeta:WrapModule(module, init, start)
