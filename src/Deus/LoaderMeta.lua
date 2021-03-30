@@ -1,11 +1,5 @@
 local Packages = {}
 local Modules = {}
-local GlobalContexts = {
-    Global = {}
-}
-local ModuleContexts = {
-    Global = setmetatable({}, {__mode = "v"})
-}
 
 function __newindex()
     error("[Deus] Locked metatable, attempt to modify loaded module")
@@ -201,60 +195,6 @@ function LoaderMeta:IsRegistered(path)
     return false
 end
 
--- Set variable in a context, defaults to global context
-function LoaderMeta:SetContext(...)
-    local args = {...}
-
-    if #args == 3 then
-        local contextName = args[1]
-        local i = args[2]
-        local v = args[3]
-
-        if not GlobalContexts[contextName] then
-            GlobalContexts[contextName] = {[i] = v}
-            ModuleContexts[contextName] = setmetatable({}, {__mode = "v"})
-        else
-            GlobalContexts[contextName][i] = v
-        end
-
-        -- Update scripts within context
-        for _,env in pairs(ModuleContexts[contextName]) do
-            env[i] = v
-        end
-    elseif #args == 2 then
-        local i = args[1]
-        local v = args[2]
-        GlobalContexts.Global[i] = v
-
-        -- Update scripts within context
-        for _,env in pairs(ModuleContexts.Global) do
-            env[i] = v
-        end
-    else
-       error("Expected 2 or 3 arguments", 2)
-    end
-end
-
---[[
-    Set script to a context, defaults to global context
-    Script can have multiple contexts, variable name conflicts can occur, last injected variable is the one set
-]]
-function LoaderMeta:GetContext(contextName, level)
-    contextName = contextName or "Global"
-
-    local context = GlobalContexts[contextName]
-
-    assert(context, ("Context %s could not be found"):format(contextName))
-
-    local env = getfenv(2 + (level or 0))
-
-    for i,v in pairs(context) do
-        env[i] = v
-    end
-
-    table.insert(ModuleContexts[contextName], env)
-end
-
 -- Returns the module which wrapped it, if the module is not a submodule it will return Deus
 function LoaderMeta:GetMainModule()
     return self._MainModule
@@ -268,6 +208,14 @@ end
 -- Returns when the module was started
 function LoaderMeta:GetStartTick()
     return self._StartTick
+end
+
+function LoaderMeta:GetModules()
+    return Modules
+end
+
+function LoaderMeta:GetPackages()
+    return Packages
 end
 
 -- Only reliable way I've found of checking if the script is a plugin so far is a hard-coded value

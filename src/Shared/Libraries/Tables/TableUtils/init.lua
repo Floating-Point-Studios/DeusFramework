@@ -160,4 +160,5 @@ function TableUtils:start()
 
     TableUtils.lock = self:WrapModule(script.LockedTable, true, true).new
 end
+
 return TableUtils
