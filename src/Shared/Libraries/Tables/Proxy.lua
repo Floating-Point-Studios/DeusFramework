@@ -9,7 +9,7 @@ local function __index(self, i)
     self = Metatables[self] or self
 
     local v = rawget(self, i)
-    if v then
+    if v ~= nil then
         return v
     end
 
@@ -28,7 +28,7 @@ local function __newindex(self, i, v)
     local original = self
     self = Metatables[self] or self
 
-    if rawget(self, i) then
+    if rawget(self, i) ~= nil then
         rawset(self, i, v)
         return true
     end
