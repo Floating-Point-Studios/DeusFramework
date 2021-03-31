@@ -26,7 +26,7 @@ function RemoteEvent:Constructor(...)
     end
 end
 
-function RemoteEvent:Deconstructor()
+function RemoteEvent:Destructor()
     self.RBXEvent:Destroy()
 end
 
@@ -70,13 +70,13 @@ function RemoteEvent:start()
 
     local None = self:Load("Deus.Symbol").get("None")
 
-    self.PrivateProperties = {
+    self.Private = {
         RBXEvent = None
     }
 
-    self.PublicReadOnlyProperties = {}
+    self.Readable = {}
 
-    self.PublicReadAndWriteProperties = {}
+    self.Writable = {}
 
     return self:Load("Deus.BaseObject").new(self)
 end

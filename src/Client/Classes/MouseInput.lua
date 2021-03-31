@@ -53,7 +53,7 @@ function MouseInput:Constructor()
     self:Enable()
 end
 
-function MouseInput:Deconstructor()
+function MouseInput:Destructor()
     self:Disable()
 end
 
@@ -78,15 +78,15 @@ function MouseInput:start()
 
     local None = self:Load("Deus.Symbol").get("None")
 
-    self.PrivateProperties = {
+    self.Private = {
         BeganConnection = None,
         EndedConnection = None,
         ChangedConnection = None,
     }
 
-    self.PublicReadOnlyProperties = {}
+    self.Readable = {}
 
-    self.PublicReadAndWriteProperties = {}
+    self.Writable = {}
 
     return self:Load("Deus.BaseObject").new(self)
 end

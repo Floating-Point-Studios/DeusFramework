@@ -61,7 +61,7 @@ function Wireframe:Constructor(mesh, adornee)
     end
 end
 
-function Wireframe:Deconstructor()
+function Wireframe:Destructor()
    self.Wires:Destroy()
 end
 
@@ -127,16 +127,16 @@ function Wireframe:start()
 
     None = Symbol.get("None")
 
-    self.PrivateProperties = {
+    self.Private = {
         LineAdornments = {},
         SphereAdornments = {}
     }
 
-    self.PublicReadOnlyProperties = {
+    self.Readable = {
         Wires = None
     }
 
-    self.PublicReadAndWriteProperties = {
+    self.Writable = {
         Adornee = None,
         Mesh = None,
         ShowLines = true,

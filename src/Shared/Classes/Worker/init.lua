@@ -45,7 +45,7 @@ function Worker:Constructor()
     self.Actor = actor
 end
 
-function Worker:Deconstructor()
+function Worker:Destructor()
     self.Actor:Destroy()
 end
 
@@ -54,15 +54,15 @@ function Worker:start()
     Workers.Name = "Workers"
     Workers.Parent = workspace
 
-    self.PrivateProperties = {
+    self.Private = {
         Actor = self:Load("Deus.Symbol").get("None")
     }
 
-    self.PublicReadOnlyProperties = {
+    self.Readable = {
         Busy = false
     }
 
-    self.PublicReadAndWriteProperties = {}
+    self.Writable = {}
 
     return self:Load("Deus.BaseObject").new(self)
 end

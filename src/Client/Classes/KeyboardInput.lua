@@ -89,7 +89,7 @@ function KeyboardInput:Constructor(keyCode, shift)
     self:Enable()
 end
 
-function KeyboardInput:Deconstructor()
+function KeyboardInput:Destructor()
    self:Disable()
 end
 
@@ -115,18 +115,18 @@ function KeyboardInput:start()
 
     local None = self:Load("Deus.Symbol").get("None")
 
-    self.PrivateProperties = {
+    self.Private = {
         BeganConnection = None,
         EndedConnection = None,
         -- ChangedConnection = None,
         FocusedConnection = None,
     }
 
-    self.PublicReadOnlyProperties = {
+    self.Readable = {
         Active = false,
     }
 
-    self.PublicReadAndWriteProperties = {
+    self.Writable = {
         -- Alt = false,
         -- Ctrl = false,
         Shift = false,

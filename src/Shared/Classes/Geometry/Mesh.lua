@@ -7,20 +7,20 @@ local Mesh = {
 }
 
 -- These do not actually count the number of faces, lines, or vertices, they are used internally for Id assignment, use #TableUtils.getKeys() for counting
-Mesh.PrivateProperties = {
+Mesh.Private = {
     -- FacesCount = 0,
     LinesCount = 0,
     VerticesCount = 0,
 }
 
-Mesh.PublicReadOnlyProperties = {
+Mesh.Readable = {
     -- Faces = {},
     Lines = {},
     Vertices = {},
     VerticesVec3 = {}
 }
 
-Mesh.PublicReadAndWriteProperties = {}
+Mesh.Writable = {}
 
 --[[
 -- Creates a face from VertexId's

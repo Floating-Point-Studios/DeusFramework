@@ -36,19 +36,19 @@ function Pool:Constructor(newItemFunc)
 end
 
 -- Destroys everything in the pool
-function Pool:Deconstructor()
+function Pool:Destructor()
     return self.Items
 end
 
 function Pool:start()
-    self.PrivateProperties = {
+    self.Private = {
         NewItemFunc = self:Load("Deus.Symbol").get("None"),
         Items = {}
     }
 
-    self.PublicReadOnlyProperties = {}
+    self.Readable = {}
 
-    self.PublicReadAndWriteProperties = {}
+    self.Writable = {}
 
     return self:Load("Deus.BaseObject").new(self)
 end
