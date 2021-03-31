@@ -21,7 +21,7 @@ function TableUtils.deepCopy(tab)
     return copy
 end
 
-function TableUtils.getKeys(tab)
+function TableUtils.keys(tab)
     local keys = {}
     for i in pairs(tab) do
         table.insert(keys, i)
@@ -29,7 +29,7 @@ function TableUtils.getKeys(tab)
     return keys
 end
 
-function TableUtils.getValues(tab)
+function TableUtils.values(tab)
     local values = {}
     for _,v in pairs(tab) do
         table.insert(values, v)
@@ -111,49 +111,13 @@ function TableUtils.sum(tab)
 end
 
 -- Returns the average of a array of numbers
-function TableUtils.average(tab)
+function TableUtils.avg(tab)
     return TableUtils.sum(tab) / #tab
 end
 
--- ALlows setting an instance to __index of a metatable
-function TableUtils.instanceAsIndex(obj)
-    return function(self, i)
-        local v = rawget(self, i)
-        if v then
-            return v
-        else
-            local success, v = pcall(function()
-                return obj[i]
-            end)
-
-            if success then
-                return v
-            else
-                Output.error("%s is not a valid member of %s", {i, obj}, 2)
-            end
-        end
-    end
-end
-
--- ALlows setting an instance to __newindex of a metatable
-function TableUtils.instanceAsNewIndex(obj)
-    return function(self, i, v)
-        if rawget(self, i) then
-            rawset(self, i, v)
-            return
-        else
-            local success = pcall(function()
-                obj[i] = v
-            end)
-
-            if success then
-                return v
-            else
-                Output.error("%s is not a valid member of %s", {i, obj}, 2)
-            end
-        end
-    end
-end
+TableUtils.average      = TableUtils.avg
+TableUtils.getKeys      = TableUtils.keys
+TableUtils.getValues    = TableUtils.values
 
 function TableUtils:start()
     Output = self:Load("Deus.Output")
