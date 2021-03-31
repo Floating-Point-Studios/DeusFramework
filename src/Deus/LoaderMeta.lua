@@ -53,39 +53,57 @@ function LoaderMeta:Load(path)
     return Modules[path]
 end
 
-function LoaderMeta:WrapModule(module, init, start)
+function LoaderMeta:WrapModule(module, shouldInit, shouldStart, state)
     local args = {require(module)}
 
     if type(args[1]) == "table" then
         module = args[1]
 
         -- Module metadata, uses underscore to try to avoid name collision
-        local moduleData = {}
+        local moduleData = {
+            _InitTick = -1,
+            _StartTick = -1
+        }
 
         -- If the MainModule is Deus itself then leave it nil
         if self ~= LoaderMeta then
             moduleData._MainModule = self
         end
 
-        setmetatable(module, {__index = setmetatable(moduleData, {__index = LoaderMeta})})
+        setmetatable(
+            module,
+            {
+                __index = setmetatable(
+                    moduleData,
+                    {
+                        __index = LoaderMeta
+                    }
+                )
+            }
+        )
 
-        if module.init then
-            if init then
-                module:init()
+        local init = module.init
+        if init then
+            module.init = function()
                 module.init = nil
+                init(module, state)
                 moduleData._InitTick = tick()
-            else
-                local moduleInit = module.init
-                module.init = function()
-                    moduleInit(module)
-                    module.init = nil
-                    moduleData._InitTick = tick()
-                end
+            end
+
+            if shouldInit then
+                module:init(state)
             end
         end
 
-        if module.start then
-            if start then
+        local start = module.start
+        if start then
+            module.start = function()
+                module.start = nil
+                moduleData._StartTick = tick()
+                return start(module)
+            end
+
+            if shouldStart then
                 local substituteModule = module:start()
 
                 if substituteModule then
@@ -94,14 +112,6 @@ function LoaderMeta:WrapModule(module, init, start)
 
                 module.start = nil
                 moduleData._StartTick = tick()
-            else
-                local moduleStart = module.start
-
-                module.start = function()
-                    module.start = nil
-                    moduleData._StartTick = tick()
-                    return moduleStart(module)
-                end
             end
         end
 
