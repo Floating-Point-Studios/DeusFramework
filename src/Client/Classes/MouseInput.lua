@@ -1,3 +1,5 @@
+local BUTTON_DOUBLE_MAX_TIME = 0.25
+
 local UserInputService = game:GetService("UserInputService")
 
 local Output
@@ -5,10 +7,19 @@ local Output
 local function inputBegan(self)
     return function(inputObject)
         if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+            if tick() - self.Button1Down.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button1DownDouble", inputObject)
+            end
             self:FireEvent("Button1Down", inputObject)
         elseif inputObject.UserInputType == Enum.UserInputType.MouseButton2 then
+            if tick() - self.Button2Down.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button2DownDouble", inputObject)
+            end
             self:FireEvent("Button2Down", inputObject)
         elseif inputObject.UserInputType == Enum.UserInputType.MouseButton3 then
+            if tick() - self.Button3Down.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button3DownDouble", inputObject)
+            end
             self:FireEvent("Button3Down", inputObject)
         end
     end
@@ -17,10 +28,19 @@ end
 local function inputEnded(self)
     return function(inputObject)
         if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+            if tick() - self.Button1Up.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button1UpDouble", inputObject)
+            end
             self:FireEvent("Button1Up", inputObject)
         elseif inputObject.UserInputType == Enum.UserInputType.MouseButton2 then
+            if tick() - self.Button2Up.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button2UpDouble", inputObject)
+            end
             self:FireEvent("Button2Up", inputObject)
         elseif inputObject.UserInputType == Enum.UserInputType.MouseButton3 then
+            if tick() - self.Button3Up.LastFired < BUTTON_DOUBLE_MAX_TIME then
+                self:FireEvent("Button3UpDouble", inputObject)
+            end
             self:FireEvent("Button3Up", inputObject)
         end
     end
@@ -42,7 +62,13 @@ end
 
 local MouseInput = {
     ClassName = "MouseInput",
-    Events = {"Move", "Button1Down", "Button1Up", "Button2Up", "Button2Down", "Button3Up", "Button3Down", "WheelBackward", "WheelForward"}
+    Events = {
+        "Move",
+        "Button1Down", "Button1Up", "Button1DownDouble", "Button1UpDouble",
+        "Button2Up", "Button2Down", "Button2DownDouble", "Button2UpDouble",
+        "Button3Up", "Button3Down", "Button3DownDouble", "Button3UpDouble",
+        "WheelBackward", "WheelForward"
+    }
 }
 
 function MouseInput:Constructor()

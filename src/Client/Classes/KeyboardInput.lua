@@ -8,7 +8,7 @@ local IsTextBoxFocused = false
 
 local function inputBegan(self)
     return function(inputObject)
-        if inputObject.KeyCode == self.KeyCode and inputObject:IsModifierKeyDown(Enum.ModifierKey.Shift) == self.Shift then
+        if inputObject.KeyCode == self.KeyCode then
             if not self.DisableWhenTextBoxFocused or (self.DisableWhenTextBoxFocused and not IsTextBoxFocused) then
                 self.Active = true
                 self:FireEvent("Began", inputObject)
@@ -40,7 +40,7 @@ local KeyboardInput = {
     Events = {"Began", "Ended", "Changed"}
 }
 
-function KeyboardInput:Constructor(keyCode, shift)
+function KeyboardInput:Constructor(keyCode)
     if type(keyCode) == "string" then
         keyCode = KeyCodes[keyCode]
     end
@@ -53,9 +53,6 @@ function KeyboardInput:Constructor(keyCode, shift)
     end
 
     self.KeyCode = keyCode or false
-    -- self.Alt = alt or false
-    -- self.Ctrl = ctrl or false
-    self.Shift = shift or false
 
     --[[
     self.BeganConnection = UserInputService.InputBegan:Connect(function(inputObject)
@@ -127,11 +124,7 @@ function KeyboardInput:start()
     }
 
     self.Writable = {
-        -- Alt = false,
-        -- Ctrl = false,
-        Shift = false,
         KeyCode = None,
-
         DisableWhenTextBoxFocused = false
     }
 

@@ -130,16 +130,40 @@ return function()
             expect(object:GetMethods()).to.be.a("table")
         end)
 
+        it("GetMethods() should give table of strings", function()
+            for _,v in pairs(object:GetMethods()) do
+                expect(v).to.be.a("string")
+            end
+        end)
+
         it("GetEvents() should give table", function()
             expect(object:GetEvents()).to.be.a("table")
+        end)
+
+        it("GetEvents() should give table of strings", function()
+            for _,v in pairs(object:GetEvents()) do
+                expect(v).to.be.a("string")
+            end
         end)
 
         it("GetReadableProperties() should give table", function()
             expect(object:GetReadableProperties()).to.be.a("table")
         end)
 
+        it("GetReadableProperties() should give table of strings", function()
+            for _,v in pairs(object:GetReadableProperties()) do
+                expect(v).to.be.a("string")
+            end
+        end)
+
         it("GetWritableProperties() should give table", function()
             expect(object:GetWritableProperties()).to.be.a("table")
+        end)
+
+        it("GetWritableProperties() should give table of strings", function()
+            for _,v in pairs(object:GetWritableProperties()) do
+                expect(v).to.be.a("string")
+            end
         end)
 
         it("SerializeProperties() should give string", function()

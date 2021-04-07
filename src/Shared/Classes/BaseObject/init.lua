@@ -200,9 +200,12 @@ function BaseObject.new(objData)
             }
 
             -- Create events
+
+            local eventObjects = {}
             for _,eventName in pairs(obj.Events) do
-                obj.Events[eventName] = BindableEvent.new()
+                eventObjects[eventName] = BindableEvent.new()
             end
+            obj.Events = eventObjects
 
             -- Read-only properties inherited by all objects
             obj.Readable.ObjectId           = HttpService:GenerateGUID(false):sub(1, 8) -- Only use first 8 characters to save memory
