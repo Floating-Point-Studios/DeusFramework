@@ -1,3 +1,4 @@
 # Deus Framework
 
-Standalone framework that provides basic utilities, an object system, and some basic services. Serves primarily as the backbone of the [CardinalEngine](https://github.com/Floating-Point-Studios/CardinalEngine)
+Basic framework with minimal utilities and services. Provides an advanced class system with properties and methods able to have different read/write permissions.
+Documentation can be found [here](https://floating-point-studios.github.io/CardinalEngine/DeusFramework/usage/), further support can be found in the [Floating Point Studios Open-Sourced Projects Discord](https://discord.gg/C7Qf86KtnP).
