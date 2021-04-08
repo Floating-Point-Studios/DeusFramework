@@ -1,5 +1,3 @@
-local Output
-
 local TableUtils = {}
 
 function TableUtils.shallowCopy(tab)
@@ -120,8 +118,6 @@ TableUtils.getKeys      = TableUtils.keys
 TableUtils.getValues    = TableUtils.values
 
 function TableUtils:start()
-    Output = self:Load("Deus.Output")
-
     TableUtils.lock = self:WrapModule(script.LockedTable, true, true).new
 end
 
